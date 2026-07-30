@@ -1,0 +1,421 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+
+body{
+
+    min-height:100vh;
+
+    background:linear-gradient(135deg,#004e92,#000428);
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:flex-start;
+
+    align-items:center;
+
+    padding:120px 20px 40px;
+
+    overflow-y:auto;
+
+}
+
+
+
+/* Header */
+
+header{
+
+    position:absolute;
+
+    top:25px;
+
+    width:100%;
+
+    text-align:center;
+
+    color:white;
+
+}
+
+
+header h1{
+
+    font-size:38px;
+
+    font-weight:700;
+
+}
+
+
+header p{
+
+    font-size:18px;
+
+    margin-top:10px;
+
+}
+
+
+
+
+
+/* Faculty Login Box */
+
+.login-box{
+
+    width:550px;
+
+    max-width:100%;
+
+    background:white;
+
+    padding:55px;
+
+    border-radius:25px;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+
+}
+
+
+
+
+
+.login-box h2{
+
+    text-align:center;
+
+    color:#004e92;
+
+    font-size:32px;
+
+    margin-bottom:45px;
+
+}
+
+
+
+
+
+/* Labels */
+
+label{
+
+    display:block;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#333;
+
+    margin-bottom:12px;
+
+}
+
+
+
+
+
+/* Inputs */
+
+input,
+select{
+
+    width:100%;
+
+    height:55px;
+
+    padding:0 18px;
+
+    margin-bottom:30px;
+
+    border-radius:12px;
+
+    border:1px solid #ccc;
+
+    background:#fafafa;
+
+    outline:none;
+
+    font-size:15px;
+
+    transition:.3s;
+
+}
+
+
+input:focus,
+select:focus{
+
+    border-color:#004e92;
+
+    background:white;
+
+    box-shadow:0 0 12px rgba(0,78,146,.25);
+
+}
+
+
+
+
+
+/* Remember Me */
+
+.checkbox{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:30px;
+
+}
+
+
+.checkbox input[type="checkbox"]{
+
+    appearance:none;
+
+    -webkit-appearance:none;
+
+    width:22px !important;
+
+    height:22px !important;
+
+    min-width:22px;
+
+    min-height:22px;
+
+    padding:0 !important;
+
+    margin:0;
+
+    border:2px solid #004e92;
+
+    border-radius:4px;
+
+    background:white;
+
+    cursor:pointer;
+
+    position:relative;
+
+}
+
+
+.checkbox input[type="checkbox"]:checked{
+
+    background:#004e92;
+
+}
+
+
+.checkbox input[type="checkbox"]:checked::after{
+
+    content:"✓";
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    position:absolute;
+
+    left:2px;
+
+    top:-4px;
+
+}
+
+
+.checkbox label{
+
+    margin:0;
+
+    font-size:15px;
+
+    font-weight:500;
+
+}
+
+
+
+
+
+/* Buttons */
+
+.button-group{
+
+    display:flex;
+
+    gap:25px;
+
+    margin-top:15px;
+
+}
+
+
+.button-group button{
+
+    flex:1;
+
+    height:55px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:linear-gradient(135deg,#004e92,#000428);
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+}
+
+
+.button-group button:hover{
+
+    background:linear-gradient(135deg,#003366,#000);
+
+    transform:translateY(-3px);
+
+}
+
+
+.button-group button:active{
+
+    transform:scale(.96);
+
+}
+
+
+
+
+
+/* Links */
+
+.links{
+
+    text-align:center;
+
+    margin-top:40px;
+
+    line-height:2;
+
+}
+
+
+.links a{
+
+    color:#004e92;
+
+    text-decoration:none;
+
+    font-weight:500;
+
+}
+
+
+.links a:hover{
+
+    text-decoration:underline;
+
+}
+
+
+
+
+
+/* Footer */
+
+footer{
+
+    width:100%;
+
+    text-align:center;
+
+    color:white;
+
+    font-size:14px;
+
+    margin-top:40px;
+
+}
+
+
+
+
+
+/* Mobile */
+
+@media(max-width:500px){
+
+
+body{
+
+    padding:120px 15px 40px;
+
+}
+
+
+header h1{
+
+    font-size:23px;
+
+}
+
+
+header p{
+
+    font-size:14px;
+
+}
+
+
+.login-box{
+
+    padding:35px 25px;
+
+}
+
+
+.login-box h2{
+
+    font-size:26px;
+
+}
+
+
+.button-group{
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+
+}

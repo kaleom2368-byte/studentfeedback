@@ -1,0 +1,308 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+}
+
+
+body{
+    background:#f4f6f9;
+    color:#333;
+    line-height:1.6;
+}
+
+
+
+/* Header */
+
+header{
+    background:#003366;
+    color:white;
+    text-align:center;
+    padding:25px;
+    box-shadow:0 2px 10px rgba(0,0,0,.2);
+}
+
+
+header h1{
+    font-size:36px;
+}
+
+
+header p{
+    margin-top:10px;
+    font-size:18px;
+}
+
+
+
+/* Navigation */
+
+nav{
+    background:#00509e;
+    padding:15px;
+    text-align:center;
+}
+
+
+nav a{
+    color:white;
+    text-decoration:none;
+    margin:0 20px;
+    font-size:18px;
+    font-weight:bold;
+    transition:.3s;
+}
+
+
+nav a:hover{
+    color:#ffd700;
+}
+
+
+
+/* Main */
+
+main{
+    width:90%;
+    max-width:1200px;
+    margin:40px auto;
+}
+
+
+
+/* Sections */
+
+section{
+    background:white;
+    margin-bottom:30px;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+
+section h2{
+    color:#003366;
+    margin-bottom:15px;
+    border-left:6px solid #00509e;
+    padding-left:10px;
+}
+
+
+section p{
+    font-size:17px;
+    color:#555;
+}
+
+
+
+/* Login Buttons Container */
+
+.login-buttons{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:25px;
+
+    flex-wrap:wrap;
+
+    margin-top:25px;
+
+}
+
+
+
+/* Login Buttons */
+
+.login-btn{
+
+    display:inline-block;
+
+    background:#00509e;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:14px 35px;
+
+    border-radius:8px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+    box-shadow:0 5px 12px rgba(0,0,0,.2);
+
+}
+
+
+
+.login-btn:hover{
+
+    background:#003366;
+
+    transform:translateY(-4px);
+
+    box-shadow:0 8px 18px rgba(0,0,0,.25);
+
+}
+
+
+
+
+
+/* Normal Buttons */
+
+button{
+
+    background:#00509e;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 28px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+
+button:hover{
+
+    background:#003366;
+
+}
+
+
+
+
+
+/* Footer */
+
+footer{
+
+    background:#003366;
+
+    color:white;
+
+    text-align:center;
+
+    padding:18px;
+
+    margin-top:50px;
+
+}
+
+
+
+/* Horizontal Line */
+
+hr{
+
+    border:none;
+
+    height:1px;
+
+    background:#ddd;
+
+    margin:20px 0;
+
+}
+
+
+
+/* Responsive */
+
+@media(max-width:900px){
+
+
+.login-buttons{
+
+    justify-content:center;
+
+}
+
+
+
+.login-btn{
+
+    width:220px;
+
+    text-align:center;
+
+}
+
+
+
+nav a{
+
+    display:block;
+
+    margin:10px 0;
+
+}
+
+
+
+header h1{
+
+    font-size:28px;
+
+}
+
+
+}
+
+
+
+@media(max-width:500px){
+
+
+main{
+
+    width:95%;
+
+}
+
+
+
+section{
+
+    padding:20px;
+
+}
+
+
+
+.login-btn{
+
+    width:100%;
+
+}
+
+
+
+header h1{
+
+    font-size:24px;
+
+}
+
+
+}

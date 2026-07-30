@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login | Anonymous Student Feedback System</title>
+
+    <link rel="stylesheet" href="./css/student.css">
+</head>
+<body>
+
+    <header>
+        <h1>Anonymous Student Feedback System</h1>
+        <p>Student Login Portal</p>
+    </header>
+
+    <main>
+
+        <section class="login-box">
+
+            <h2>Student Login</h2>
+
+            <form action="/student/login" method="post">
+
+               
+               <label for="rollno">Roll Number</label>
+<input
+    type="text"
+    id="rollno"
+    name="student_id"
+    placeholder="Enter Roll Number"
+    required
+>
+
+<label for="password">Password</label>
+<input
+    type="password"
+    id="password"
+    name="password"
+    placeholder="Enter Password"
+    required
+>
+
+                <div class="checkbox">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember Me</label>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit">Login</button>
+                    <button type="reset">Clear</button>
+                </div>
+
+            </form>
+
+            <div class="links">
+
+    <a href="#">
+        Forgot Password?
+    </a>
+
+    <br><br>
+
+    <span>
+        Don't have an account?
+    </span>
+
+    <br>
+
+    <a href="student-register.html">
+        Sign Up
+    </a>
+
+    <br><br>
+
+    <a href="mainfile.html">
+        ← Back to Home
+    </a>
+
+</div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Anonymous Student Feedback System</p>
+    </footer>
+
+</body>
+</html>
