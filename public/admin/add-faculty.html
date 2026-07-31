@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Add Faculty</title>
+
+<link rel="stylesheet" href="../css/add-faculty.css">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>
+Anonymous Student Feedback System
+</h1>
+
+<p>
+Add Faculty Member
+</p>
+
+</header>
+
+
+
+<nav>
+
+<a href="admin-dashboard.html">
+Dashboard
+</a>
+
+<a href="#">
+Faculty List
+</a>
+
+<a href="../index.html">
+Logout
+</a>
+
+</nav>
+
+
+
+
+
+<main>
+
+
+<section class="form-box">
+
+
+<h2>
+Add New Faculty
+</h2>
+
+
+
+<form action="/admin/add-faculty" method="POST">
+
+
+
+<label>
+Faculty ID
+</label>
+
+<input 
+type="text"
+name="faculty_id"
+placeholder="Example: FAC001"
+required>
+
+
+
+<label>
+Faculty Name
+</label>
+
+<input 
+type="text"
+name="name"
+placeholder="Enter Faculty Name"
+required>
+
+
+
+<label>
+Email
+</label>
+
+<input 
+type="email"
+name="email"
+placeholder="faculty@gmail.com"
+required>
+
+
+
+<label>
+Password
+</label>
+
+<input 
+type="password"
+name="password"
+placeholder="Enter Password"
+required>
+
+
+
+
+<label>
+Department
+</label>
+
+
+<select name="department" required>
+
+
+<option value="">
+Select Department
+</option>
+
+
+<option>
+Computer Engineering
+</option>
+
+
+<option>
+Information Technology
+</option>
+
+
+<option>
+Mechanical Engineering
+</option>
+
+
+<option>
+Electrical Engineering
+</option>
+
+
+<option>
+Civil Engineering
+</option>
+
+
+</select>
+
+
+
+
+
+<button type="submit">
+
+Add Faculty
+
+</button>
+
+
+
+</form>
+
+
+
+</section>
+
+
+</main>
+
+
+
+
+<footer>
+
+<p>
+© 2026 Anonymous Student Feedback System
+</p>
+
+</footer>
+
+
+
+</body>
+
+</html>

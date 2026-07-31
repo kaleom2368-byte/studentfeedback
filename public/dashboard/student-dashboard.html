@@ -3,182 +3,321 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
 
-<title>Student Dashboard</title>
-
-<link rel="stylesheet" href="../css/student-dashboard.css">
+    <link rel="stylesheet" href="../css/student-dashboard.css">
 
 </head>
 
-
 <body>
 
+    <!-- Header -->
 
-<header>
+    <header>
 
-<h1>
-Anonymous Student Feedback System
-</h1>
+        <div class="header-left">
+            <h1>Anonymous Student Feedback System</h1>
+            <p>Student Dashboard</p>
+        </div>
 
-<p>
-Student Dashboard
-</p>
+        <div class="header-right">
 
-</header>
+            <a href="/student/logout" class="logout-btn">
+                Logout
+            </a>
 
+        </div>
 
+    </header>
 
 
-<nav>
 
-<a href="student-dashboard.html">
-Home
-</a>
+    <!-- Navigation -->
 
-<a href="#">
-Profile
-</a>
+    <nav>
 
-<a href="#">
-Feedback
-</a>
+        <a href="student-dashboard.html">Home</a>
 
-<a href="../student.html">
-Logout
-</a>
+        <a href="#profile">My Profile</a>
 
-</nav>
+        <a href="#actions">Quick Actions</a>
 
+        <a href="#notifications">Notifications</a>
 
+    </nav>
 
 
 
-<main>
+    <!-- Main -->
 
+    <main>
 
-<section class="welcome-box">
+        <!-- Welcome -->
 
-<h2 id="welcome">
-Welcome 👋
-</h2>
+        <section class="welcome-card">
 
-<p>
-You can submit anonymous feedback about faculty members and view your feedback history here.
-</p>
+            <h2 id="welcome">
+                Welcome...
+            </h2>
 
-</section>
+            <p>
+                Welcome to the Anonymous Student Feedback System.
+                Submit honest and anonymous feedback to help improve teaching quality.
+            </p>
 
+        </section>
 
 
 
+        <!-- Student Profile -->
 
-<section class="dashboard-grid">
+        <section class="profile-card" id="profile">
 
+            <h2>👤 Student Profile</h2>
 
+            <div class="profile-grid">
 
-<div class="dashboard-card">
+                <div class="profile-item">
+                    <span class="label">Student ID</span>
+                    <span id="student-id">Loading...</span>
+                </div>
 
-<h3>
-👤 My Profile
-</h3>
+                <div class="profile-item">
+                    <span class="label">Name</span>
+                    <span id="student-name">Loading...</span>
+                </div>
 
-<p>
-View and update your student information.
-</p>
+                <div class="profile-item">
+                    <span class="label">Email</span>
+                    <span id="student-email">Loading...</span>
+                </div>
 
-<a href="#">
-View Profile
-</a>
+                <div class="profile-item">
+                    <span class="label">Department</span>
+                    <span id="student-department">Loading...</span>
+                </div>
 
-</div>
+                <div class="profile-item">
+                    <span class="label">Year</span>
+                    <span id="student-year">Loading...</span>
+                </div>
 
+                <div class="profile-item">
+                    <span class="label">Division</span>
+                    <span id="student-division">Loading...</span>
+                </div>
 
+            </div>
 
+        </section>
 
 
-<div class="dashboard-card">
 
-<h3>
-📝 Submit Feedback
-</h3>
+        <!-- Dashboard Cards -->
 
-<p>
-Submit anonymous feedback about faculty teaching and behaviour.
-</p>
+        <section class="dashboard-grid" id="actions">
 
-<a href="#">
-Give Feedback
-</a>
+            <div class="dashboard-card">
 
-</div>
+                <h3>📝 Submit Feedback</h3>
 
+                <p>
+                    Submit anonymous feedback for your faculty members.
+                </p>
 
+                <a href="../feedback.html">
+                    Open
+                </a>
 
+            </div>
 
 
-<div class="dashboard-card">
 
-<h3>
-📊 Feedback History
-</h3>
+            <div class="dashboard-card">
 
-<p>
-Check your previous submitted feedback.
-</p>
+                <h3>📜 Feedback History</h3>
 
-<a href="#">
-View History
-</a>
+                <p>
+                    View the feedback you have submitted.
+                </p>
 
-</div>
+                <a href="../feedback-history.html">
+                   View
+                 </a>
 
+            </div>
 
 
-</section>
 
+            <div class="dashboard-card">
 
+                <h3>👤 My Profile</h3>
 
-</main>
+                <p>
+                    View your personal details.
+                </p>
 
+                <a href="#profile">
+                    Open
+                </a>
 
+            </div>
 
 
-<footer>
 
-<p>
-© 2026 Anonymous Student Feedback System
-</p>
+            <div class="dashboard-card">
 
-</footer>
+                <h3>🚪 Logout</h3>
 
+                <p>
+                    Securely logout from your account.
+                </p>
 
-<script>
+                <a href="/student/logout">
+                    Logout
+                </a>
 
-fetch("/student/student-info")
+            </div>
 
-.then(response=>response.json())
+        </section>
 
-.then(data=>{
 
 
-    if(data.logged){
+        <!-- Statistics -->
 
+        <section class="stats-section">
 
-        document.getElementById("welcome").innerHTML =
+            <h2>📊 Statistics</h2>
 
-        "Welcome, " + data.student.name + " 👋";
+            <div class="stats-grid">
 
+                <div class="stat-card">
 
-    }
+                    <h3 id="submitted-count">
+                        0
+                    </h3>
 
+                    <p>
+                        Feedback Submitted
+                    </p>
 
-});
+                </div>
 
+                <div class="stat-card">
 
-</script>
+                    <h3 id="pending-count">
+                        0
+                    </h3>
+
+                    <p>
+                        Pending
+                    </p>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <h3 id="completion">
+                        0%
+                    </h3>
+
+                    <p>
+                        Completion
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- Notifications -->
+
+        <section class="notification-section" id="notifications">
+
+            <h2>🔔 Notifications</h2>
+
+            <ul>
+
+                <li>Welcome to the Anonymous Student Feedback System.</li>
+
+                <li>Submit feedback before the deadline.</li>
+
+                <li>Your identity always remains anonymous.</li>
+
+            </ul>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- Footer -->
+
+    <footer>
+
+        <p>
+
+            © 2026 Anonymous Student Feedback System
+
+        </p>
+
+    </footer>
+
+
+
+    <script>
+
+        fetch("/student/student-info")
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                if (!data.logged) {
+
+                    window.location.href = "/student.html";
+                    return;
+
+                }
+
+                document.getElementById("welcome").innerHTML =
+                    "Welcome, " + data.student.name + " 👋";
+
+                document.getElementById("student-id").innerHTML =
+                    data.student.student_id;
+
+                document.getElementById("student-name").innerHTML =
+                    data.student.name;
+
+                document.getElementById("student-email").innerHTML =
+                    data.student.email;
+
+                document.getElementById("student-department").innerHTML =
+                    data.student.department;
+
+                document.getElementById("student-year").innerHTML =
+                    data.student.year;
+
+                document.getElementById("student-division").innerHTML =
+                    data.student.division;
+
+                // Temporary statistics
+
+                document.getElementById("submitted-count").innerHTML = "0";
+                document.getElementById("pending-count").innerHTML = "6";
+                document.getElementById("completion").innerHTML = "0%";
+
+            });
+
+    </script>
+
 </body>
 
 </html>

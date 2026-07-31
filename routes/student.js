@@ -61,16 +61,22 @@ router.post("/login",(req,res)=>{
 
             <head>
 
-            <title>Login Successful</title>
+            <title>
+            Login Successful
+            </title>
+
 
             <link rel="stylesheet" href="/css/message.css">
 
+
             <meta http-equiv="refresh" content="2;url=/dashboard/student-dashboard.html">
+
 
             </head>
 
 
             <body>
+
 
             <div class="message-box">
 
@@ -81,13 +87,20 @@ router.post("/login",(req,res)=>{
 
 
             <p>
+            Welcome ${result[0].name} 👋
+            </p>
+
+
+            <p>
             Redirecting to dashboard...
             </p>
 
 
             </div>
 
+
             </body>
+
 
             </html>
 
@@ -96,14 +109,21 @@ router.post("/login",(req,res)=>{
 
 
         }
+
         else{
 
 
             res.send(`
 
-            <h2>❌ Login Failed</h2>
+            <h2>
+            ❌ Login Failed
+            </h2>
 
-            <p>Invalid Student ID or Password</p>
+
+            <p>
+            Invalid Student ID or Password
+            </p>
+
 
             <a href="/student.html">
             Try Again
@@ -119,6 +139,8 @@ router.post("/login",(req,res)=>{
 
 
 });
+
+
 
 
 
@@ -192,7 +214,9 @@ router.post("/register",(req,res)=>{
 
                 return res.send(`
 
-                <h2>Registration Failed</h2>
+                <h2>
+                Registration Failed
+                </h2>
 
                 <pre>${err}</pre>
 
@@ -213,6 +237,8 @@ router.post("/register",(req,res)=>{
 
 
 });
+
+
 
 
 
@@ -249,6 +275,39 @@ router.get("/student-info",(req,res)=>{
 
     });
 
+
+
+});
+
+
+
+
+
+
+
+// =======================
+// STUDENT LOGOUT
+// =======================
+
+router.get("/logout",(req,res)=>{
+
+
+    req.session.destroy((err)=>{
+
+
+        if(err){
+
+            console.log(err);
+
+            return res.send("Logout Failed");
+
+        }
+
+
+        res.redirect("/student.html");
+
+
+    });
 
 
 });

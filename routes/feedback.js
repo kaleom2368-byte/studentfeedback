@@ -7,10 +7,78 @@ const db = require("../db");
 
 
 // =======================
+// GET FACULTY LIST
+// =======================
+
+router.get("/faculty",(req,res)=>{
+
+
+    const sql = `
+
+    SELECT 
+    faculty_id,
+    name,
+    department
+
+    FROM faculty
+
+    `;
+
+
+    db.query(sql,(err,result)=>{
+
+
+        if(err){
+
+            console.log(err);
+
+            return res.status(500).json({
+
+                error:"Database Error"
+
+            });
+
+        }
+
+
+        res.json(result);
+
+
+    });
+
+
+});
+
+
+
+
+
+
+// =======================
 // SUBMIT FEEDBACK
 // =======================
 
 router.post("/submit",(req,res)=>{
+
+
+    // Check student login
+
+    if(!req.session.student){
+
+        return res.send(`
+
+        <h2>
+        Please Login First
+        </h2>
+
+        <a href="/student.html">
+        Login
+        </a>
+
+        `);
+
+    }
+
 
 
     const {
@@ -27,11 +95,17 @@ router.post("/submit",(req,res)=>{
 
 
 
+    const student_id = req.session.student.student_id;
+
+
+
+
     const sql = `
 
     INSERT INTO feedback
 
     (
+        student_id,
         faculty_id,
         department,
         subject,
@@ -41,9 +115,10 @@ router.post("/submit",(req,res)=>{
         comments
     )
 
-    VALUES (?,?,?,?,?,?,?)
+    VALUES (?,?,?,?,?,?,?,?)
 
     `;
+
 
 
 
@@ -53,6 +128,7 @@ router.post("/submit",(req,res)=>{
 
         [
 
+            student_id,
             faculty_id,
             department,
             subject,
@@ -71,9 +147,27 @@ router.post("/submit",(req,res)=>{
 
                 console.log(err);
 
-                return res.send("Feedback submission failed");
+
+                return res.send(`
+
+                <h2>
+                ❌ Feedback Submission Failed
+                </h2>
+
+
+                <p>
+                ${err.message}
+                </p>
+
+
+                <a href="/feedback.html">
+                Try Again
+                </a>
+
+                `);
 
             }
+
 
 
 
@@ -85,9 +179,13 @@ router.post("/submit",(req,res)=>{
 
             <head>
 
-            <title>Feedback Submitted</title>
+            <title>
+            Success
+            </title>
 
-            <link rel="stylesheet" href="/css/message.css">
+
+            <meta http-equiv="refresh" content="2;url=/dashboard/student-dashboard.html">
+
 
             </head>
 
@@ -95,25 +193,14 @@ router.post("/submit",(req,res)=>{
             <body>
 
 
-            <div class="message-box">
-
-
-            <h2 class="success">
-            ✅ Feedback Submitted
+            <h2>
+            ✅ Feedback Submitted Successfully
             </h2>
 
 
             <p>
-            Thank you for your response.
+            Redirecting to Dashboard...
             </p>
-
-
-            <a href="/dashboard/student-dashboard.html">
-            Back to Dashboard
-            </a>
-
-
-            </div>
 
 
             </body>
@@ -129,6 +216,111 @@ router.post("/submit",(req,res)=>{
 
 
     );
+
+
+});
+
+
+
+
+
+
+
+
+// =======================
+// GET STUDENT FEEDBACK HISTORY
+// =======================
+
+router.get("/history",(req,res)=>{
+
+
+    // Check student login
+
+    if(!req.session.student){
+
+        return res.send(`
+
+        <h2>
+        Please Login First
+        </h2>
+
+
+        <a href="/student.html">
+        Login
+        </a>
+
+        `);
+
+    }
+
+
+
+
+    const student_id = req.session.student.student_id;
+
+
+
+    const sql = `
+
+    SELECT
+
+    feedback.*,
+
+    faculty.name AS faculty_name
+
+
+    FROM feedback
+
+
+    JOIN faculty
+
+    ON feedback.faculty_id = faculty.faculty_id
+
+
+    WHERE feedback.student_id = ?
+
+
+    ORDER BY feedback.submitted_at DESC
+
+    `;
+
+
+
+
+    db.query(
+
+        sql,
+
+        [student_id],
+
+
+        (err,result)=>{
+
+
+            if(err){
+
+                console.log(err);
+
+
+                return res.status(500).json({
+
+                    error:"Database Error"
+
+                });
+
+            }
+
+
+
+            res.json(result);
+
+
+
+        }
+
+
+    );
+
 
 
 });

@@ -1,291 +1,311 @@
+/* ===========================
+   STUDENT DASHBOARD CSS
+=========================== */
+
 *{
-
-margin:0;
-
-padding:0;
-
-box-sizing:border-box;
-
-font-family:'Segoe UI',sans-serif;
-
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
 }
-
-
 
 body{
-
-background:#f4f6f9;
-
-color:#333;
-
+    background:#f4f7fc;
+    color:#333;
 }
 
-
-
-/* Header */
-
+/* ===========================
+   HEADER
+=========================== */
 
 header{
+    background:linear-gradient(135deg,#003366,#00509e);
+    color:#fff;
+    padding:20px 50px;
 
-background:#003366;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 
-color:white;
-
-text-align:center;
-
-padding:25px;
-
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
 }
-
-
 
 header h1{
-
-font-size:32px;
-
+    font-size:30px;
 }
-
-
 
 header p{
-
-margin-top:8px;
-
-font-size:18px;
-
+    margin-top:5px;
+    font-size:16px;
+    opacity:.9;
 }
 
+.logout-btn{
+    text-decoration:none;
+    background:#ff4d4d;
+    color:#fff;
+    padding:12px 25px;
+    border-radius:8px;
+    font-weight:bold;
+    transition:.3s;
+}
 
+.logout-btn:hover{
+    background:#d63031;
+    transform:translateY(-2px);
+}
 
-
-
-/* Navigation */
-
+/* ===========================
+   NAVIGATION
+=========================== */
 
 nav{
-
-background:#00509e;
-
-padding:15px;
-
-text-align:center;
-
+    background:#004080;
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    padding:15px;
 }
-
-
 
 nav a{
-
-color:white;
-
-text-decoration:none;
-
-font-weight:bold;
-
-margin:0 20px;
-
+    color:#fff;
+    text-decoration:none;
+    font-weight:bold;
+    transition:.3s;
 }
-
-
 
 nav a:hover{
-
-color:#ffd700;
-
+    color:#ffd700;
 }
 
-
-
-
-
-/* Main */
-
+/* ===========================
+   MAIN
+=========================== */
 
 main{
-
-width:90%;
-
-max-width:1100px;
-
-margin:40px auto;
-
+    width:90%;
+    max-width:1300px;
+    margin:35px auto;
 }
 
+/* ===========================
+   WELCOME
+=========================== */
 
-
-
-
-/* Welcome */
-
-
-.welcome-box{
-
-background:white;
-
-padding:30px;
-
-border-radius:12px;
-
-box-shadow:0 5px 15px rgba(0,0,0,.1);
-
+.welcome-card{
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+    margin-bottom:30px;
 }
 
-
-
-.welcome-box h2{
-
-color:#003366;
-
-margin-bottom:15px;
-
+.welcome-card h2{
+    color:#003366;
+    margin-bottom:15px;
+    font-size:30px;
 }
 
+.welcome-card p{
+    color:#666;
+    line-height:1.8;
+}
 
+/* ===========================
+   PROFILE
+=========================== */
 
+.profile-card{
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+    margin-bottom:30px;
+}
 
+.profile-card h2{
+    color:#003366;
+    margin-bottom:25px;
+}
 
-/* Dashboard Cards */
+.profile-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
 
+.profile-item{
+    background:#f8fbff;
+    border-left:5px solid #00509e;
+    padding:18px;
+    border-radius:10px;
+}
+
+.label{
+    display:block;
+    color:#00509e;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+/* ===========================
+   DASHBOARD CARDS
+=========================== */
 
 .dashboard-grid{
-
-display:grid;
-
-grid-template-columns:repeat(3,1fr);
-
-gap:25px;
-
-margin-top:30px;
-
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:25px;
+    margin-bottom:35px;
 }
-
-
-
-
 
 .dashboard-card{
-
-background:white;
-
-padding:30px;
-
-text-align:center;
-
-border-radius:15px;
-
-box-shadow:0 5px 15px rgba(0,0,0,.1);
-
-transition:.3s;
-
+    background:#fff;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+    transition:.3s;
 }
-
-
 
 .dashboard-card:hover{
-
-transform:translateY(-8px);
-
+    transform:translateY(-8px);
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
 }
-
-
-
-
 
 .dashboard-card h3{
-
-color:#003366;
-
-margin-bottom:15px;
-
-font-size:22px;
-
+    color:#003366;
+    margin-bottom:15px;
 }
-
-
-
-
 
 .dashboard-card p{
-
-color:#555;
-
-margin-bottom:25px;
-
+    color:#666;
+    margin-bottom:20px;
+    line-height:1.6;
 }
-
-
-
-
 
 .dashboard-card a{
-
-background:#00509e;
-
-color:white;
-
-text-decoration:none;
-
-padding:12px 25px;
-
-border-radius:8px;
-
-font-weight:bold;
-
+    display:inline-block;
+    text-decoration:none;
+    background:#00509e;
+    color:#fff;
+    padding:10px 25px;
+    border-radius:8px;
+    transition:.3s;
 }
-
-
 
 .dashboard-card a:hover{
-
-background:#003366;
-
+    background:#003366;
 }
 
+/* ===========================
+   STATISTICS
+=========================== */
 
+.stats-section{
+    margin-bottom:35px;
+}
 
+.stats-section h2{
+    color:#003366;
+    margin-bottom:20px;
+}
 
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
 
-/* Footer */
+.stat-card{
+    background:#fff;
+    padding:25px;
+    text-align:center;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
 
+.stat-card h3{
+    color:#00509e;
+    font-size:42px;
+    margin-bottom:10px;
+}
+
+.stat-card p{
+    color:#666;
+}
+
+/* ===========================
+   NOTIFICATIONS
+=========================== */
+
+.notification-section{
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+.notification-section h2{
+    color:#003366;
+    margin-bottom:20px;
+}
+
+.notification-section ul{
+    padding-left:25px;
+}
+
+.notification-section li{
+    margin-bottom:15px;
+    color:#555;
+}
+
+/* ===========================
+   FOOTER
+=========================== */
 
 footer{
-
-background:#003366;
-
-color:white;
-
-text-align:center;
-
-padding:18px;
-
-margin-top:50px;
-
+    margin-top:50px;
+    background:#003366;
+    color:#fff;
+    text-align:center;
+    padding:20px;
 }
 
+/* ===========================
+   RESPONSIVE
+=========================== */
 
+@media(max-width:900px){
 
-
-
-/* Mobile */
-
-
-@media(max-width:800px){
-
-
-.dashboard-grid{
-
-grid-template-columns:1fr;
-
+header{
+    flex-direction:column;
+    gap:20px;
+    text-align:center;
 }
 
-
-nav a{
-
-display:block;
-
-margin:10px;
-
+nav{
+    flex-wrap:wrap;
+    gap:15px;
 }
 
+header h1{
+    font-size:24px;
+}
+
+.welcome-card h2{
+    font-size:24px;
+}
+
+.profile-grid,
+.dashboard-grid,
+.stats-grid{
+    grid-template-columns:1fr;
+}
+
+.logout-btn{
+    width:100%;
+    text-align:center;
+}
 
 }

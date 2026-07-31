@@ -41,6 +41,10 @@ const studentRoute = require("./routes/student.js");
 
 const feedbackRoute = require("./routes/feedback.js");
 
+const adminRoute = require("./routes/admin.js");
+
+const facultyRoute = require("./routes/faculty.js");
+
 
 
 console.log("Student Route:", typeof studentRoute);
@@ -53,10 +57,11 @@ console.log("Feedback Route:", typeof feedbackRoute);
 
 app.use("/student", studentRoute);
 
-
 app.use("/feedback", feedbackRoute);
 
+app.use("/admin", adminRoute);
 
+app.use("/faculty", facultyRoute);
 
 
 

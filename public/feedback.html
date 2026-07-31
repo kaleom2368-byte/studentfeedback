@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Submit Feedback</title>
+
+<link rel="stylesheet" href="css/feedback.css">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>
+Anonymous Student Feedback System
+</h1>
+
+<p>
+Submit Anonymous Feedback
+</p>
+
+</header>
+
+
+
+
+<nav>
+
+<a href="dashboard/student-dashboard.html">
+Dashboard
+</a>
+
+<a href="index.html">
+Home
+</a>
+
+</nav>
+
+
+
+
+
+<main>
+
+
+<section class="feedback-box">
+
+
+<h2>
+📝 Faculty Feedback Form
+</h2>
+
+
+
+
+<form action="/feedback/submit" method="POST">
+
+
+
+<label>
+Select Faculty
+</label>
+
+
+<select name="faculty_id" id="faculty" required>
+
+<option value="">
+Loading Faculty...
+</option>
+
+</select>
+
+
+
+
+
+<label>
+Department
+</label>
+
+
+<input 
+type="text"
+name="department"
+id="department"
+readonly>
+
+
+
+
+
+<label>
+Subject
+</label>
+
+
+<input
+type="text"
+name="subject"
+placeholder="Enter Subject"
+required>
+
+
+
+
+<label>
+Teaching Quality
+</label>
+
+<div class="stars">
+
+<input type="radio" id="teach5" name="teaching" value="5">
+<label for="teach5">★</label>
+
+<input type="radio" id="teach4" name="teaching" value="4">
+<label for="teach4">★</label>
+
+<input type="radio" id="teach3" name="teaching" value="3">
+<label for="teach3">★</label>
+
+<input type="radio" id="teach2" name="teaching" value="2">
+<label for="teach2">★</label>
+
+<input type="radio" id="teach1" name="teaching" value="1" required>
+<label for="teach1">★</label>
+
+</div>
+
+
+
+
+
+<label>
+Communication
+</label>
+
+<div class="stars">
+
+<input type="radio" id="comm5" name="communication" value="5">
+<label for="comm5">★</label>
+
+<input type="radio" id="comm4" name="communication" value="4">
+<label for="comm4">★</label>
+
+<input type="radio" id="comm3" name="communication" value="3">
+<label for="comm3">★</label>
+
+<input type="radio" id="comm2" name="communication" value="2">
+<label for="comm2">★</label>
+
+<input type="radio" id="comm1" name="communication" value="1" required>
+<label for="comm1">★</label>
+
+</div>
+
+
+
+
+<label>
+Behaviour
+</label>
+
+<div class="stars">
+
+<input type="radio" id="beh5" name="behaviour" value="5">
+<label for="beh5">★</label>
+
+<input type="radio" id="beh4" name="behaviour" value="4">
+<label for="beh4">★</label>
+
+<input type="radio" id="beh3" name="behaviour" value="3">
+<label for="beh3">★</label>
+
+<input type="radio" id="beh2" name="behaviour" value="2">
+<label for="beh2">★</label>
+
+<input type="radio" id="beh1" name="behaviour" value="1" required>
+<label for="beh1">★</label>
+
+</div>
+
+
+
+
+
+<label>
+Comments
+</label>
+
+
+<textarea
+
+name="comments"
+
+rows="5"
+
+placeholder="Write your feedback here..."
+
+></textarea>
+
+
+
+
+
+<button type="submit">
+
+Submit Feedback
+
+</button>
+
+
+
+</form>
+
+
+</section>
+
+
+</main>
+
+
+
+
+
+
+<footer>
+
+<p>
+© 2026 Anonymous Student Feedback System
+</p>
+
+</footer>
+
+
+
+
+
+
+<script>
+
+
+// Load Faculty List
+
+
+fetch("/feedback/faculty")
+
+.then(response => response.json())
+
+.then(data => {
+
+
+    const facultySelect =
+    document.getElementById("faculty");
+
+
+
+    facultySelect.innerHTML =
+    '<option value="">Select Faculty</option>';
+
+
+
+    data.forEach(faculty => {
+
+
+        let option =
+        document.createElement("option");
+
+
+        option.value =
+        faculty.faculty_id;
+
+
+        option.textContent =
+        faculty.name;
+
+
+
+        option.dataset.department =
+        faculty.department;
+
+
+
+        facultySelect.appendChild(option);
+
+
+
+    });
+
+
+
+});
+
+
+
+
+
+// Auto fill department
+
+
+document.getElementById("faculty")
+
+.addEventListener("change",function(){
+
+
+    let selected =
+    this.options[this.selectedIndex];
+
+
+    document.getElementById("department").value =
+    selected.dataset.department || "";
+
+
+});
+
+
+
+</script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Feedback History</title>
+
+<link rel="stylesheet" href="css/feedback-history.css">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>
+Anonymous Student Feedback System
+</h1>
+
+<p>
+My Feedback History
+</p>
+
+</header>
+
+
+
+
+<nav>
+
+<a href="dashboard/student-dashboard.html">
+Dashboard
+</a>
+
+<a href="feedback.html">
+Give Feedback
+</a>
+
+<a href="index.html">
+Logout
+</a>
+
+</nav>
+
+
+
+
+
+<main>
+
+
+<section class="history-box">
+
+
+<h2>
+📜 Submitted Feedback
+</h2>
+
+
+
+<div id="feedback-container">
+
+
+<p>
+Loading feedback...
+</p>
+
+
+</div>
+
+
+
+</section>
+
+
+
+</main>
+
+
+
+
+
+
+<footer>
+
+<p>
+© 2026 Anonymous Student Feedback System
+</p>
+
+</footer>
+
+
+
+
+
+
+<script>
+
+
+fetch("/feedback/history")
+
+.then(response => response.json())
+
+.then(data => {
+
+
+    const container =
+    document.getElementById("feedback-container");
+
+
+
+    if(data.length === 0){
+
+
+        container.innerHTML = `
+
+        <h3>
+        No Feedback Submitted Yet
+        </h3>
+
+        <a href="feedback.html">
+        Submit Feedback
+        </a>
+
+        `;
+
+
+        return;
+
+
+    }
+
+
+
+
+
+    container.innerHTML="";
+
+
+
+    data.forEach(feedback=>{
+
+
+        let card=document.createElement("div");
+
+
+        card.className="feedback-card";
+
+
+
+        card.innerHTML=`
+
+        <h3>
+        👨‍🏫 ${feedback.faculty_name}
+        </h3>
+
+
+        <p>
+        <b>Subject:</b>
+        ${feedback.subject}
+        </p>
+
+
+        <p>
+        <b>Teaching:</b>
+        ⭐ ${feedback.teaching}/5
+        </p>
+
+
+        <p>
+        <b>Communication:</b>
+        ⭐ ${feedback.communication}/5
+        </p>
+
+
+        <p>
+        <b>Behaviour:</b>
+        ⭐ ${feedback.behaviour}/5
+        </p>
+
+
+        <p>
+        <b>Comments:</b>
+        ${feedback.comments || "No comments"}
+        </p>
+
+
+        <p>
+        <b>Date:</b>
+        ${feedback.submitted_at}
+        </p>
+
+
+        `;
+
+
+
+        container.appendChild(card);
+
+
+
+    });
+
+
+
+});
+
+
+
+</script>
+
+
+
+</body>
+
+</html>

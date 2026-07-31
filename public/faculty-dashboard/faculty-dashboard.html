@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
+Faculty Dashboard
+</title>
+
+
+<link rel="stylesheet" href="../css/faculty-dashboard.css">
+
+</head>
+
+
+<body>
+
+
+
+<header>
+
+<div>
+
+<h1>
+Anonymous Student Feedback System
+</h1>
+
+<p>
+Faculty Dashboard
+</p>
+
+</div>
+
+
+<a href="/faculty/logout">
+Logout
+</a>
+
+
+</header>
+
+
+
+
+
+<nav>
+
+<a href="faculty-dashboard.html">
+Home
+</a>
+
+<a href="#feedback">
+Feedback
+</a>
+
+<a href="#analytics">
+Analytics
+</a>
+
+<a href="/index.html">
+← Back to Home
+</a>
+
+</nav>
+
+
+
+
+
+
+
+
+<main>
+
+
+
+<section class="welcome-card">
+
+
+<h2 id="welcome">
+
+Welcome Faculty 👋
+
+</h2>
+
+
+<p>
+
+View anonymous student feedback and teaching performance.
+
+</p>
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="stats-grid" id="analytics">
+
+
+
+<div class="stat-card">
+
+<h2 id="total-feedback">
+0
+</h2>
+
+<p>
+Total Feedback
+</p>
+
+</div>
+
+
+
+
+
+<div class="stat-card">
+
+<h2 id="avg-teaching">
+0
+</h2>
+
+<p>
+Average Teaching Rating
+</p>
+
+</div>
+
+
+
+
+
+<div class="stat-card">
+
+<h2 id="avg-communication">
+0
+</h2>
+
+<p>
+Average Communication
+</p>
+
+</div>
+
+
+
+
+
+<div class="stat-card">
+
+<h2 id="avg-behaviour">
+0
+</h2>
+
+<p>
+Average Behaviour
+</p>
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="feedback-section" id="feedback">
+
+
+<h2>
+📝 Anonymous Feedback
+</h2>
+
+
+<div id="feedback-container">
+
+
+<p>
+Loading feedback...
+</p>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+
+<footer>
+
+<p>
+© 2026 Anonymous Student Feedback System
+</p>
+
+</footer>
+
+
+
+
+
+
+
+
+<script>
+
+
+fetch("/faculty/info")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+if(!data.logged){
+
+    window.location.href="/faculty.html";
+
+    return;
+
+}
+
+
+document.getElementById("welcome").innerHTML=
+
+"Welcome, "+data.name+" 👋";
+
+
+});
+
+
+
+
+
+
+
+
+fetch("/faculty/feedback")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+
+document.getElementById("total-feedback").innerHTML=
+data.total;
+
+
+document.getElementById("avg-teaching").innerHTML=
+data.teaching;
+
+
+document.getElementById("avg-communication").innerHTML=
+data.communication;
+
+
+document.getElementById("avg-behaviour").innerHTML=
+data.behaviour;
+
+
+
+
+
+const box=document.getElementById("feedback-container");
+
+
+box.innerHTML="";
+
+
+
+
+
+data.feedback.forEach(item=>{
+
+
+let div=document.createElement("div");
+
+
+div.className="feedback-card";
+
+
+
+div.innerHTML=`
+
+<h3>
+Subject: ${item.subject}
+</h3>
+
+
+<p>
+Teaching ⭐ ${item.teaching}/5
+</p>
+
+
+<p>
+Communication ⭐ ${item.communication}/5
+</p>
+
+
+<p>
+Behaviour ⭐ ${item.behaviour}/5
+</p>
+
+
+<p>
+Comment:
+${item.comments || "No comment"}
+</p>
+
+`;
+
+
+
+box.appendChild(div);
+
+
+
+});
+
+
+
+});
+
+
+
+</script>
+
+
+
+
+
+</body>
+
+</html>
