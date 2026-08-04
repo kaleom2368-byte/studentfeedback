@@ -1,11 +1,16 @@
 {
   "name": "studentfeedback",
   "version": "1.0.0",
+  "description": "Anonymous Student Feedback System",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
+  "engines": {
+    "node": "24.x"
+  },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "express-session": "^1.19.0",
     "mysql2": "^3.23.2"

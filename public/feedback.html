@@ -11,6 +11,8 @@
 
 <link rel="stylesheet" href="css/feedback.css">
 
+<link rel="stylesheet" href="/css/darkmode.css">
+
 </head>
 
 
@@ -19,16 +21,22 @@
 
 <header>
 
+<button id="dark-mode-btn">
+🌓 Theme
+</button>
+
+
 <h1>
 Anonymous Student Feedback System
 </h1>
+
 
 <p>
 Submit Anonymous Feedback
 </p>
 
-</header>
 
+</header>
 
 
 
@@ -38,9 +46,11 @@ Submit Anonymous Feedback
 Dashboard
 </a>
 
+
 <a href="index.html">
 Home
 </a>
+
 
 </nav>
 
@@ -60,8 +70,21 @@ Home
 
 
 
+<div class="feedback-note">
 
-<form action="/feedback/submit" method="POST">
+🔒 <strong>Anonymous Feedback:</strong>
+
+Your identity is never shared with faculty members.
+
+Please provide honest, respectful, and constructive feedback.
+
+</div>
+
+
+
+
+
+<form id="feedback-form">
 
 
 
@@ -81,17 +104,53 @@ Loading Faculty...
 
 
 
+<div id="faculty-card" class="faculty-card">
+
+
+<div class="faculty-avatar">
+👨‍🏫
+</div>
+
+
+<div class="faculty-details">
+
+
+<h3 id="faculty-name">
+Select Faculty
+</h3>
+
+
+<p id="faculty-dept">
+Department
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+
 
 <label>
 Department
 </label>
 
 
-<input 
+<input
+
 type="text"
+
 name="department"
+
 id="department"
-readonly>
+
+readonly
+
+>
+
 
 
 
@@ -103,10 +162,19 @@ Subject
 
 
 <input
+
 type="text"
+
 name="subject"
+
 placeholder="Enter Subject"
-required>
+
+required
+
+>
+
+
+
 
 
 
@@ -115,22 +183,29 @@ required>
 Teaching Quality
 </label>
 
+
 <div class="stars">
 
-<input type="radio" id="teach5" name="teaching" value="5">
+
+<input id="teach5" type="radio" name="teaching" value="5">
 <label for="teach5">★</label>
 
-<input type="radio" id="teach4" name="teaching" value="4">
+
+<input id="teach4" type="radio" name="teaching" value="4">
 <label for="teach4">★</label>
 
-<input type="radio" id="teach3" name="teaching" value="3">
+
+<input id="teach3" type="radio" name="teaching" value="3">
 <label for="teach3">★</label>
 
-<input type="radio" id="teach2" name="teaching" value="2">
+
+<input id="teach2" type="radio" name="teaching" value="2">
 <label for="teach2">★</label>
 
-<input type="radio" id="teach1" name="teaching" value="1" required>
+
+<input id="teach1" type="radio" name="teaching" value="1" required>
 <label for="teach1">★</label>
+
 
 </div>
 
@@ -142,24 +217,32 @@ Teaching Quality
 Communication
 </label>
 
+
 <div class="stars">
 
-<input type="radio" id="comm5" name="communication" value="5">
+
+<input id="comm5" type="radio" name="communication" value="5" required>
 <label for="comm5">★</label>
 
-<input type="radio" id="comm4" name="communication" value="4">
+
+<input id="comm4" type="radio" name="communication" value="4">
 <label for="comm4">★</label>
 
-<input type="radio" id="comm3" name="communication" value="3">
+
+<input id="comm3" type="radio" name="communication" value="3">
 <label for="comm3">★</label>
 
-<input type="radio" id="comm2" name="communication" value="2">
+
+<input id="comm2" type="radio" name="communication" value="2">
 <label for="comm2">★</label>
 
-<input type="radio" id="comm1" name="communication" value="1" required>
+
+<input id="comm1" type="radio" name="communication" value="1">
 <label for="comm1">★</label>
 
+
 </div>
+
 
 
 
@@ -168,29 +251,31 @@ Communication
 Behaviour
 </label>
 
+
 <div class="stars">
 
-<input type="radio" id="beh5" name="behaviour" value="5">
+
+<input id="beh5" type="radio" name="behaviour" value="5" required>
 <label for="beh5">★</label>
 
-<input type="radio" id="beh4" name="behaviour" value="4">
+
+<input id="beh4" type="radio" name="behaviour" value="4">
 <label for="beh4">★</label>
 
-<input type="radio" id="beh3" name="behaviour" value="3">
+
+<input id="beh3" type="radio" name="behaviour" value="3">
 <label for="beh3">★</label>
 
-<input type="radio" id="beh2" name="behaviour" value="2">
+
+<input id="beh2" type="radio" name="behaviour" value="2">
 <label for="beh2">★</label>
 
-<input type="radio" id="beh1" name="behaviour" value="1" required>
+
+<input id="beh1" type="radio" name="behaviour" value="1">
 <label for="beh1">★</label>
 
+
 </div>
-
-
-
-
-
 <label>
 Comments
 </label>
@@ -198,9 +283,11 @@ Comments
 
 <textarea
 
+id="comments"
+
 name="comments"
 
-rows="5"
+maxlength="300"
 
 placeholder="Write your feedback here..."
 
@@ -208,11 +295,29 @@ placeholder="Write your feedback here..."
 
 
 
+<div id="char-count">
+0 / 300 characters
+</div>
+
+
+
+
+<div id="word-warning">
+
+</div>
+
+
+<div id="success-message">
+
+</div>
+
+
+
 
 
 <button type="submit">
 
-Submit Feedback
+✅ Submit Feedback
 
 </button>
 
@@ -225,7 +330,6 @@ Submit Feedback
 
 
 </main>
-
 
 
 
@@ -244,10 +348,13 @@ Submit Feedback
 
 
 
+
+
 <script>
 
-
-// Load Faculty List
+// =================================
+// LOAD FACULTY LIST
+// =================================
 
 
 fetch("/feedback/faculty")
@@ -261,39 +368,68 @@ fetch("/feedback/faculty")
     document.getElementById("faculty");
 
 
-
     facultySelect.innerHTML =
     '<option value="">Select Faculty</option>';
 
 
 
-    data.forEach(faculty => {
+    if(data.success && data.faculty.length > 0){
 
 
-        let option =
-        document.createElement("option");
-
-
-        option.value =
-        faculty.faculty_id;
-
-
-        option.textContent =
-        faculty.name;
+        data.faculty.forEach(faculty => {
 
 
 
-        option.dataset.department =
-        faculty.department;
+            let option =
+            document.createElement("option");
 
 
 
-        facultySelect.appendChild(option);
+            option.value =
+            faculty.faculty_id;
 
 
 
-    });
+            option.textContent =
+            faculty.name;
 
+
+
+            option.dataset.department =
+            faculty.department;
+
+
+
+            facultySelect.appendChild(option);
+
+
+
+        });
+
+
+    }
+
+    else{
+
+
+        facultySelect.innerHTML =
+        '<option value="">No Faculty Available</option>';
+
+
+    }
+
+
+
+})
+
+
+.catch(error=>{
+
+
+    console.error(
+        "Faculty loading error:",
+        error
+    );
 
 
 });
@@ -301,29 +437,283 @@ fetch("/feedback/faculty")
 
 
 
+// =================================
+// FACULTY CARD
+// =================================
 
-// Auto fill department
 
-
-document.getElementById("faculty")
-
+document
+.getElementById("faculty")
 .addEventListener("change",function(){
+
 
 
     let selected =
     this.options[this.selectedIndex];
 
 
-    document.getElementById("department").value =
+
+    document
+    .getElementById("department")
+    .value =
     selected.dataset.department || "";
+
+
+
+
+    if(selected.value !== ""){
+
+
+        document
+        .getElementById("faculty-card")
+        .style.display="flex";
+
+
+
+        document
+        .getElementById("faculty-name")
+        .innerHTML =
+        selected.textContent;
+
+
+
+        document
+        .getElementById("faculty-dept")
+        .innerHTML =
+        selected.dataset.department;
+
+
+    }
+
+    else{
+
+
+        document
+        .getElementById("faculty-card")
+        .style.display="none";
+
+
+    }
+
 
 
 });
 
 
 
+
+// =================================
+// CHARACTER COUNTER
+// =================================
+
+
+const commentBox =
+document.getElementById("comments");
+
+
+const charCount =
+document.getElementById("char-count");
+
+
+
+commentBox.addEventListener("input",()=>{
+
+
+    let count =
+    commentBox.value.length;
+
+
+    charCount.innerHTML =
+    count + " / 300 characters";
+
+
+    if(count >= 250){
+
+        charCount.style.color="orange";
+
+    }
+
+    else{
+
+        charCount.style.color="white";
+
+    }
+
+
+});
+
+
+
+
+// =================================
+// ABUSIVE WORD FILTER
+// =================================
+
+
+const form =
+document.getElementById("feedback-form");
+
+
+const warning =
+document.getElementById("word-warning");
+
+
+
+const badWords=[
+
+"idiot",
+"stupid",
+"fool",
+"dumb",
+"hate",
+"useless",
+"worst",
+"mc",
+"bc"
+
+];
+
+
+form.addEventListener("submit",function(e){
+
+    e.preventDefault();
+
+
+    let comment =
+    commentBox.value.toLowerCase();
+
+
+
+    let found =
+    badWords.some(word =>
+    comment.includes(word)
+    );
+
+
+
+    if(found){
+
+
+        warning.style.display="block";
+
+
+        warning.innerHTML =
+        `
+        ⚠️ <strong>Warning!</strong>
+        <br>
+        Please avoid abusive words.
+        <br>
+        Use respectful and constructive feedback.
+        `;
+
+
+        return;
+
+
+    }
+
+
+
+    const formData = {
+
+        faculty_id:
+        document.getElementById("faculty").value,
+
+
+        department:
+        document.getElementById("department").value,
+
+
+        subject:
+        document.querySelector('[name="subject"]').value,
+
+
+        teaching:
+        document.querySelector('[name="teaching"]:checked').value,
+
+
+        communication:
+        document.querySelector('[name="communication"]:checked').value,
+
+
+        behaviour:
+        document.querySelector('[name="behaviour"]:checked').value,
+
+
+        comments:
+        commentBox.value
+
+    };
+
+
+
+    fetch("/feedback/submit",{
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+
+        body:JSON.stringify(formData)
+
+    })
+
+
+
+    .then(response=>response.json())
+
+
+    .then(data=>{
+
+
+       if(data.success){
+
+
+    form.reset();
+
+
+    document.getElementById("faculty-card").style.display="none";
+
+
+    document.getElementById("department").value="";
+
+
+    // Go to dashboard with success flag
+
+    window.location.href =
+    "/dashboard/student-dashboard.html?feedback=success";
+
+
+}
+
+
+    })
+
+
+
+    .catch(error=>{
+
+
+    console.error(
+        "Submit Error:",
+        error
+    );
+
+
+
+});
+});
+  // CLOSE form.addEventListener
+
+
 </script>
 
+
+<script src="/js/darkmode.js"></script>
 
 
 </body>

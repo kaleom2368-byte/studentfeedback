@@ -3,156 +3,140 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anonymous Student Feedback System</title>
 
-    <title>Anonymous Student Feedback System</title>
-
-    <link rel="stylesheet" href="./css/main.css">
+<link rel="stylesheet" href="./css/main.css">
+<link rel="stylesheet" href="./css/darkmode.css">
 
 </head>
 
-
 <body>
 
+<header class="hero">
 
-<header>
+    <div class="hero-top">
 
-    <h1>Anonymous Student Feedback System</h1>
+        <div class="logo">
 
-    <p>Digital Feedback Management Portal</p>
+            <h1>Anonymous Student Feedback System</h1>
 
-</header>
+            <p>Secure • Anonymous • Transparent</p>
 
+        </div>
 
-
-<nav>
-
-    <a href="index.html">Home</a>
-
-    <a href="#about">About</a>
-
-    <a href="#contact">Contact</a>
-
-</nav>
-
-
-
-
-<main>
-
-
-<section>
-
-    <h2>Welcome</h2>
-
-    <p>
-        This system allows students to submit anonymous feedback about faculty.
-        Faculty members can view feedback reports, and the HOD can monitor
-        department performance.
-    </p>
-
-</section>
-
-
-
-
-
-<section class="portal-section">
-
-    <h2>Select Login Portal</h2>
-
-
-    <div class="login-buttons">
-
-
-        <a href="student.html" class="login-btn">
-
-            Student Login
-
-        </a>
-
-
-
-        <a href="faculty.html" class="login-btn">
-
-            Faculty Login
-
-        </a>
-
-
-
-        <a href="hodfile.html" class="login-btn">
-
-            HOD Login
-
-        </a>
-
-
-
-        <a href="adminfile.html" class="login-btn">
-
-            Admin Login
-
-        </a>
-
+        <button id="dark-mode-btn">
+            🌙 Dark Mode
+        </button>
 
     </div>
 
+    <div class="hero-content">
+
+        <h2>
+            Empower Students.<br>
+            Improve Teaching.
+        </h2>
+
+        <p>
+
+            A modern feedback platform where students can anonymously
+            submit feedback to help improve education quality.
+
+        </p>
+
+    </div>
+
+</header>
+
+<main>
+
+<section class="portal-section">
+
+<h2>Select Your Portal</h2>
+
+<div class="portal-grid">
+
+<a href="auth/student.html" class="portal-card">
+
+<div class="icon">🎓</div>
+
+<h3>Student</h3>
+
+<p>Submit anonymous feedback.</p>
+
+</a>
+
+<a href="auth/faculty.html" class="portal-card">
+
+<div class="icon">👨‍🏫</div>
+
+<h3>Faculty</h3>
+
+<p>View feedback reports.</p>
+
+</a>
+
+
+</div>
 
 </section>
 
+<section class="features">
 
+<h2>Why Choose Our System?</h2>
 
+<div class="feature-grid">
 
+<div class="feature-card">
 
-<section id="about">
+<h3>🔒 Anonymous</h3>
 
-    <h2>About the System</h2>
+<p>
+Students can give honest feedback without revealing their identity.
+</p>
 
-    <p>
+</div>
 
-        Students can provide anonymous feedback without revealing their identity.
-        Faculty can view feedback summaries, while the HOD can access
-        department-wide reports and analytics.
+<div class="feature-card">
 
-    </p>
+<h3>📊 Analytics</h3>
 
+<p>
+Faculty and HOD receive meaningful reports and statistics.
+</p>
+
+</div>
+
+<div class="feature-card">
+
+<h3>⚡ Fast & Secure</h3>
+
+<p>
+Built for speed, security, and ease of use.
+</p>
+
+</div>
+
+</div>
 
 </section>
-
-
-
-
-<section id="contact">
-
-    <h2>Contact</h2>
-
-    <p>
-
-        For any issues related to the feedback system, contact the administrator.
-
-    </p>
-
-
-</section>
-
 
 </main>
 
-
-
-
 <footer>
 
-    <p>
-        &copy; 2026 Anonymous Student Feedback System. All Rights Reserved.
-    </p>
+<p>
 
+© 2026 Anonymous Student Feedback System
+
+</p>
 
 </footer>
 
+<script src="/js/darkmode.js"></script>
 
 </body>
 

@@ -1,0 +1,1044 @@
+/* =========================================================
+   Anonymous Student Feedback System
+   Student Login CSS
+   Part 1
+========================================================= */
+
+/* =========================
+   GOOGLE FONT
+========================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+/* =========================
+   ROOT VARIABLES
+========================= */
+
+:root{
+
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+
+    --success:#22c55e;
+    --danger:#ef4444;
+
+    --white:#ffffff;
+    --black:#111827;
+
+    --text:#1e293b;
+    --text-light:#64748b;
+
+    --glass:rgba(255,255,255,0.18);
+
+    --glass-border:rgba(255,255,255,0.25);
+
+    --shadow:
+    0 12px 35px rgba(0,0,0,.18);
+
+    --radius:20px;
+
+    --transition:.35s ease;
+
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+
+body{
+
+    font-family:"Poppins",sans-serif;
+
+    min-height:100vh;
+
+    display:flex;
+    flex-direction:column;
+
+    color:var(--text);
+
+    overflow-x:hidden;
+
+    transition:
+    background .4s ease,
+    color .4s ease;
+
+}
+
+
+/* =========================
+   BACKGROUND
+========================= */
+
+body{
+
+    background:
+    linear-gradient(
+    135deg,
+    #dbeafe,
+    #eff6ff,
+    #ffffff);
+
+}
+
+
+/* floating blobs */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    width:350px;
+    height:350px;
+
+    border-radius:50%;
+
+    background:
+    rgba(37,99,235,.18);
+
+    top:-120px;
+    left:-100px;
+
+    filter:blur(90px);
+
+    z-index:-2;
+
+}
+
+
+body::after{
+
+    content:"";
+
+    position:fixed;
+
+    width:350px;
+    height:350px;
+
+    border-radius:50%;
+
+    background:
+    rgba(59,130,246,.15);
+
+    bottom:-120px;
+    right:-100px;
+
+    filter:blur(90px);
+
+    z-index:-2;
+
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+
+    width:100%;
+
+    backdrop-filter:blur(16px);
+
+    background:
+    rgba(255,255,255,.25);
+
+    border-bottom:
+    1px solid rgba(255,255,255,.3);
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,.06);
+
+}
+
+
+.header-content{
+
+    width:90%;
+
+    max-width:1200px;
+
+    margin:auto;
+
+    padding:18px 0;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+
+header h1{
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:#1e3a8a;
+
+    letter-spacing:.5px;
+
+}
+
+
+header p{
+
+    margin-top:4px;
+
+    color:#475569;
+
+    font-size:15px;
+
+}
+
+
+/* =========================
+   DARK MODE BUTTON
+========================= */
+
+#dark-mode-btn{
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:12px;
+
+    background:var(--primary);
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:var(--transition);
+
+}
+
+
+#dark-mode-btn:hover{
+
+    background:var(--primary-dark);
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 10px 20px rgba(37,99,235,.25);
+
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main{
+
+    flex:1;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:50px 20px;
+
+}
+/* =========================================================
+   LOGIN CARD
+========================================================= */
+
+.login-box{
+
+    width:100%;
+    max-width:470px;
+
+    padding:42px;
+
+    border-radius:var(--radius);
+
+    background:rgba(255,255,255,.55);
+
+    backdrop-filter:blur(22px);
+
+    border:1px solid rgba(255,255,255,.45);
+
+    box-shadow:var(--shadow);
+
+    animation:fadeUp .7s ease;
+
+}
+
+.login-box h2{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:#1e3a8a;
+
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.login-box form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+
+/* =========================================================
+   LABELS
+========================================================= */
+
+.login-box label{
+
+    font-size:15px;
+
+    font-weight:600;
+
+    color:#334155;
+
+}
+
+
+/* =========================================================
+   INPUTS + SELECT
+========================================================= */
+
+.login-box input,
+.login-box select{
+
+    width:100%;
+
+    padding:14px 16px;
+
+    border-radius:12px;
+
+    border:1px solid #d6dbe5;
+
+    background:white;
+
+    color:#1f2937;
+
+    font-size:15px;
+
+    font-family:"Poppins",sans-serif;
+
+    transition:all .30s ease;
+
+}
+
+
+/* placeholder */
+
+.login-box input::placeholder{
+
+    color:#94a3b8;
+
+}
+
+
+/* hover */
+
+.login-box input:hover,
+.login-box select:hover{
+
+    border-color:#60a5fa;
+
+}
+
+
+/* focus */
+
+.login-box input:focus,
+.login-box select:focus{
+
+    outline:none;
+
+    border-color:#2563eb;
+
+    background:white;
+
+    box-shadow:
+    0 0 0 4px rgba(37,99,235,.15);
+
+}
+
+
+/* =========================================================
+   DEPARTMENT DROPDOWN
+========================================================= */
+
+.login-box select{
+
+    width:100%;
+
+    padding:14px 16px;
+
+    border-radius:12px;
+
+    border:1px solid #d6dbe5;
+
+    background:white;
+
+    color:#1f2937;
+
+    font-size:15px;
+
+    font-family:"Poppins",sans-serif;
+
+    cursor:pointer;
+
+}
+
+
+/* =========================================================
+   ERROR MESSAGE
+========================================================= */
+
+/* Hidden until there is an error */
+#login-error{
+
+    display:none;
+
+    margin-bottom:18px;
+
+    width:100%;
+
+}
+
+/* Visible error message */
+.error-box{
+
+    padding:16px 20px;
+
+    border-radius:14px;
+
+    background:rgba(239,68,68,.12);
+
+    backdrop-filter:blur(12px);
+
+    -webkit-backdrop-filter:blur(12px);
+
+    border:1px solid rgba(239,68,68,.25);
+
+    color:#b91c1c;
+
+    font-weight:600;
+
+    text-align:center;
+
+    box-shadow:
+    0 8px 24px rgba(239,68,68,.10);
+
+    animation:fadeDown .35s ease;
+
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:
+        translateY(35px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+        translateY(0);
+
+    }
+
+}
+@keyframes fadeDown{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(-12px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+/* =========================================================
+   BUTTON GROUP
+========================================================= */
+
+.button-group{
+
+    display:flex;
+
+    gap:14px;
+
+    margin-top:12px;
+
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+========================================================= */
+
+.button-group button:first-child{
+
+    flex:1;
+
+    border:none;
+
+    cursor:pointer;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:all .30s ease;
+
+    box-shadow:
+    0 10px 25px rgba(37,99,235,.25);
+
+}
+
+
+.button-group button:first-child:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+    0 18px 35px rgba(37,99,235,.35);
+
+}
+
+
+/* =========================================================
+   RESET BUTTON
+========================================================= */
+
+.button-group button:last-child{
+
+    flex:1;
+
+    border:none;
+
+    cursor:pointer;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    background:#f1f5f9;
+
+    color:#334155;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:all .30s ease;
+
+}
+
+
+.button-group button:last-child:hover{
+
+    background:#e2e8f0;
+
+    transform:translateY(-2px);
+
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+.links{
+
+    text-align:center;
+
+    margin-top:25px;
+
+}
+
+
+.links a{
+
+    text-decoration:none;
+
+    color:#2563eb;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+
+.links a:hover{
+
+    color:#1d4ed8;
+
+    text-decoration:underline;
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+
+    text-align:center;
+
+    padding:20px;
+
+    color:#64748b;
+
+    font-size:14px;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:768px){
+
+.login-box{
+
+    padding:30px;
+
+}
+
+header h1{
+
+    font-size:24px;
+
+}
+
+.header-content{
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.button-group{
+
+    flex-direction:column;
+
+}
+
+}
+
+
+@media(max-width:500px){
+
+.login-box{
+
+    padding:24px;
+
+}
+
+.login-box h2{
+
+    font-size:26px;
+
+}
+
+header h1{
+
+    font-size:21px;
+
+}
+
+}
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+body.dark{
+
+    background:
+    linear-gradient(
+        135deg,
+        #0f172a,
+        #111827,
+        #1e293b
+    );
+
+    color:#f8fafc;
+
+}
+
+body.dark::before{
+
+    background:
+    rgba(37,99,235,.18);
+
+}
+
+body.dark::after{
+
+    background:
+    rgba(59,130,246,.12);
+
+}
+
+
+/* Header */
+
+body.dark header{
+
+    background:
+    rgba(15,23,42,.45);
+
+    border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+}
+
+
+/* Heading */
+
+body.dark header h1{
+
+    color:white;
+
+}
+
+body.dark header p{
+
+    color:#cbd5e1;
+
+}
+
+
+/* Login Box */
+
+body.dark .login-box{
+
+    background:
+    rgba(17,24,39,.70);
+
+    border:
+    1px solid rgba(255,255,255,.08);
+
+}
+
+
+/* Login Title */
+
+body.dark .login-box h2{
+
+    color:white;
+
+}
+
+
+/* Labels */
+
+body.dark .login-box label{
+
+    color:#e2e8f0;
+
+}
+
+
+/* Inputs */
+
+body.dark .login-box input,
+body.dark .login-box select{
+
+    background:#0f172a;
+
+    color:white;
+
+    border:1px solid #334155;
+
+}
+
+
+/* Placeholder */
+
+body.dark .login-box input::placeholder{
+
+    color:#94a3b8;
+
+}
+
+
+/* Focus */
+
+body.dark .login-box input:focus,
+body.dark .login-box select:focus{
+
+    background:#111827;
+
+    color:white;
+
+    border-color:#3b82f6;
+
+    box-shadow:
+    0 0 0 4px rgba(59,130,246,.20);
+
+}
+body.dark .error-box{
+
+    background:rgba(239,68,68,.15);
+
+    border:1px solid rgba(248,113,113,.30);
+
+    color:#fecaca;
+
+    box-shadow:
+    0 8px 24px rgba(239,68,68,.15);
+
+}
+
+/* Reset Button */
+
+body.dark .button-group button:last-child{
+
+    background:#1e293b;
+
+    color:white;
+
+}
+
+body.dark .button-group button:last-child:hover{
+
+    background:#334155;
+
+}
+
+
+/* Footer */
+
+body.dark footer{
+
+    color:#cbd5e1;
+
+}
+body.dark .eye-icon{
+    color:#cbd5e1;
+}
+
+body.dark .eye-icon:hover{
+    color:#60a5fa;
+}
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+body:not(.dark) .login-box{
+
+    background:
+    rgba(255,255,255,.58);
+
+}
+
+body:not(.dark) .login-box input,
+body:not(.dark) .login-box select{
+
+    background:white;
+
+    color:#1e293b;
+
+}
+
+body:not(.dark) .login-box input:focus,
+body:not(.dark) .login-box select:focus{
+
+    background:white;
+
+    color:#1e293b;
+
+}
+
+
+/* =========================================================
+   CHROME / BRAVE AUTOFILL FIX
+========================================================= */
+
+/* Light */
+
+body:not(.dark) input:-webkit-autofill,
+body:not(.dark) input:-webkit-autofill:hover,
+body:not(.dark) input:-webkit-autofill:focus,
+body:not(.dark) select:-webkit-autofill{
+
+    -webkit-box-shadow:
+    0 0 0 1000px white inset !important;
+
+    -webkit-text-fill-color:#1e293b !important;
+
+    transition:
+    background-color 9999s;
+
+}
+
+
+/* Dark */
+
+body.dark input:-webkit-autofill,
+body.dark input:-webkit-autofill:hover,
+body.dark input:-webkit-autofill:focus,
+body.dark select:-webkit-autofill{
+
+    -webkit-box-shadow:
+    0 0 0 1000px #0f172a inset !important;
+
+    -webkit-text-fill-color:white !important;
+
+    transition:
+    background-color 9999s;
+
+}
+
+
+/* =========================================================
+   SMOOTH TRANSITIONS
+========================================================= */
+
+body,
+header,
+.login-box,
+input,
+select,
+button,
+footer{
+
+    transition:
+    background .35s ease,
+    color .35s ease,
+    border-color .35s ease,
+    box-shadow .35s ease,
+    transform .30s ease;
+
+}
+.password-box{
+    position:relative;
+    width:100%;
+}
+
+.password-box input{
+    width:100%;
+    padding-right:45px;
+    box-sizing:border-box;
+}
+
+.toggle-password{
+    position:absolute;
+    right:15px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    user-select:none;
+    font-size:18px;
+    color:#666;
+}
+
+.toggle-password:hover{
+    color:#2563eb;
+}
+.password-box{
+    position:relative;
+}
+
+.password-box input{
+    width:100%;
+    padding-right:45px;
+}
+
+.eye-icon{
+    position:absolute;
+    right:15px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:20px;
+    user-select:none;
+    color:#64748b;
+    transition:.3s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.eye-icon:hover{
+    color:#2563eb;
+}

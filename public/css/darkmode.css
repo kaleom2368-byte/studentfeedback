@@ -1,0 +1,156 @@
+/* =========================
+   GLOBAL DARK MODE
+========================= */
+
+body.dark{
+
+    background:#0b1120;
+    color:#f8fafc;
+
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+body.dark header{
+
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+body.dark .portal-card,
+body.dark .feature-card,
+body.dark .login-box,
+body.dark .welcome-card,
+body.dark .profile-card,
+body.dark .stat-card,
+body.dark .feedback-card{
+
+    background:#1e293b;
+
+    color:#f8fafc;
+
+    border:1px solid #334155;
+
+}
+
+
+
+/* =========================
+   TEXT
+========================= */
+
+
+body.dark h1,
+body.dark h2,
+body.dark h3{
+
+    color:white;
+
+}
+
+
+body.dark p,
+body.dark span,
+body.dark label{
+
+    color:#cbd5e1;
+
+}
+
+
+
+/* =========================
+   INPUTS
+========================= */
+
+
+body.dark input,
+body.dark select,
+body.dark textarea{
+
+    background:#0f172a;
+
+    color:white;
+
+    border:1px solid #334155;
+
+}
+
+
+
+body.dark input::placeholder,
+body.dark textarea::placeholder{
+
+    color:#94a3b8;
+
+}
+
+
+
+body.dark input:focus,
+body.dark select:focus,
+body.dark textarea:focus{
+
+    border-color:#3b82f6;
+
+    box-shadow:0 0 10px rgba(59,130,246,.3);
+
+}
+
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+
+body.dark #dark-mode-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+
+body.dark #dark-mode-btn:hover{
+
+    background:#3b82f6;
+
+}
+
+
+
+/* =========================
+   LINKS
+========================= */
+
+
+body.dark a{
+
+    color:#60a5fa;
+
+}
+
+
+
+/* =========================
+   FOOTER
+========================= */
+
+
+body.dark footer{
+
+    background:#0f172a;
+
+    border-top:1px solid #334155;
+
+}

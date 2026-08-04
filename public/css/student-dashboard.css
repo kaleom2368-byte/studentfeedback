@@ -1,311 +1,2866 @@
-/* ===========================
-   STUDENT DASHBOARD CSS
-=========================== */
+/* =====================================================
+   ANONYMOUS STUDENT FEEDBACK SYSTEM
+   STUDENT DASHBOARD
+   PART 1 - GLOBAL + BACKGROUND + HEADER + NAV
+===================================================== */
+
+
+/* ================= GOOGLE FONT ================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+/* ================= RESET ================= */
 
 *{
+
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    font-family:'Poppins',sans-serif;
+
 }
+
+
+/* ================= ROOT ================= */
+
+:root{
+
+    --primary:#2563eb;
+    --secondary:#1d4ed8;
+    --accent:#60a5fa;
+
+    --dark:#0f172a;
+
+    --white:#ffffff;
+
+    --text:#1e293b;
+    --muted:#64748b;
+
+    --glass-dark:rgba(255,255,255,.10);
+    --glass-light:rgba(255,255,255,.75);
+
+}
+
+
+/* ================= HTML ================= */
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+
+/* ================= BODY ================= */
 
 body{
-    background:#f4f7fc;
-    color:#333;
+
+    min-height:100vh;
+
+    color:white;
+
+    overflow-x:hidden;
+
+    background:
+    linear-gradient(
+        135deg,
+        #0f172a,
+        #1d4ed8,
+        #38bdf8
+    );
+
+    position:relative;
+
 }
 
-/* ===========================
+
+/* ================= BACKGROUND GLOW ================= */
+
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    width:500px;
+    height:500px;
+
+    top:-180px;
+    left:-180px;
+
+    border-radius:50%;
+
+    background:
+    rgba(96,165,250,.25);
+
+    filter:blur(130px);
+
+    z-index:-1;
+
+}
+
+
+
+body::after{
+
+    content:"";
+
+    position:fixed;
+
+    width:450px;
+    height:450px;
+
+    bottom:-150px;
+    right:-150px;
+
+    border-radius:50%;
+
+    background:
+    rgba(37,99,235,.25);
+
+    filter:blur(130px);
+
+    z-index:-1;
+
+}
+
+
+
+/* ================= CONTAINER ================= */
+
+
+.container{
+
+    width:92%;
+
+    max-width:1300px;
+
+    margin:auto;
+
+}
+
+
+
+/* =====================================================
    HEADER
-=========================== */
+===================================================== */
+
 
 header{
-    background:linear-gradient(135deg,#003366,#00509e);
-    color:#fff;
-    padding:20px 50px;
+
+    width:100%;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+    padding:22px 0;
+
+    background:
+    rgba(255,255,255,.10);
+
+    backdrop-filter:blur(20px);
+
+    border-bottom:
+
+    1px solid rgba(255,255,255,.15);
+
+    box-shadow:
+
+    0 10px 35px rgba(0,0,0,.20);
+
+}
+
+
+
+.header-content{
+
+    width:92%;
+
+    max-width:1300px;
+
+    margin:auto;
 
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
 
-    box-shadow:0 5px 15px rgba(0,0,0,.15);
 }
 
-header h1{
-    font-size:30px;
+
+
+.header-left h1{
+
+    font-size:34px;
+
+    font-weight:700;
+
+    color:white;
+
 }
 
-header p{
-    margin-top:5px;
+
+
+.header-left p{
+
+    margin-top:6px;
+
     font-size:16px;
-    opacity:.9;
+
+    color:#dbeafe;
+
 }
+
+
+
+/* ================= HEADER BUTTON AREA ================= */
+
+
+.header-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+
+
+/* ================= DARK MODE BUTTON ================= */
+
+
+#dark-mode-btn{
+
+    height:48px;
+
+    padding:0 22px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#111827;
+
+    color:white;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+
+
+#dark-mode-btn:hover{
+
+    transform:translateY(-3px);
+
+    background:#000;
+
+}
+
+
+
+/* ================= LOGOUT BUTTON ================= */
+
 
 .logout-btn{
+
+    height:48px;
+
+    padding:0 25px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:12px;
+
     text-decoration:none;
-    background:#ff4d4d;
-    color:#fff;
-    padding:12px 25px;
-    border-radius:8px;
-    font-weight:bold;
+
+    color:white;
+
+    font-weight:600;
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #ef4444,
+        #dc2626
+    );
+
     transition:.3s;
+
 }
+
+
 
 .logout-btn:hover{
-    background:#d63031;
-    transform:translateY(-2px);
+
+    transform:translateY(-3px);
+
+    box-shadow:
+
+    0 15px 30px rgba(239,68,68,.35);
+
 }
 
-/* ===========================
+
+
+/* =====================================================
    NAVIGATION
-=========================== */
+===================================================== */
+
 
 nav{
-    background:#004080;
+
+    width:92%;
+
+    max-width:1300px;
+
+    margin:25px auto;
+
+    padding:18px 25px;
+
     display:flex;
+
     justify-content:center;
-    gap:30px;
-    padding:15px;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:25px;
+
+
+    background:
+
+    rgba(255,255,255,.10);
+
+
+    backdrop-filter:blur(20px);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.15);
+
+
+    border-radius:20px;
+
+
+    box-shadow:
+
+    0 10px 30px rgba(0,0,0,.20);
+
 }
+
+
 
 nav a{
-    color:#fff;
+
+    position:relative;
+
+    padding:10px 15px;
+
+    color:white;
+
     text-decoration:none;
-    font-weight:bold;
+
+    font-weight:600;
+
     transition:.3s;
+
 }
+
+
+
+/* underline */
+
+nav a::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    bottom:0;
+
+    width:0;
+
+    height:3px;
+
+    background:#facc15;
+
+    border-radius:20px;
+
+    transition:.3s;
+
+}
+
+
 
 nav a:hover{
-    color:#ffd700;
+
+    color:#60a5fa;
+
 }
 
-/* ===========================
-   MAIN
-=========================== */
+
+
+nav a:hover::after{
+
+    width:100%;
+
+}
+/* =====================================================
+   PART 2 - MAIN LAYOUT + WELCOME + GLASS CARDS
+===================================================== */
+
+
+/* ================= MAIN ================= */
+
 
 main{
-    width:90%;
+
+    width:92%;
+
     max-width:1300px;
-    margin:35px auto;
+
+    margin:35px auto 100px;
+
 }
 
-/* ===========================
-   WELCOME
-=========================== */
+
+
+section{
+
+    margin-bottom:35px;
+
+}
+
+
+
+/* =====================================================
+   GLASS CARD SYSTEM
+===================================================== */
+
+
+.glass-card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    padding:35px;
+
+    background:
+
+    rgba(255,255,255,.12);
+
+    backdrop-filter:blur(22px);
+
+    border:
+
+    1px solid rgba(255,255,255,.18);
+
+    border-radius:24px;
+
+    box-shadow:
+
+    0 20px 45px rgba(0,0,0,.22);
+
+    transition:.35s ease;
+
+}
+
+
+
+.glass-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:
+
+    0 30px 60px rgba(0,0,0,.30);
+
+}
+
+
+
+/* ================= CARD SHINE ================= */
+
+
+.glass-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:200px;
+
+    height:200px;
+
+    right:-100px;
+
+    top:-100px;
+
+    border-radius:50%;
+
+    background:
+
+    rgba(96,165,250,.18);
+
+    filter:blur(40px);
+
+}
+
+
+
+/* =====================================================
+   WELCOME CARD
+===================================================== */
+
 
 .welcome-card{
-    background:#fff;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,.1);
-    margin-bottom:30px;
+
+    position:relative;
+
+    padding:40px;
+
+    overflow:hidden;
+
 }
+
+
+
+.welcome-content{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:40px;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.welcome-text{
+
+    flex:1;
+
+}
+
+
+
+/* ================= TAG ================= */
+
+
+.welcome-tag{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:8px 18px;
+
+    margin-bottom:18px;
+
+    border-radius:50px;
+
+    background:
+
+    rgba(255,255,255,.15);
+
+    border:
+
+    1px solid rgba(255,255,255,.20);
+
+    color:#dbeafe;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+
+
+/* ================= TITLE ================= */
+
 
 .welcome-card h2{
-    color:#003366;
-    margin-bottom:15px;
-    font-size:30px;
+
+    font-size:34px;
+
+    font-weight:700;
+
+    margin-bottom:18px;
+
+    color:white;
+
 }
+
+
 
 .welcome-card p{
-    color:#666;
-    line-height:1.8;
+
+    max-width:850px;
+
+    font-size:16px;
+
+    line-height:1.9;
+
+    color:#e2e8f0;
+
 }
 
-/* ===========================
-   PROFILE
-=========================== */
+
+
+/* ================= IMAGE / ICON ================= */
+
+
+.welcome-image{
+
+    width:180px;
+
+    height:180px;
+
+    border-radius:50%;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    font-size:85px;
+
+
+    background:
+
+    rgba(255,255,255,.10);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.20);
+
+
+    box-shadow:
+
+    0 15px 35px rgba(0,0,0,.20);
+
+}
+
+
+
+/* =====================================================
+   WELCOME BUTTONS
+===================================================== */
+
+
+.welcome-buttons{
+
+    display:flex;
+
+    gap:18px;
+
+    margin-top:30px;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.primary-btn,
+.secondary-btn{
+
+    display:inline-flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    padding:14px 30px;
+
+    border-radius:50px;
+
+
+    text-decoration:none;
+
+
+    font-weight:600;
+
+
+    transition:.3s;
+
+}
+
+
+
+/* PRIMARY */
+
+
+.primary-btn{
+
+    color:white;
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #3b82f6,
+        #2563eb
+    );
+
+}
+
+
+
+.primary-btn:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+
+    0 15px 35px rgba(37,99,235,.45);
+
+}
+
+
+
+/* SECONDARY */
+
+
+.secondary-btn{
+
+    color:white;
+
+
+    border:
+
+    1px solid rgba(255,255,255,.30);
+
+
+    background:
+
+    rgba(255,255,255,.08);
+
+}
+
+
+
+.secondary-btn:hover{
+
+    transform:translateY(-4px);
+
+    background:
+
+    rgba(255,255,255,.15);
+
+}
+
+
+
+/* =====================================================
+   LEFT BLUE ACCENT
+===================================================== */
+
+
+.welcome-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:0;
+
+    height:100%;
+
+    width:6px;
+
+
+    background:
+
+    linear-gradient(
+        180deg,
+        #60a5fa,
+        #2563eb
+    );
+
+}
+
+
+
+/* =====================================================
+   SECTION TITLE
+===================================================== */
+
+
+.section-title{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    margin-bottom:22px;
+
+    color:white;
+
+}
+
+
+
+/* =====================================================
+   GRID SYSTEM
+===================================================== */
+
+
+.grid{
+
+    display:grid;
+
+    gap:25px;
+
+}
+
+
+
+.grid-2{
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(320px,1fr));
+
+}
+
+
+
+.grid-3{
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(280px,1fr));
+
+}
+
+
+
+.grid-4{
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(230px,1fr));
+
+}
+/* =====================================================
+   PART 3 - PROFILE + STATISTICS + DASHBOARD CARDS
+===================================================== */
+
+
+/* =====================================================
+   PROFILE CARD
+===================================================== */
+
 
 .profile-card{
-    background:#fff;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,.1);
-    margin-bottom:30px;
+
+    padding:35px;
+
 }
 
-.profile-card h2{
-    color:#003366;
-    margin-bottom:25px;
-}
+
 
 .profile-grid{
+
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(260px,1fr));
+
+    gap:22px;
+
 }
+
+
+
+/* ================= PROFILE ITEM ================= */
+
 
 .profile-item{
-    background:#f8fbff;
-    border-left:5px solid #00509e;
-    padding:18px;
-    border-radius:10px;
+
+    padding:22px;
+
+    border-radius:18px;
+
+    background:
+
+    rgba(255,255,255,.08);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.15);
+
+
+    transition:.3s;
+
 }
 
-.label{
+
+
+.profile-item:hover{
+
+    transform:translateY(-5px);
+
+
+    background:
+
+    rgba(255,255,255,.15);
+
+
+    box-shadow:
+
+    0 15px 35px rgba(0,0,0,.20);
+
+}
+
+
+
+/* Label */
+
+
+.profile-item .label{
+
     display:block;
-    color:#00509e;
-    font-weight:bold;
-    margin-bottom:8px;
+
+    font-size:13px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.6px;
+
+    color:#bfdbfe;
+
+    font-weight:600;
+
+    margin-bottom:10px;
+
 }
 
-/* ===========================
-   DASHBOARD CARDS
-=========================== */
 
-.dashboard-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:25px;
-    margin-bottom:35px;
+
+/* Value */
+
+
+.profile-item .value{
+
+    font-size:19px;
+
+    font-weight:600;
+
+    color:white;
+
 }
 
-.dashboard-card{
-    background:#fff;
-    padding:25px;
-    border-radius:15px;
-    text-align:center;
-    box-shadow:0 5px 15px rgba(0,0,0,.1);
-    transition:.3s;
-}
 
-.dashboard-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 10px 25px rgba(0,0,0,.15);
-}
 
-.dashboard-card h3{
-    color:#003366;
-    margin-bottom:15px;
-}
+/* =====================================================
+   STATISTICS SECTION
+===================================================== */
 
-.dashboard-card p{
-    color:#666;
-    margin-bottom:20px;
-    line-height:1.6;
-}
-
-.dashboard-card a{
-    display:inline-block;
-    text-decoration:none;
-    background:#00509e;
-    color:#fff;
-    padding:10px 25px;
-    border-radius:8px;
-    transition:.3s;
-}
-
-.dashboard-card a:hover{
-    background:#003366;
-}
-
-/* ===========================
-   STATISTICS
-=========================== */
-
-.stats-section{
-    margin-bottom:35px;
-}
-
-.stats-section h2{
-    color:#003366;
-    margin-bottom:20px;
-}
 
 .stats-grid{
+
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(220px,1fr));
+
+
+    gap:25px;
+
 }
+
+
+
+/* ================= STAT CARD ================= */
+
 
 .stat-card{
-    background:#fff;
-    padding:25px;
+
+    padding:30px;
+
     text-align:center;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,.1);
+
+
+    background:
+
+    rgba(255,255,255,.10);
+
+
+    backdrop-filter:blur(20px);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.18);
+
+
+    border-radius:22px;
+
+
+    transition:.35s;
+
 }
 
-.stat-card h3{
-    color:#00509e;
+
+
+.stat-card:hover{
+
+    transform:translateY(-8px);
+
+
+    box-shadow:
+
+    0 25px 50px rgba(0,0,0,.25);
+
+}
+
+
+
+/* Icon */
+
+
+.stat-icon{
+
     font-size:42px;
-    margin-bottom:10px;
+
+    margin-bottom:15px;
+
 }
 
-.stat-card p{
-    color:#666;
+
+
+/* Number */
+
+
+.stat-number{
+
+    font-size:38px;
+
+    font-weight:700;
+
+    color:white;
+
+    margin-bottom:8px;
+
 }
 
-/* ===========================
-   NOTIFICATIONS
-=========================== */
+
+
+/* Title */
+
+
+.stat-title{
+
+    font-size:15px;
+
+    color:#dbeafe;
+
+}
+
+
+
+/* =====================================================
+   DASHBOARD CARDS
+===================================================== */
+
+
+.dashboard-grid{
+
+    display:grid;
+
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(300px,1fr));
+
+
+    gap:28px;
+
+}
+
+
+
+/* ================= DASHBOARD CARD ================= */
+
+
+.dashboard-card{
+
+
+    padding:35px;
+
+    text-align:center;
+
+
+    background:
+
+    rgba(255,255,255,.10);
+
+
+    backdrop-filter:blur(20px);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.18);
+
+
+    border-radius:24px;
+
+
+    transition:.35s;
+
+}
+
+
+
+.dashboard-card:hover{
+
+    transform:translateY(-8px);
+
+
+    box-shadow:
+
+    0 25px 55px rgba(0,0,0,.30);
+
+}
+
+
+
+/* Icon */
+
+
+.dashboard-card .card-icon{
+
+    font-size:55px;
+
+    margin-bottom:18px;
+
+}
+
+
+
+/* Heading */
+
+
+.dashboard-card h3{
+
+    font-size:24px;
+
+    margin-bottom:15px;
+
+    color:white;
+
+}
+
+
+
+/* Description */
+
+
+.dashboard-card p{
+
+    color:#dbeafe;
+
+    line-height:1.8;
+
+    margin-bottom:28px;
+
+}
+
+
+
+/* ================= CARD BUTTON ================= */
+
+
+.dashboard-card a{
+
+
+    display:inline-flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    width:180px;
+
+    height:50px;
+
+
+    border-radius:50px;
+
+
+    text-decoration:none;
+
+
+    color:white;
+
+
+    font-weight:600;
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #3b82f6,
+        #2563eb
+    );
+
+
+    transition:.3s;
+
+}
+
+
+
+.dashboard-card a:hover{
+
+    transform:translateY(-4px);
+
+
+    box-shadow:
+
+    0 15px 35px rgba(37,99,235,.45);
+
+}
+
+
+
+/* =====================================================
+   CARD BLUE GLOW BORDER
+===================================================== */
+
+
+.profile-item:hover,
+.stat-card:hover,
+.dashboard-card:hover{
+
+    border-color:
+
+    rgba(96,165,250,.50);
+
+}
+/* =====================================================
+   PART 4 - NOTIFICATIONS + ACTIONS + ANIMATIONS
+===================================================== */
+
+
+/* =====================================================
+   NOTIFICATION SECTION
+===================================================== */
+
 
 .notification-section{
-    background:#fff;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,.1);
+
+    padding:35px;
+
+    background:
+
+    rgba(255,255,255,.10);
+
+
+    backdrop-filter:blur(22px);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.18);
+
+
+    border-radius:22px;
+
 }
 
-.notification-section h2{
-    color:#003366;
-    margin-bottom:20px;
+
+
+/* Title */
+
+
+.notification-section h3{
+
+    font-size:28px;
+
+    margin-bottom:25px;
+
+    color:white;
+
 }
 
-.notification-section ul{
-    padding-left:25px;
+
+
+/* =====================================================
+   NOTIFICATION ITEM
+===================================================== */
+
+
+.notification{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+
+    padding:18px 22px;
+
+
+    margin-bottom:18px;
+
+
+    border-radius:16px;
+
+
+    background:
+
+    rgba(255,255,255,.08);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.12);
+
+
+    transition:.3s;
+
 }
 
-.notification-section li{
-    margin-bottom:15px;
-    color:#555;
+
+
+.notification:hover{
+
+    transform:translateX(8px);
+
+
+    background:
+
+    rgba(255,255,255,.15);
+
 }
 
-/* ===========================
+
+
+/* Icon */
+
+
+.notification-icon{
+
+    width:55px;
+
+    height:55px;
+
+
+    flex-shrink:0;
+
+
+    border-radius:50%;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    font-size:24px;
+
+
+    background:
+
+    rgba(96,165,250,.20);
+
+
+    color:#60a5fa;
+
+}
+
+
+
+/* Content */
+
+
+.notification-content{
+
+    flex:1;
+
+}
+
+
+
+.notification-content h4{
+
+    font-size:18px;
+
+    margin-bottom:5px;
+
+    color:white;
+
+}
+
+
+
+.notification-content p{
+
+    color:#dbeafe;
+
+    line-height:1.6;
+
+}
+
+
+
+/* =====================================================
+   QUICK ACTION BUTTONS
+===================================================== */
+
+
+.action-buttons{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+
+    gap:18px;
+
+
+    margin-top:30px;
+
+}
+
+
+
+.action-buttons a{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    padding:14px 28px;
+
+
+    border-radius:50px;
+
+
+    text-decoration:none;
+
+
+    color:white;
+
+
+    font-weight:600;
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #3b82f6,
+        #2563eb
+    );
+
+
+    transition:.3s;
+
+}
+
+
+
+.action-buttons a:hover{
+
+    transform:translateY(-4px);
+
+
+    box-shadow:
+
+    0 15px 35px rgba(37,99,235,.45);
+
+}
+
+
+
+/* =====================================================
+   SUCCESS MESSAGE
+===================================================== */
+
+
+.feedback-success{
+
+    position:fixed;
+
+
+    top:25px;
+
+
+    left:50%;
+
+
+    transform:translateX(-50%);
+
+
+    padding:18px 35px;
+
+
+    border-radius:18px;
+
+
+    background:
+
+    rgba(34,197,94,.20);
+
+
+    backdrop-filter:blur(20px);
+
+
+    border:
+
+    1px solid rgba(34,197,94,.40);
+
+
+    color:white;
+
+
+    font-weight:600;
+
+
+    font-size:16px;
+
+
+    box-shadow:
+
+    0 20px 40px rgba(0,0,0,.25);
+
+
+    z-index:9999;
+
+
+    animation:
+
+    popup .35s ease;
+
+}
+
+
+
+/* Popup Animation */
+
+
+@keyframes popup{
+
+    from{
+
+        opacity:0;
+
+        transform:
+
+        translate(-50%,-30px);
+
+    }
+
+
+    to{
+
+        opacity:1;
+
+        transform:
+
+        translate(-50%,0);
+
+    }
+
+}
+
+
+
+/* =====================================================
+   LOADING SPINNER
+===================================================== */
+
+
+.loading{
+
+    width:45px;
+
+    height:45px;
+
+
+    border-radius:50%;
+
+
+    border:
+
+    4px solid rgba(255,255,255,.20);
+
+
+    border-top:
+
+    4px solid white;
+
+
+    animation:
+
+    spin 1s linear infinite;
+
+
+    margin:auto;
+
+}
+
+
+
+@keyframes spin{
+
+    from{
+
+        transform:rotate(0deg);
+
+    }
+
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+
+
+/* =====================================================
+   FADE ANIMATION CLASS
+===================================================== */
+
+
+.fade-in{
+
+    animation:
+
+    fadeIn .5s ease;
+
+}
+
+
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+
+/* =====================================================
+   SMOOTH TRANSITIONS
+===================================================== */
+
+
+button,
+a,
+.glass-card,
+.profile-item,
+.stat-card,
+.dashboard-card,
+.notification{
+
+    transition:
+
+    transform .3s ease,
+    box-shadow .3s ease,
+    background .3s ease;
+
+}
+/* =====================================================
+   PART 5 - LIGHT MODE + DARK MODE + FOOTER + RESPONSIVE
+===================================================== */
+
+
+/* =====================================================
    FOOTER
-=========================== */
+===================================================== */
+
 
 footer{
-    margin-top:50px;
-    background:#003366;
-    color:#fff;
-    text-align:center;
-    padding:20px;
+
+    position:fixed;
+
+    left:0;
+
+    bottom:0;
+
+    width:100%;
+
+
+    height:55px;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    background:
+
+    rgba(255,255,255,.10);
+
+
+    backdrop-filter:blur(20px);
+
+
+    border-top:
+
+    1px solid rgba(255,255,255,.15);
+
+
+    color:white;
+
+
+    font-size:14px;
+
+
+    z-index:1000;
+
 }
 
-/* ===========================
+
+
+
+
+/* =====================================================
+   LIGHT MODE
+===================================================== */
+
+
+body:not(.dark){
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #eff6ff,
+        #dbeafe,
+        #bfdbfe
+    );
+
+
+    color:#111827;
+
+}
+
+
+
+/* Background glow */
+
+
+body:not(.dark)::before{
+
+    background:
+
+    rgba(37,99,235,.12);
+
+}
+
+
+
+body:not(.dark)::after{
+
+    background:
+
+    rgba(96,165,250,.20);
+
+}
+
+
+
+/* ================= HEADER ================= */
+
+
+body:not(.dark) header{
+
+    background:
+
+    rgba(255,255,255,.80);
+
+
+    border-bottom:
+
+    1px solid rgba(0,0,0,.08);
+
+}
+
+
+
+body:not(.dark) .header-left h1{
+
+    color:#1e3a8a;
+
+}
+
+
+
+body:not(.dark) .header-left p{
+
+    color:#475569;
+
+}
+
+
+
+
+
+/* ================= BUTTON ================= */
+
+
+body:not(.dark) #dark-mode-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+
+
+body:not(.dark) #dark-mode-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+
+
+/* Logout stays same */
+
+
+
+
+/* ================= NAV ================= */
+
+
+body:not(.dark) nav{
+
+    background:
+
+    rgba(255,255,255,.80);
+
+
+    border:
+
+    1px solid rgba(0,0,0,.08);
+
+}
+
+
+
+body:not(.dark) nav a{
+
+    color:#1e293b;
+
+}
+
+
+
+body:not(.dark) nav a:hover{
+
+    color:#2563eb;
+
+}
+
+
+
+
+
+/* =====================================================
+   LIGHT MODE CARDS
+===================================================== */
+
+
+body:not(.dark) .glass-card,
+body:not(.dark) .profile-card,
+body:not(.dark) .dashboard-card,
+body:not(.dark) .stat-card,
+body:not(.dark) .notification-section{
+
+
+    background:
+
+    rgba(255,255,255,.85);
+
+
+    border:
+
+    1px solid rgba(0,0,0,.08);
+
+
+    color:#111827;
+
+
+    box-shadow:
+
+    0 20px 45px rgba(0,0,0,.12);
+
+}
+
+
+
+
+
+/* Titles */
+
+
+body:not(.dark) h2,
+body:not(.dark) h3,
+body:not(.dark) h4{
+
+
+    color:#1e3a8a;
+
+}
+
+
+
+/* Paragraph */
+
+
+body:not(.dark) p{
+
+    color:#475569;
+
+}
+
+
+
+
+
+/* Welcome */
+
+
+body:not(.dark) .welcome-tag{
+
+    background:#dbeafe;
+
+    color:#1d4ed8;
+
+}
+
+
+
+body:not(.dark) .welcome-card p{
+
+    color:#475569;
+
+}
+
+
+
+
+
+/* Profile */
+
+
+body:not(.dark) .profile-item{
+
+
+    background:#ffffff;
+
+
+    border:
+
+    1px solid #dbe4ef;
+
+
+}
+
+
+
+body:not(.dark) .profile-item .label{
+
+    color:#2563eb;
+
+}
+
+
+
+body:not(.dark) .profile-item .value{
+
+    color:#111827;
+
+}
+
+
+
+
+
+/* Statistics */
+
+
+body:not(.dark) .stat-number{
+
+    color:#1e3a8a;
+
+}
+
+
+
+body:not(.dark) .stat-title{
+
+    color:#475569;
+
+}
+
+
+
+
+
+/* Dashboard text */
+
+
+body:not(.dark) .dashboard-card p{
+
+    color:#475569;
+
+}
+
+
+
+
+
+/* Notifications */
+
+
+body:not(.dark) .notification{
+
+
+    background:white;
+
+
+    border:
+
+    1px solid #dbe4ef;
+
+}
+
+
+
+body:not(.dark) .notification-content p{
+
+    color:#475569;
+
+}
+
+
+
+
+
+/* Action secondary button */
+
+
+body:not(.dark) .secondary-btn{
+
+
+    color:#1d4ed8;
+
+
+    border:
+
+    1px solid #93c5fd;
+
+
+    background:white;
+
+}
+
+
+
+body:not(.dark) .secondary-btn:hover{
+
+    background:#eff6ff;
+
+}
+
+
+
+
+
+/* Footer */
+
+
+body:not(.dark) footer{
+
+
+    background:
+
+    rgba(255,255,255,.85);
+
+
+    color:#334155;
+
+
+    border-top:
+
+    1px solid rgba(0,0,0,.08);
+
+}
+
+
+
+
+
+
+
+/* =====================================================
+   DARK MODE POLISH
+===================================================== */
+
+
+body.dark{
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #020617,
+        #111827,
+        #000000
+    );
+
+}
+
+
+
+
+body.dark header,
+body.dark nav,
+body.dark footer{
+
+
+    background:
+
+    rgba(15,23,42,.85);
+
+}
+
+
+
+body.dark .glass-card,
+body.dark .profile-card,
+body.dark .dashboard-card,
+body.dark .stat-card,
+body.dark .notification-section{
+
+
+    background:
+
+    rgba(30,41,59,.80);
+
+}
+
+
+
+body.dark .profile-item,
+body.dark .notification{
+
+
+    background:
+
+    rgba(255,255,255,.08);
+
+}
+
+
+
+
+
+/* =====================================================
    RESPONSIVE
-=========================== */
+===================================================== */
+
 
 @media(max-width:900px){
 
-header{
+
+.header-content{
+
     flex-direction:column;
+
     gap:20px;
+
     text-align:center;
+
 }
+
+
+
+.header-right{
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+}
+
+
 
 nav{
-    flex-wrap:wrap;
+
     gap:15px;
+
 }
 
-header h1{
-    font-size:24px;
+
+
+.welcome-content{
+
+    flex-direction:column;
+
+    text-align:center;
+
 }
 
-.welcome-card h2{
-    font-size:24px;
+
+
+.welcome-buttons{
+
+    justify-content:center;
+
 }
+
+
 
 .profile-grid,
-.dashboard-grid,
-.stats-grid{
+.stats-grid,
+.dashboard-grid{
+
     grid-template-columns:1fr;
+
 }
 
-.logout-btn{
-    width:100%;
-    text-align:center;
+
+
 }
+
+
+
+
+@media(max-width:600px){
+
+
+body{
+
+    padding-bottom:70px;
+
+}
+
+
+
+.header-left h1{
+
+    font-size:26px;
+
+}
+
+
+
+.welcome-card h2{
+
+    font-size:28px;
+
+}
+
+
+
+.section-title{
+
+    font-size:24px;
+
+}
+
+
+
+footer{
+
+    font-size:12px;
+
+}
+
+
+
+}
+/* =====================================================
+   PART 6 - PREMIUM FINISHING TOUCHES
+===================================================== */
+
+
+/* =====================================================
+   CUSTOM SCROLLBAR
+===================================================== */
+
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+
+
+::-webkit-scrollbar-track{
+
+    background:#0f172a;
+
+}
+
+
+
+::-webkit-scrollbar-thumb{
+
+    background:
+
+    linear-gradient(
+        180deg,
+        #60a5fa,
+        #2563eb
+    );
+
+
+    border-radius:20px;
+
+}
+
+
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#1d4ed8;
+
+}
+
+
+
+/* Light mode scrollbar */
+
+
+body:not(.dark)::-webkit-scrollbar-track{
+
+    background:#e2e8f0;
+
+}
+
+
+
+body:not(.dark)::-webkit-scrollbar-thumb{
+
+    background:#2563eb;
+
+}
+
+
+
+
+
+/* =====================================================
+   TEXT SELECTION
+===================================================== */
+
+
+::selection{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+
+
+
+
+/* =====================================================
+   SMOOTH CARD ENTRY
+===================================================== */
+
+
+.glass-card,
+.profile-card,
+.dashboard-card,
+.stat-card,
+.notification-section{
+
+    animation:
+
+    fadeUp .6s ease both;
+
+}
+
+
+
+
+@keyframes fadeUp{
+
+
+    from{
+
+        opacity:0;
+
+        transform:
+
+        translateY(25px);
+
+    }
+
+
+
+    to{
+
+        opacity:1;
+
+        transform:
+
+        translateY(0);
+
+    }
+
+}
+
+
+
+
+
+/* =====================================================
+   BUTTON PRESS EFFECT
+===================================================== */
+
+
+button:active,
+a:active{
+
+    transform:scale(.96);
+
+}
+
+
+
+
+
+/* =====================================================
+   REMOVE UNWANTED TRANSFORM CONFLICTS
+===================================================== */
+
+
+body.dark .glass-card:hover,
+body.dark .profile-item:hover,
+body.dark .dashboard-card:hover,
+body.dark .stat-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+
+
+
+
+/* =====================================================
+   ACCESSIBILITY FOCUS
+===================================================== */
+
+
+a:focus,
+button:focus{
+
+
+    outline:none;
+
+
+    box-shadow:
+
+    0 0 0 4px rgba(96,165,250,.35);
+
+
+}
+
+
+
+
+
+/* =====================================================
+   PREMIUM HOVER LIGHT GLOW
+===================================================== */
+
+
+body:not(.dark) .glass-card:hover,
+body:not(.dark) .dashboard-card:hover,
+body:not(.dark) .stat-card:hover{
+
+
+    box-shadow:
+
+    0 25px 55px rgba(37,99,235,.18);
+
+}
+
+
+
+
+
+/* =====================================================
+   IMAGE / ICON POLISH
+===================================================== */
+
+
+.welcome-image,
+.card-icon,
+.stat-icon{
+
+
+    user-select:none;
+
+
+}
+
+
+
+
+
+/* =====================================================
+   DISABLE TEXT DRAG
+===================================================== */
+
+
+button,
+nav a,
+.primary-btn,
+.secondary-btn,
+.dashboard-card a{
+
+
+    user-select:none;
+
+}
+
+
+
+
+
+/* =====================================================
+   SMOOTH PAGE FEEL
+===================================================== */
+
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+
+
+
+
+/* =====================================================
+   PRINT CLEANUP
+===================================================== */
+
+
+@media print{
+
+
+    header,
+    footer,
+    nav,
+    #dark-mode-btn,
+    .logout-btn{
+
+
+        display:none;
+
+    }
+
+
+
+    body{
+
+
+        background:white;
+
+        color:black;
+
+    }
+
+
+}
+/* ===================================
+   FEEDBACK SUCCESS POPUP
+=================================== */
+
+.feedback-success {
+
+    position: fixed;
+
+    top: 120px;   /* distance from top */
+
+
+    left: 50%;
+
+    transform: translateX(-50%) scale(0.8);
+
+
+    min-width: 420px;
+
+    padding: 25px 35px;
+
+
+    background: rgba(34,197,94,0.18);
+
+    backdrop-filter: blur(18px);
+
+    -webkit-backdrop-filter: blur(18px);
+
+
+    border: 1px solid rgba(255,255,255,0.3);
+
+
+    color:white;
+
+    border-radius:22px;
+
+
+    text-align:center;
+
+
+    font-size:17px;
+
+    line-height:1.6;
+
+
+    box-shadow:
+    0 20px 50px rgba(0,0,0,0.35);
+
+
+    z-index:9999;
+
+
+    animation:
+    popupShow 0.5s cubic-bezier(.34,1.56,.64,1) forwards;
+
+}
+@keyframes popupShow {
+
+    from {
+
+        opacity:0;
+
+        transform:
+        translateX(-50%)
+        translateY(-30px)
+        scale(0.7);
+
+        filter:blur(8px);
+
+    }
+
+
+    to {
+
+        opacity:1;
+
+        transform:
+        translateX(-50%)
+        translateY(0)
+        scale(1);
+
+        filter:blur(0);
+
+    }
+
+}
+
+
+
+.feedback-success.hide {
+
+    animation:
+    popupHide 0.4s ease forwards;
+
+}
+
+
+
+@keyframes popupHide {
+
+    from {
+
+        opacity:1;
+
+        transform:
+        translateX(-50%)
+        translateY(0)
+        scale(1);
+
+    }
+
+
+    to {
+
+        opacity:0;
+
+        transform:
+        translateX(-50%)
+        translateY(-30px)
+        scale(0.7);
+
+    }
+
+}
+/* ===========================
+   SUCCESS POPUP CONTENT
+=========================== */
+
+.toast-icon{
+
+    font-size:48px;
+
+    margin-bottom:12px;
+
+}
+
+.toast-title{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+}
+
+.toast-message{
+
+    font-size:16px;
+
+    opacity:.95;
+
+    margin-bottom:18px;
+
+}
+
+
+
+/* Progress Bar */
+
+.toast-progress{
+
+    width:100%;
+
+    height:6px;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    background:rgba(255,255,255,.15);
+
+}
+
+
+
+.toast-progress-bar{
+
+    width:100%;
+
+    height:100%;
+
+    border-radius:20px;
+
+    background:linear-gradient(
+        90deg,
+        #6dff8d,
+        #00d26a
+    );
+
+    animation:progressBar 5s linear forwards;
+
+}
+
+
+
+@keyframes progressBar{
+
+    from{
+
+        width:100%;
+
+    }
+
+    to{
+
+        width:0%;
+
+    }
 
 }

@@ -1,0 +1,282 @@
+/* =========================
+   COMMON LOGIN DESIGN
+========================= */
+
+
+main{
+
+    min-height:70vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+
+.login-box{
+
+
+    width:420px;
+
+    padding:40px;
+
+    background:white;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+    transition:.3s;
+
+
+}
+
+
+
+.login-box:hover{
+
+    transform:translateY(-5px);
+
+}
+
+
+
+.login-box h2{
+
+    text-align:center;
+
+    color:#003366;
+
+    margin-bottom:30px;
+
+}
+
+
+
+/* labels */
+
+
+.login-box label{
+
+    display:block;
+
+    margin-top:15px;
+
+    margin-bottom:8px;
+
+    font-weight:bold;
+
+    color:#334155;
+
+}
+
+
+
+/* inputs */
+
+
+.login-box input,
+.login-box select{
+
+
+    width:100%;
+
+    padding:14px;
+
+    border-radius:10px;
+
+    border:1px solid #cbd5e1;
+
+    outline:none;
+
+    background:#f8fafc;
+
+    color:#111827;
+
+    font-size:15px;
+
+    transition:.3s;
+
+
+}
+
+
+
+.login-box input:focus,
+.login-box select:focus{
+
+
+    border-color:#0284c7;
+
+    box-shadow:0 0 0 3px rgba(2,132,199,.2);
+
+
+}
+
+
+
+/* checkbox */
+
+
+.checkbox{
+
+
+    margin-top:20px;
+
+    display:flex;
+
+    gap:10px;
+
+    align-items:center;
+
+}
+
+
+
+/* buttons */
+
+
+.button-group{
+
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:25px;
+
+
+}
+
+
+
+.button-group button{
+
+
+    flex:1;
+
+    padding:13px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    background:#00509e;
+
+    color:white;
+
+
+}
+
+
+
+.button-group button:hover{
+
+
+    background:#003366;
+
+
+}
+
+
+
+/* links */
+
+
+.links{
+
+    text-align:center;
+
+    margin-top:25px;
+
+}
+
+
+
+.links a{
+
+
+    color:#00509e;
+
+    text-decoration:none;
+
+
+}
+
+
+
+/* =========================
+      DARK MODE
+========================= */
+
+
+body.dark .login-box{
+
+
+    background:#1e293b;
+
+}
+
+
+
+body.dark .login-box h2{
+
+
+    color:white;
+
+
+}
+
+
+
+body.dark .login-box label{
+
+
+    color:#e2e8f0;
+
+
+}
+
+
+
+body.dark .login-box input,
+body.dark .login-box select{
+
+
+    background:#0f172a;
+
+    color:white;
+
+    border:1px solid #475569;
+
+
+}
+
+
+
+body.dark .login-box input:focus,
+body.dark .login-box select:focus{
+
+
+    border-color:#38bdf8;
+
+
+}
+
+
+
+body.dark .links a{
+
+
+    color:#38bdf8;
+
+
+}

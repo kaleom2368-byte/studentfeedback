@@ -1,47 +1,52 @@
 const express = require("express");
-
 const router = express.Router();
 
 const db = require("../db");
 
 
+// =====================================
+// GET FACULTY LIST FOR FEEDBACK FORM
+// =====================================
 
-// =======================
-// GET FACULTY LIST
-// =======================
-
-router.get("/faculty",(req,res)=>{
+router.get("/faculty", (req, res) => {
 
 
     const sql = `
-
-    SELECT 
-    faculty_id,
-    name,
-    department
-
-    FROM faculty
-
+        SELECT 
+            faculty_id,
+            name,
+            department
+        FROM faculty
     `;
 
 
-    db.query(sql,(err,result)=>{
+    db.query(sql, (err, result) => {
 
 
-        if(err){
+        if (err) {
 
-            console.log(err);
+            console.error("Faculty Fetch Error:", err);
+
 
             return res.status(500).json({
 
-                error:"Database Error"
+                success: false,
+
+                message: "Unable to fetch faculty"
 
             });
 
         }
 
 
-        res.json(result);
+
+        res.json({
+
+            success: true,
+
+            faculty: result
+
+        });
 
 
     });
@@ -52,37 +57,15 @@ router.get("/faculty",(req,res)=>{
 
 
 
-
-
-// =======================
+// =====================================
 // SUBMIT FEEDBACK
-// =======================
+// =====================================
 
-router.post("/submit",(req,res)=>{
-
-
-    // Check student login
-
-    if(!req.session.student){
-
-        return res.send(`
-
-        <h2>
-        Please Login First
-        </h2>
-
-        <a href="/student.html">
-        Login
-        </a>
-
-        `);
-
-    }
-
+router.post("/submit", (req, res) => {
 
 
     const {
-
+        
         faculty_id,
         department,
         subject,
@@ -95,39 +78,11 @@ router.post("/submit",(req,res)=>{
 
 
 
-    const student_id = req.session.student.student_id;
-
-
-
-
     const sql = `
 
-    INSERT INTO feedback
+        INSERT INTO feedback
 
-    (
-        student_id,
-        faculty_id,
-        department,
-        subject,
-        teaching,
-        communication,
-        behaviour,
-        comments
-    )
-
-    VALUES (?,?,?,?,?,?,?,?)
-
-    `;
-
-
-
-
-    db.query(
-
-        sql,
-
-        [
-
+        (
             student_id,
             faculty_id,
             department,
@@ -136,86 +91,78 @@ router.post("/submit",(req,res)=>{
             communication,
             behaviour,
             comments
+        )
 
-        ],
+        VALUES
 
+        (?,?,?,?,?,?,?,?)
 
-        (err,result)=>{
+    `;
 
+const values = [
 
-            if(err){
+    req.session.student.student_id,
 
-                console.log(err);
+    faculty_id,
 
+    department,
 
-                return res.send(`
+    subject,
 
-                <h2>
-                ❌ Feedback Submission Failed
-                </h2>
+    teaching,
 
+    communication,
 
-                <p>
-                ${err.message}
-                </p>
+    behaviour,
 
+    comments
 
-                <a href="/feedback.html">
-                Try Again
-                </a>
-
-                `);
-
-            }
+];
 
 
+    db.query(sql, values, (err, result) => {
 
 
-            res.send(`
-
-            <!DOCTYPE html>
-
-            <html>
-
-            <head>
-
-            <title>
-            Success
-            </title>
+        if (err) {
 
 
-            <meta http-equiv="refresh" content="2;url=/dashboard/student-dashboard.html">
+            console.error(
+                "Feedback Insert Error:",
+                err
+            );
 
 
-            </head>
+            return res.status(500).json({
 
+                success:false,
 
-            <body>
+                message:"Failed to submit feedback"
 
-
-            <h2>
-            ✅ Feedback Submitted Successfully
-            </h2>
-
-
-            <p>
-            Redirecting to Dashboard...
-            </p>
-
-
-            </body>
-
-
-            </html>
-
-            `);
-
+            });
 
 
         }
 
 
-    );
+
+        console.log(
+            "Feedback saved:",
+            result.insertId
+        );
+
+
+
+        res.json({
+
+            success:true,
+
+            redirect:"/dashboard/student-dashboard.html?feedback=success"
+
+        });
+
+
+
+    });
 
 
 });
@@ -223,36 +170,55 @@ router.post("/submit",(req,res)=>{
 
 
 
+// =====================================
+// FEEDBACK HISTORY
+// =====================================
+
+router.get("/history", (req, res) => {
 
 
+    res.json({
+
+        success:true,
+
+        feedback:[]
+
+    });
 
 
-// =======================
-// GET STUDENT FEEDBACK HISTORY
-// =======================
+});
 
-router.get("/history",(req,res)=>{
+// =====================================
+// FEEDBACK STATUS TEST
+// =====================================
+
+router.get("/status",(req,res)=>{
 
 
-    // Check student login
+    console.log("🔥 STATUS ROUTE HIT");
+
 
     if(!req.session.student){
 
-        return res.send(`
-
-        <h2>
-        Please Login First
-        </h2>
+        console.log("❌ No student session");
 
 
-        <a href="/student.html">
-        Login
-        </a>
+        return res.json({
 
-        `);
+            success:false,
+
+            message:"Not Logged In"
+
+        });
 
     }
 
+
+
+    console.log(
+        "Logged Student:",
+        req.session.student.student_id
+    );
 
 
 
@@ -262,71 +228,74 @@ router.get("/history",(req,res)=>{
 
     const sql = `
 
-    SELECT
+        SELECT
 
-    feedback.*,
+            feedback.faculty_id,
 
-    faculty.name AS faculty_name
+            feedback.subject,
 
+            feedback.submitted_at,
 
-    FROM feedback
+            faculty.name AS faculty_name
 
+        FROM feedback
 
-    JOIN faculty
+        JOIN faculty
 
-    ON feedback.faculty_id = faculty.faculty_id
+        ON feedback.faculty_id = faculty.faculty_id
 
+        WHERE feedback.student_id = ?
 
-    WHERE feedback.student_id = ?
-
-
-    ORDER BY feedback.submitted_at DESC
+        ORDER BY feedback.submitted_at DESC
 
     `;
 
 
 
-
-    db.query(
-
-        sql,
-
-        [student_id],
+    db.query(sql,[student_id],(err,result)=>{
 
 
-        (err,result)=>{
+        if(err){
+
+            console.error(
+                "Status Query Error:",
+                err
+            );
 
 
-            if(err){
+            return res.json({
 
-                console.log(err);
+                success:false
 
-
-                return res.status(500).json({
-
-                    error:"Database Error"
-
-                });
-
-            }
-
-
-
-            res.json(result);
-
-
+            });
 
         }
 
 
-    );
+
+        console.log(
+            "Feedback Found:",
+            result
+        );
+
+
+
+        res.json({
+
+            success:true,
+
+            count:result.length,
+
+            history:result
+
+        });
+
+
+
+    });
 
 
 
 });
-
-
-
-
 
 module.exports = router;

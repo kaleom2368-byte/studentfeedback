@@ -1,34 +1,39 @@
 const express = require("express");
-
 const router = express.Router();
 
 const db = require("../db");
 
 
-// =======================
-// FACULTY LOGIN
-// =======================
 
-router.post("/login",(req,res)=>{
+// =======================================
+// FACULTY LOGIN
+// =======================================
+
+router.post("/login", (req,res)=>{
 
 
     const {
-
         faculty_id,
+        email,
+        department,
         password
-
     } = req.body;
 
 
 
     const sql = `
 
-    SELECT *
+        SELECT *
 
-    FROM faculty
+        FROM faculty
 
-    WHERE faculty_id=? 
-    AND password=?
+        WHERE faculty_id = ?
+
+        AND email = ?
+
+        AND department = ?
+
+        AND password = ?
 
     `;
 
@@ -40,169 +45,92 @@ router.post("/login",(req,res)=>{
 
         [
             faculty_id,
+            email,
+            department,
             password
         ],
-
 
         (err,result)=>{
 
 
             if(err){
 
-                console.log(err);
+                console.error(
+                    "Faculty Login Error:",
+                    err
+                );
 
-                return res.send("Database Error");
+
+                return res
+                .status(500)
+                .send("Database Error");
 
             }
 
 
 
-            if(result.length > 0){
+
+            if(result.length === 0){
 
 
-                req.session.faculty = {
+                return res.redirect(
 
-                    faculty_id: result[0].faculty_id,
+                    "/auth/faculty.html?error=" +
 
-                    name: result[0].name,
+                    encodeURIComponent(
+                    "Invalid Faculty ID, Email, Department or Password"
+                    )
 
-                    email: result[0].email,
-
-                    department: result[0].department
-
-                };
-
-
-
-                res.send(`
-
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<title>
-Login Success
-</title>
-
-
-<meta http-equiv="refresh" content="2;url=/faculty-dashboard/faculty-dashboard.html">
-
-
-<style>
-
-body{
-
-font-family:Arial;
-
-background:#f4f6f9;
-
-height:100vh;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-}
-
-
-.box{
-
-background:white;
-
-padding:40px;
-
-border-radius:15px;
-
-text-align:center;
-
-box-shadow:0 5px 20px rgba(0,0,0,0.2);
-
-}
-
-
-h2{
-
-color:green;
-
-}
-
-
-</style>
-
-
-</head>
-
-
-<body>
-
-
-<div class="box">
-
-
-<h2>
-✅ Faculty Login Successful
-</h2>
-
-
-<p>
-Welcome ${result[0].name} 👋
-</p>
-
-
-<p>
-Department: ${result[0].department}
-</p>
-
-
-<p>
-Redirecting to Faculty Dashboard...
-</p>
-
-
-</div>
-
-
-</body>
-
-</html>
-
-                `);
+                );
 
 
             }
 
 
-            else{
 
 
-                res.send(`
-
-<h2>
-❌ Login Failed
-</h2>
+            const faculty = result[0];
 
 
-<p>
-Invalid Faculty ID or Password
-</p>
+
+            req.session.faculty = {
 
 
-<a href="/faculty.html">
-Try Again
-</a>
-
-                `);
+                faculty_id:
+                faculty.faculty_id,
 
 
-            }
+                name:
+                faculty.name,
+
+
+                email:
+                faculty.email,
+
+
+                department:
+                faculty.department,
+
+
+                subject:
+                faculty.subject
+
+
+
+            };
+
+
+
+
+            res.redirect(
+
+                "/dashboard/faculty-dashboard.html"
+
+            );
+
 
 
         }
-
 
     );
 
@@ -213,36 +141,40 @@ Try Again
 
 
 
-// =======================
-// GET LOGGED IN FACULTY INFO
-// =======================
+
+
+
+
+// =======================================
+// FACULTY INFO
+// =======================================
 
 router.get("/info",(req,res)=>{
 
 
     if(!req.session.faculty){
 
+
         return res.json({
 
-            logged:false
+            success:false
 
         });
+
 
     }
 
 
 
+
     res.json({
 
-        logged:true,
+        success:true,
 
-        name:req.session.faculty.name,
-
-        faculty_id:req.session.faculty.faculty_id,
-
-        department:req.session.faculty.department
+        faculty:req.session.faculty
 
     });
+
 
 
 });
@@ -253,60 +185,64 @@ router.get("/info",(req,res)=>{
 
 
 
-// =======================
-// GET FACULTY FEEDBACK
-// =======================
+
+
+// =======================================
+// FACULTY FEEDBACK ANALYTICS
+// =======================================
 
 router.get("/feedback",(req,res)=>{
 
 
     if(!req.session.faculty){
 
+
         return res.json({
 
-            total:0,
-
-            teaching:0,
-
-            communication:0,
-
-            behaviour:0,
-
-            feedback:[]
+            success:false
 
         });
+
 
     }
 
 
 
-    const faculty_id = req.session.faculty.faculty_id;
+    const faculty_id =
+    req.session.faculty.faculty_id;
+
 
 
 
     const sql = `
 
-    SELECT
 
-    subject,
+        SELECT
 
-    teaching,
+        subject,
 
-    communication,
+        teaching,
 
-    behaviour,
+        communication,
 
-    comments,
+        behaviour,
 
-    submitted_at
+        comments,
 
-    FROM feedback
+        created_at
 
-    WHERE faculty_id = ?
 
-    ORDER BY submitted_at DESC
+        FROM feedback
+
+
+        WHERE faculty_id = ?
+
+
+        ORDER BY created_at DESC
+
 
     `;
+
 
 
 
@@ -322,70 +258,242 @@ router.get("/feedback",(req,res)=>{
 
             if(err){
 
-                console.log(err);
 
-                return res.status(500).json({
+                console.error(
+                    "Feedback Error:",
+                    err
+                );
 
-                    error:"Database Error"
+
+                return res.json({
+
+                    success:false
 
                 });
+
 
             }
 
 
 
-            let total = result.length;
 
 
             let teaching = 0;
-
             let communication = 0;
-
             let behaviour = 0;
+
+
+
+            const teachStars =
+            [0,0,0,0,0];
+
+
+            const commStars =
+            [0,0,0,0,0];
+
+
+            const behaveStars =
+            [0,0,0,0,0];
+
+
+
 
 
 
             result.forEach(item=>{
 
 
-                teaching += item.teaching;
+                const teach =
+                Number(item.teaching);
 
-                communication += item.communication;
 
-                behaviour += item.behaviour;
+                const comm =
+                Number(item.communication);
+
+
+                const behave =
+                Number(item.behaviour);
+
+
+
+
+                teaching += teach;
+
+                communication += comm;
+
+                behaviour += behave;
+
+
+
+
+                if(teach >=1 && teach <=5)
+
+                    teachStars[teach-1]++;
+
+
+
+
+                if(comm >=1 && comm <=5)
+
+                    commStars[comm-1]++;
+
+
+
+
+                if(behave >=1 && behave <=5)
+
+                    behaveStars[behave-1]++;
+
 
 
             });
 
 
 
-            if(total > 0){
 
 
-                teaching = (teaching / total).toFixed(1);
 
-                communication = (communication / total).toFixed(1);
-
-                behaviour = (behaviour / total).toFixed(1);
+            const total =
+            result.length;
 
 
-            }
+
+
+
+            const teachAverage =
+            total
+            ?
+            Number(
+            (teaching/total)
+            .toFixed(1)
+            )
+            :
+            0;
+
+
+
+
+
+            const commAverage =
+            total
+            ?
+            Number(
+            (communication/total)
+            .toFixed(1)
+            )
+            :
+            0;
+
+
+
+
+
+
+            const behaveAverage =
+            total
+            ?
+            Number(
+            (behaviour/total)
+            .toFixed(1)
+            )
+            :
+            0;
+
+
+
+
 
 
 
             res.json({
 
+
+
+                success:true,
+
+
+
                 total,
 
-                teaching,
 
-                communication,
 
-                behaviour,
+                teaching:
+                Math.round(teachAverage),
 
-                feedback:result
+
+
+                communication:
+                Math.round(commAverage),
+
+
+
+                behaviour:
+                Math.round(behaveAverage),
+
+
+
+
+                teachAverage,
+
+
+                commAverage,
+
+
+                behaveAverage,
+
+
+
+
+                responses:
+                total,
+
+
+
+
+                teachStars,
+
+
+                commStars,
+
+
+                behaveStars,
+
+
+
+
+
+                overall:
+
+                Number(
+
+                    (
+
+                    (
+                    teachAverage +
+                    commAverage +
+                    behaveAverage
+
+                    )
+                    /
+                    3
+
+                    )
+                    .toFixed(1)
+
+                ),
+
+
+
+
+
+                feedback:
+                result
+
+
+
 
             });
+
 
 
         }
@@ -394,37 +502,41 @@ router.get("/feedback",(req,res)=>{
     );
 
 
+
 });
 
 
 
 
-// =======================
+
+
+
+
+
+// =======================================
 // FACULTY LOGOUT
-// =======================
+// =======================================
 
 router.get("/logout",(req,res)=>{
 
 
-    req.session.destroy((err)=>{
+    req.session.destroy(()=>{
 
 
-        if(err){
+        res.redirect(
 
-            console.log(err);
+            "/auth/faculty.html"
 
-            return res.send("Logout Failed");
-
-        }
-
-
-        res.redirect("/faculty.html");
+        );
 
 
     });
 
 
 });
+
+
+
 
 
 

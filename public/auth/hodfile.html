@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HOD Login | Anonymous Student Feedback System</title>
+
+<link rel="stylesheet" href="../css/hod.css">
+<link rel="stylesheet" href="../css/darkmode.css">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <button id="dark-mode-btn">
+        🌙 Dark Mode
+    </button>
+
+
+    <h1>
+        Anonymous Student Feedback System
+    </h1>
+
+
+    <p>
+        Head of Department Login Portal
+    </p>
+
+
+    <span class="login-note">
+        Authorized Department Heads Only
+    </span>
+
+
+</header>
+
+
+
+<main>
+
+
+<section class="login-box">
+
+
+    <div class="icon">
+        🏢
+    </div>
+
+
+    <h2>
+        HOD Secure Login
+    </h2>
+
+
+    <form action="/hod/login" method="POST">
+
+
+        <label for="hodid">
+            HOD Employee ID
+        </label>
+
+
+        <input
+            type="text"
+            id="hodid"
+            name="hodid"
+            placeholder="Enter Employee ID"
+            required
+        >
+
+
+
+        <label for="password">
+            Password
+        </label>
+
+
+        <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter Password"
+            required
+        >
+
+
+
+        <div class="checkbox">
+
+            <input
+                type="checkbox"
+                id="remember"
+            >
+
+            <label for="remember">
+                Remember Me
+            </label>
+
+        </div>
+
+
+
+        <div class="button-group">
+
+
+            <button type="submit">
+
+                Secure Login
+
+            </button>
+
+
+
+            <button type="reset">
+
+                Clear
+
+            </button>
+
+
+        </div>
+
+
+    </form>
+
+
+
+    <div class="auth-message">
+
+
+        <strong>
+            Authorized Personnel Only
+        </strong>
+
+
+        This portal is restricted to<br>
+        registered department heads.
+
+
+    </div>
+
+
+
+</section>
+
+
+</main>
+
+
+
+
+<footer>
+
+<p>
+© 2026 Anonymous Student Feedback System
+</p>
+
+</footer>
+
+
+
+<script src="/js/darkmode.js"></script>
+
+
+</body>
+
+</html>

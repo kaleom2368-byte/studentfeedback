@@ -3,317 +3,121 @@ const router = express.Router();
 
 const db = require("../db");
 
-
-
-// =======================
+// ===============================
 // STUDENT LOGIN
-// =======================
+// ===============================
+router.post("/login", (req, res) => {
 
-router.post("/login",(req,res)=>{
+    console.log("========== LOGIN ROUTE HIT ==========");
+    console.log("Request Body:", req.body);
 
+    const student_id = req.body.student_id;
+    const password = req.body.password;
+    const department = req.body.department;
 
-    const {student_id,password}=req.body;
+    const sql = `
+        SELECT *
+        FROM students
+        WHERE student_id = ?
+        AND password = ?
+    `;
 
+    db.query(sql, [student_id, password], (err, result) => {
 
-    const sql =
-    "SELECT * FROM students WHERE student_id=? AND password=?";
+        if (err) {
 
+            console.error("Database Error:", err);
 
-    db.query(sql,[student_id,password],(err,result)=>{
-
-
-        if(err){
-
-            console.log(err);
-
-            return res.send("Database Error");
-
-        }
-
-
-
-        if(result.length>0){
-
-
-            req.session.student={
-
-                student_id:result[0].student_id,
-
-                name:result[0].name,
-
-                email:result[0].email,
-
-                department:result[0].department,
-
-                year:result[0].year,
-
-                division:result[0].division
-
-            };
-
-
-
-            res.send(`
-
-            <!DOCTYPE html>
-
-            <html>
-
-            <head>
-
-            <title>
-            Login Successful
-            </title>
-
-
-            <link rel="stylesheet" href="/css/message.css">
-
-
-            <meta http-equiv="refresh" content="2;url=/dashboard/student-dashboard.html">
-
-
-            </head>
-
-
-            <body>
-
-
-            <div class="message-box">
-
-
-            <h2 class="success">
-            ✅ Login Successful
-            </h2>
-
-
-            <p>
-            Welcome ${result[0].name} 👋
-            </p>
-
-
-            <p>
-            Redirecting to dashboard...
-            </p>
-
-
-            </div>
-
-
-            </body>
-
-
-            </html>
-
-            `);
-
-
+            return res.status(500).send("Database Error");
 
         }
 
-        else{
+        // Invalid Roll Number / Password
+        if (result.length === 0) {
 
+            console.log("❌ Invalid Roll Number or Password");
 
-            res.send(`
-
-            <h2>
-            ❌ Login Failed
-            </h2>
-
-
-            <p>
-            Invalid Student ID or Password
-            </p>
-
-
-            <a href="/student.html">
-            Try Again
-            </a>
-
-            `);
-
+            return res.redirect(
+                "/auth/student.html?error=" +
+                encodeURIComponent("Invalid Roll Number or Password")
+            );
 
         }
 
+        const student = result[0];
+
+        console.log("Database Department:", student.department);
+        console.log("Selected Department:", department);
+
+        // Department Check
+        if (
+            student.department.trim().toLowerCase() !==
+            department.trim().toLowerCase()
+        ) {
+
+            console.log("❌ Wrong Department Selected");
+
+            return res.redirect(
+                "/auth/student.html?error=" +
+                encodeURIComponent("Please select your correct department")
+            );
+
+        }
+
+        // Create Session
+        req.session.student = {
+
+            student_id: student.student_id,
+            name: student.name,
+            email: student.email,
+            department: student.department,
+            year: student.year,
+            division: student.division
+
+        };
+
+        console.log("✅ Login Success:", student.name);
+
+        res.redirect("/dashboard/student-dashboard.html");
 
     });
 
-
 });
 
+// ===============================
+// STUDENT INFO
+// ===============================
+router.get("/student-info", (req, res) => {
 
-
-
-
-
-
-
-
-// =======================
-// STUDENT REGISTER
-// =======================
-
-router.post("/register",(req,res)=>{
-
-
-    const {
-
-        student_id,
-        name,
-        email,
-        password,
-        department,
-        year,
-        division
-
-    }=req.body;
-
-
-
-    const sql=`
-
-    INSERT INTO students
-
-    (
-    student_id,
-    name,
-    email,
-    password,
-    department,
-    year,
-    division
-    )
-
-    VALUES(?,?,?,?,?,?,?)
-
-    `;
-
-
-
-    db.query(
-
-        sql,
-
-        [
-            student_id,
-            name,
-            email,
-            password,
-            department,
-            year,
-            division
-        ],
-
-
-        (err,result)=>{
-
-
-            if(err){
-
-                console.log(err);
-
-
-                return res.send(`
-
-                <h2>
-                Registration Failed
-                </h2>
-
-                <pre>${err}</pre>
-
-                `);
-
-
-            }
-
-
-
-            res.redirect("/student.html");
-
-
-        }
-
-
-    );
-
-
-});
-
-
-
-
-
-
-
-
-
-// =======================
-// GET STUDENT DATA
-// =======================
-
-router.get("/student-info",(req,res)=>{
-
-
-    if(!req.session.student){
-
+    if (!req.session.student) {
 
         return res.json({
-
-            logged:false
-
+            logged: false
         });
-
 
     }
 
-
-
     res.json({
 
-        logged:true,
+        logged: true,
 
-        student:req.session.student
-
-    });
-
-
-
-});
-
-
-
-
-
-
-
-// =======================
-// STUDENT LOGOUT
-// =======================
-
-router.get("/logout",(req,res)=>{
-
-
-    req.session.destroy((err)=>{
-
-
-        if(err){
-
-            console.log(err);
-
-            return res.send("Logout Failed");
-
-        }
-
-
-        res.redirect("/student.html");
-
+        student: req.session.student
 
     });
 
-
 });
 
+// ===============================
+// LOGOUT
+// ===============================
+router.get("/logout", (req, res) => {
 
+    req.session.destroy(() => {
 
+        res.redirect("/auth/student.html");
 
+    });
+
+});
 
 module.exports = router;

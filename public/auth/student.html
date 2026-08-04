@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Student Login | Anonymous Student Feedback System</title>
+
+<link rel="stylesheet" href="../css/student-clean.css">
+<link rel="stylesheet" href="../css/darkmode.css">
+</head>
+
+<body>
+
+<header>
+
+<div class="header-content">
+
+<div>
+
+<h1>
+Anonymous Student Feedback System
+</h1>
+
+<p>
+Student Login Portal
+</p>
+
+</div>
+
+<button id="dark-mode-btn">
+🌙 Dark Mode
+</button>
+
+</div>
+
+</header>
+
+<main>
+
+<section class="login-box">
+
+<h2>
+🎓 Student Login
+</h2>
+<div id="login-error"></div>
+
+<form action="/student/login" method="POST">
+
+<label for="rollno">
+Roll Number
+</label>
+
+<input
+type="text"
+id="rollno"
+name="student_id"
+placeholder="Enter Roll Number"
+required
+>
+
+<label for="department">
+Department
+</label>
+
+<select
+    id="department"
+    name="department"
+    required
+>
+    <option value="">
+        Select Department
+    </option>
+
+    <option value="Information Technology">
+        Information Technology
+    </option>
+
+    <option value="Computer Engineering">
+        Computer Engineering
+    </option>
+</select>
+
+<label>Password</label>
+
+<div class="password-box">
+
+    <input
+        type="password"
+        id="password"
+        name="password"
+        class="form-input"
+        placeholder="Enter Password"
+        required
+    >
+
+    <span id="togglePassword" class="eye-icon">
+        👁
+    </span>
+
+</div>
+
+<div class="button-group">
+
+<button type="submit">
+Login
+</button>
+
+<button type="reset">
+Clear
+</button>
+
+</div>
+
+</form>
+
+<div class="links">
+
+<br><br>
+
+<a href="../index.html">
+← Back to Home
+</a>
+
+</div>
+
+</section>
+
+</main>
+
+<footer>
+
+<p>
+© 2026 Anonymous Student Feedback System
+</p>
+
+</footer>
+<script>
+
+const params = new URLSearchParams(window.location.search);
+
+const error = params.get("error");
+
+const errorBox = document.getElementById("login-error");
+
+if (error) {
+
+    errorBox.style.display = "block";
+
+    errorBox.innerHTML = `
+        <div class="error-box">
+            ❌ ${decodeURIComponent(error)}
+        </div>
+    `;
+
+}
+
+
+
+</script>
+
+<script src="/js/darkmode.js"></script>
+<script>
+const password = document.getElementById("password");
+const toggle = document.getElementById("togglePassword");
+
+console.log(password);
+console.log(toggle);
+
+toggle.onclick = function () {
+
+    if (password.type === "password") {
+        password.type = "text";
+        toggle.innerHTML = "🙈";
+    } else {
+        password.type = "password";
+        toggle.innerHTML = "👁";
+    }
+
+};
+</script>
+
+
+</body>
+
+</html>
