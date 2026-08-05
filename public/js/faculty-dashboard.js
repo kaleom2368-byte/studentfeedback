@@ -429,7 +429,7 @@ ${"⭐".repeat(item.behaviour)}
 
 <p class="feedback-date">
 
-📅 ${new Date(item.created_at)
+📅 ${new Date(item.submitted_at)
 .toLocaleDateString()}
 
 </p>

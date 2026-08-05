@@ -3,6 +3,8 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const helmet = require("helmet");
+const cors = require("cors");
 
 
 // ================= ROUTES =================
@@ -29,22 +31,68 @@ const app = express();
 
 
 
-
 // =====================================================
-// MIDDLEWARE
+// SECURITY MIDDLEWARE
 // =====================================================
-
-
-// Form data
 
 app.use(
-    express.urlencoded({
-        extended:true
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: [
+                    "'self'",
+                    "'unsafe-inline'",
+                    "https://cdn.jsdelivr.net"
+                ],
+                styleSrc: [
+                    "'self'",
+                    "'unsafe-inline'",
+                    "https://fonts.googleapis.com"
+                ],
+                fontSrc: [
+                    "'self'",
+                    "https://fonts.gstatic.com",
+                    "data:"
+                ],
+                imgSrc: [
+                    "'self'",
+                    "data:",
+                    "blob:"
+                ]
+            }
+        }
     })
 );
 
 
-// JSON data
+app.use(
+    cors({
+
+        origin:true,
+
+        credentials:true
+
+    })
+);
+
+
+
+
+// =====================================================
+// BODY PARSER
+// =====================================================
+
+
+app.use(
+    express.urlencoded({
+
+        extended:true
+
+    })
+);
+
+
 
 app.use(
     express.json()
@@ -52,9 +100,15 @@ app.use(
 
 
 
-// Disable cache
 
-app.use((req,res,next)=>{
+
+// =====================================================
+// DISABLE CACHE
+// =====================================================
+
+
+app.use(
+(req,res,next)=>{
 
 
     res.setHeader(
@@ -84,14 +138,19 @@ app.use((req,res,next)=>{
 
 
 
-// Session
+
+// =====================================================
+// SESSION
+// =====================================================
+
 
 app.use(
 
     session({
 
         secret:
-        process.env.SESSION_SECRET,
+        process.env.SESSION_SECRET ||
+        "studentfeedbacksecret",
 
 
         resave:false,
@@ -103,7 +162,11 @@ app.use(
         cookie:{
 
 
-            secure:false,
+            secure:
+            process.env.NODE_ENV === "production",
+
+
+            httpOnly:true,
 
 
             maxAge:
@@ -126,6 +189,7 @@ app.use(
 
 
 
+
 // =====================================================
 // STATIC FILES
 // =====================================================
@@ -136,8 +200,11 @@ app.use(
     express.static(
 
         path.join(
+
             __dirname,
+
             "public"
+
         )
 
     )
@@ -161,10 +228,12 @@ app.use(
 );
 
 
+
 app.use(
     "/faculty",
     facultyRoute
 );
+
 
 
 app.use(
@@ -173,10 +242,12 @@ app.use(
 );
 
 
+
 app.use(
     "/admin",
     adminRoute
 );
+
 
 
 app.use(
@@ -205,14 +276,14 @@ app.use(
 
 
 
-
 // =====================================================
-// HEALTH CHECK (FOR LIVE SERVER)
+// HEALTH CHECK
 // =====================================================
 
 
 app.get(
     "/health",
+
     (req,res)=>{
 
 
@@ -221,7 +292,11 @@ app.get(
             status:"OK",
 
             message:
-            "Anonymous Student Feedback System is running"
+            "Anonymous Student Feedback System is running",
+
+            environment:
+            process.env.NODE_ENV
+
 
         });
 
@@ -243,29 +318,30 @@ app.get(
 
 
 app.get(
-    "/",
-    (req,res)=>{
+
+"/",
+
+(req,res)=>{
 
 
-        res.sendFile(
+    res.sendFile(
 
-            path.join(
+        path.join(
 
-                __dirname,
+            __dirname,
 
-                "public",
+            "public",
 
-                "index.html"
+            "index.html"
 
-            )
+        )
 
-        );
+    );
 
 
-    }
+}
 
 );
-
 
 
 
@@ -304,9 +380,7 @@ app.listen(
 
 
         console.log(
-
             ` Server running on port ${PORT}`
-
         );
 
 

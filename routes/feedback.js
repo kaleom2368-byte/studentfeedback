@@ -64,8 +64,22 @@ router.get("/faculty", (req, res) => {
 router.post("/submit", (req, res) => {
 
 
+    if(!req.session.student){
+
+        return res.status(401).json({
+
+            success:false,
+
+            message:"Student login required"
+
+        });
+
+    }
+
+
+
     const {
-        
+
         faculty_id,
         department,
         subject,
@@ -109,11 +123,11 @@ const values = [
 
     subject,
 
-    teaching,
+    Number(teaching),
 
-    communication,
+    Number(communication),
 
-    behaviour,
+    Number(behaviour),
 
     comments
 
