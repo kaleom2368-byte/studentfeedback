@@ -3,9 +3,10 @@ const router = express.Router();
 
 const db = require("../db");
 
-// ===============================
+// =====================================================
 // STUDENT LOGIN
-// ===============================
+// =====================================================
+
 router.post("/login", (req, res) => {
 
     console.log("========== LOGIN ROUTE HIT ==========");
@@ -14,6 +15,23 @@ router.post("/login", (req, res) => {
     const student_id = req.body.student_id;
     const password = req.body.password;
     const department = req.body.department;
+
+    // -------------------------------------------------
+    // CHECK REQUIRED FIELDS
+    // -------------------------------------------------
+
+    if (!student_id || !password || !department) {
+
+        return res.redirect(
+            "/auth/student.html?error=" +
+            encodeURIComponent("Please enter all login details")
+        );
+
+    }
+
+    // -------------------------------------------------
+    // FIND STUDENT
+    // -------------------------------------------------
 
     const sql = `
         SELECT *
@@ -26,30 +44,45 @@ router.post("/login", (req, res) => {
 
         if (err) {
 
-            console.error("Database Error:", err);
+            console.error("❌ Database Error:", err);
 
             return res.status(500).send("Database Error");
 
         }
 
-        // Invalid Roll Number / Password
+        // -------------------------------------------------
+        // INVALID LOGIN
+        // -------------------------------------------------
+
         if (result.length === 0) {
 
             console.log("❌ Invalid Roll Number or Password");
 
             return res.redirect(
                 "/auth/student.html?error=" +
-                encodeURIComponent("Invalid Roll Number or Password")
+                encodeURIComponent(
+                    "Invalid Roll Number or Password"
+                )
             );
 
         }
 
         const student = result[0];
 
-        console.log("Database Department:", student.department);
-        console.log("Selected Department:", department);
+        // -------------------------------------------------
+        // DEPARTMENT CHECK
+        // -------------------------------------------------
 
-        // Department Check
+        console.log(
+            "Database Department:",
+            student.department
+        );
+
+        console.log(
+            "Selected Department:",
+            department
+        );
+
         if (
             student.department.trim().toLowerCase() !==
             department.trim().toLowerCase()
@@ -59,40 +92,88 @@ router.post("/login", (req, res) => {
 
             return res.redirect(
                 "/auth/student.html?error=" +
-                encodeURIComponent("Please select your correct department")
+                encodeURIComponent(
+                    "Please select your correct department"
+                )
             );
 
         }
 
-        // Create Session
+        // -------------------------------------------------
+        // CREATE STUDENT SESSION
+        // -------------------------------------------------
+
         req.session.student = {
 
             student_id: student.student_id,
+
             name: student.name,
+
             email: student.email,
+
             department: student.department,
+
             year: student.year,
+
             division: student.division
 
         };
 
-        console.log("✅ Login Success:", student.name);
+        console.log(
+            "✅ Login Success:",
+            student.name
+        );
 
-        res.redirect("/dashboard/student-dashboard.html");
+        // -------------------------------------------------
+        // SAVE SESSION BEFORE REDIRECT
+        // -------------------------------------------------
+
+        req.session.save((sessionError) => {
+
+            if (sessionError) {
+
+                console.error(
+                    "❌ Session Save Error:",
+                    sessionError
+                );
+
+                return res.status(500).send(
+                    "Session Error"
+                );
+
+            }
+
+            console.log(
+                "✅ Student session saved"
+            );
+
+            // -------------------------------------------------
+            // GO TO DASHBOARD
+            // -------------------------------------------------
+
+            res.redirect(
+                "/dashboard/student-dashboard.html"
+            );
+
+        });
 
     });
 
 });
 
-// ===============================
-// STUDENT INFO
-// ===============================
+
+// =====================================================
+// STUDENT INFORMATION
+// =====================================================
+
 router.get("/student-info", (req, res) => {
 
     if (!req.session.student) {
 
         return res.json({
+
             logged: false
+
         });
 
     }
@@ -107,17 +188,53 @@ router.get("/student-info", (req, res) => {
 
 });
 
-// ===============================
-// LOGOUT
-// ===============================
+
+// =====================================================
+// STUDENT LOGOUT
+// =====================================================
+
 router.get("/logout", (req, res) => {
 
-    req.session.destroy(() => {
+    console.log("========== STUDENT LOGOUT ==========");
+
+    req.session.destroy((err) => {
+
+        if (err) {
+
+            console.error(
+                "❌ Logout Error:",
+                err
+            );
+
+            return res.status(500).json({
+
+                success: false,
+
+                message: "Logout failed"
+
+            });
+
+        }
+
+        // -------------------------------------------------
+        // REMOVE SESSION COOKIE
+        // -------------------------------------------------
+
+        res.clearCookie("connect.sid");
+
+        console.log(
+            "✅ Student logged out successfully"
+        );
+
+        // -------------------------------------------------
+        // REDIRECT TO LOGIN
+        // -------------------------------------------------
 
         res.redirect("/auth/student.html");
 
     });
 
 });
+
 
 module.exports = router;

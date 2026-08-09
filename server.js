@@ -6,7 +6,10 @@ const session = require("express-session");
 const helmet = require("helmet");
 const cors = require("cors");
 
-// ================= ROUTES =================
+
+// =====================================================
+// ROUTES
+// =====================================================
 
 const studentRoute = require("./routes/student");
 const facultyRoute = require("./routes/faculty");
@@ -16,13 +19,20 @@ const feedbackRoute = require("./routes/feedback");
 const dashboardRoute = require("./routes/dashboard");
 const facultyDirectoryRoute = require("./routes/faculty-directory");
 
-// ================= DATABASE =================
+
+// =====================================================
+// DATABASE
+// =====================================================
 
 require("./db");
 
-// ================= APP =================
+
+// =====================================================
+// APP
+// =====================================================
 
 const app = express();
+
 
 // =====================================================
 // SECURITY
@@ -30,8 +40,11 @@ const app = express();
 
 app.use(
     helmet({
+
         contentSecurityPolicy: {
+
             directives: {
+
                 defaultSrc: ["'self'"],
 
                 scriptSrc: [
@@ -68,22 +81,44 @@ app.use(
                     "'self'",
                     "https://cdn.jsdelivr.net"
                 ]
+
             }
+
         }
+
     })
 );
 
-app.use(cors({
-    origin: true,
-    credentials: true
-}));
+
+// =====================================================
+// CORS
+// =====================================================
+
+app.use(
+    cors({
+
+        origin: true,
+
+        credentials: true
+
+    })
+);
+
 
 // =====================================================
 // BODY PARSER
 // =====================================================
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(
+    express.urlencoded({
+        extended: true
+    })
+);
+
+app.use(
+    express.json()
+);
+
 
 // =====================================================
 // DISABLE CACHE
@@ -110,48 +145,99 @@ app.use((req, res, next) => {
 
 });
 
+
 // =====================================================
 // SESSION
 // =====================================================
 
-app.use(session({
+app.use(
+    session({
 
-    secret:
-        process.env.SESSION_SECRET || "StudentFeedback2026",
+        secret:
+            process.env.SESSION_SECRET ||
+            "StudentFeedback2026",
 
-    resave: false,
+        resave: false,
 
-    saveUninitialized: false,
+        saveUninitialized: false,
 
-    cookie: {
+        cookie: {
 
-        secure: false,
+            secure: false,
 
-        httpOnly: true,
+            httpOnly: true,
 
-        maxAge: 1000 * 60 * 60 * 24
+            maxAge: 1000 * 60 * 60 * 24
 
-    }
+        }
 
-}));
+    })
+);
+
 
 // =====================================================
 // STATIC FILES
 // =====================================================
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(
+    express.static(
+        path.join(__dirname, "public")
+    )
+);
+
 
 // =====================================================
 // ROUTES
 // =====================================================
 
-app.use("/student", studentRoute);
-app.use("/faculty", facultyRoute);
-app.use("/hod", hodRoute);
-app.use("/admin", adminRoute);
-app.use("/feedback", feedbackRoute);
-app.use("/dashboard", dashboardRoute);
-app.use("/faculty-directory", facultyDirectoryRoute);
+// Student routes
+app.use(
+    "/student",
+    studentRoute
+);
+
+
+// Faculty routes
+app.use(
+    "/faculty",
+    facultyRoute
+);
+
+
+// HOD routes
+app.use(
+    "/hod",
+    hodRoute
+);
+
+
+// Admin routes
+app.use(
+    "/admin",
+    adminRoute
+);
+
+
+// Feedback routes
+app.use(
+    "/feedback",
+    feedbackRoute
+);
+
+
+// Dashboard routes
+app.use(
+    "/dashboard",
+    dashboardRoute
+);
+
+
+// Faculty directory
+app.use(
+    "/faculty-directory",
+    facultyDirectoryRoute
+);
+
 
 // =====================================================
 // HEALTH CHECK
@@ -164,17 +250,18 @@ app.get("/health", (req, res) => {
         status: "OK",
 
         environment:
-            process.env.NODE_ENV || "development",
+            process.env.NODE_ENV ||
+            "development",
 
-        database:
-            "Connected"
+        database: "Connected"
 
     });
 
 });
 
+
 // =====================================================
-// HOME
+// HOME PAGE
 // =====================================================
 
 app.get("/", (req, res) => {
@@ -189,28 +276,68 @@ app.get("/", (req, res) => {
 
 });
 
+
 // =====================================================
 // 404
 // =====================================================
 
 app.use((req, res) => {
 
-    res.status(404).send("404 Page Not Found");
+    res.status(404).send(
+        "404 Page Not Found"
+    );
 
 });
+
 
 // =====================================================
 // SERVER
 // =====================================================
 
-const PORT = process.env.PORT || 3000;
+const PORT =
+    process.env.PORT ||
+    3000;
 
-app.listen(PORT, "0.0.0.0", () => {
 
-    console.log("======================================");
-    console.log(" Anonymous Student Feedback System");
-    console.log(` Server running on port ${PORT}`);
-    console.log(` NODE_ENV = ${process.env.NODE_ENV}`);
-    console.log("======================================");
+app.listen(
+    PORT,
+    "0.0.0.0",
+    () => {
 
-});
+        console.log(
+            "======================================"
+        );
+
+        console.log(
+            " Anonymous Student Feedback System"
+        );
+
+        console.log(
+            ` Server running at http://localhost:${PORT}`
+        );
+
+        console.log(
+            ` NODE_ENV = ${
+                process.env.NODE_ENV ||
+                "development"
+            }`
+        );
+
+        console.log(
+            " Student routes: /student"
+        );
+
+        console.log(
+            " Dashboard routes: /dashboard"
+        );
+
+        console.log(
+            " Faculty Directory: /faculty-directory"
+        );
+
+        console.log(
+            "======================================"
+        );
+
+    }
+);

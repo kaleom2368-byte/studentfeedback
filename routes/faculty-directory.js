@@ -8,80 +8,103 @@ const db = require("../db");
 // GET FACULTY BY STUDENT DEPARTMENT
 // ======================================
 
-router.get("/", (req,res)=>{
+router.get("/", (req, res) => {
 
+    // ----------------------------------
+    // CHECK STUDENT LOGIN
+    // ----------------------------------
 
-    if(!req.session.student){
+    if (!req.session.student) {
 
-        return res.json({
+        return res.status(401).json({
 
-            success:false,
+            success: false,
 
-            message:"Not Logged In"
+            message: "Student not logged in"
 
         });
 
     }
 
 
+    // ----------------------------------
+    // GET STUDENT DEPARTMENT
+    // ----------------------------------
 
-    const department = req.session.student.department;
+    const department =
+        req.session.student.department;
 
 
+    if (!department) {
+
+        return res.status(400).json({
+
+            success: false,
+
+            message: "Student department not found"
+
+        });
+
+    }
+
+
+    // ----------------------------------
+    // GET FACULTY
+    // ----------------------------------
 
     const sql = `
 
-       SELECT
+        SELECT
+            faculty_id,
+            name,
+            email,
+            department
 
-    faculty_id,
-    name,
-    email,
-    subject
-
-FROM faculty
+        FROM faculty
 
         WHERE department = ?
 
-        ORDER BY name
+        ORDER BY name ASC
 
     `;
 
 
+    db.query(sql, [department], (err, result) => {
 
-    db.query(sql,[department],(err,result)=>{
+        if (err) {
+
+            console.error(
+                "❌ Faculty Directory Error:",
+                err
+            );
 
 
-        if(err){
+            return res.status(500).json({
 
-            console.error("Faculty Directory Error:",err);
+                success: false,
 
-
-            return res.json({
-
-                success:false
+                message: "Database error"
 
             });
 
         }
 
 
+        // ----------------------------------
+        // RETURN FACULTY
+        // ----------------------------------
 
         res.json({
 
-            success:true,
+            success: true,
 
-            faculty:result
+            faculty: result
 
         });
 
-
-
     });
 
-
-
 });
-
 
 
 module.exports = router;
