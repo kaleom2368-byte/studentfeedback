@@ -42,7 +42,7 @@ node server.js
 Open:
 
 ```
-http://localhost:3000
+https://studentfeedback-22u8.onrender.com/index.html
 ```
 
 ---
