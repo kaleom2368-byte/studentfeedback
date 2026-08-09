@@ -3,719 +3,240 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Student Feedback System</title>
 
-<title>Submit Feedback</title>
-
-<link rel="stylesheet" href="css/feedback.css">
-
-<link rel="stylesheet" href="/css/darkmode.css">
+    <link rel="stylesheet" href="/css/feedback.css">
+    <link rel="stylesheet" href="/css/darkmode.css">
 
 </head>
 
-
 <body>
 
+    <!-- =====================================================
+                        HEADER
+    ====================================================== -->
 
-<header>
+    <header class="page-header">
 
-<button id="dark-mode-btn">
-🌓 Theme
-</button>
+        <div class="header-content">
 
+            <div class="header-text">
 
-<h1>
-Anonymous Student Feedback System
-</h1>
+                <h1>Anonymous Student Feedback System</h1>
 
+                <p>
+                    Help us improve the quality of teaching by sharing your
+                    honest and anonymous feedback.
+                </p>
 
-<p>
-Submit Anonymous Feedback
-</p>
+            </div>
 
+            <button
+                id="dark-mode-btn"
+                class="theme-btn"
+                type="button">
 
-</header>
+                🌓 Theme
 
+            </button>
 
+        </div>
 
-<nav>
+    </header>
 
-<a href="dashboard/student-dashboard.html">
-Dashboard
-</a>
+    <!-- =====================================================
+                    MAIN CONTAINER
+    ====================================================== -->
 
+    <main class="feedback-container">
 
-<a href="index.html">
-Home
-</a>
+        <!-- Back Button -->
 
+        <div class="top-actions">
 
-</nav>
+            <button
+                type="button"
+                class="back-btn"
+                onclick="history.back()">
 
+                ← Back to Dashboard
 
+            </button>
 
+        </div>
 
+        <!-- =====================================================
+                    ANONYMOUS NOTICE
+        ====================================================== -->
 
-<main>
+        <section class="notice-card">
 
+            <div class="notice-icon">
 
-<section class="feedback-box">
+                🔒
 
+            </div>
 
-<h2>
-📝 Faculty Feedback Form
-</h2>
+            <div class="notice-content">
 
+                <h2>Anonymous Feedback</h2>
 
+                <p>
 
-<div class="feedback-note">
+                    Your identity is never shared with faculty members.
+                    Please answer honestly. Your feedback is used only
+                    for academic quality improvement.
 
-🔒 <strong>Anonymous Feedback:</strong>
+                </p>
 
-Your identity is never shared with faculty members.
+            </div>
 
-Please provide honest, respectful, and constructive feedback.
+        </section>
 
-</div>
+        <!-- =====================================================
+                    FACULTY INFORMATION
+        ====================================================== -->
 
+        <section class="faculty-card">
 
+            <div class="section-title">
 
+                <h2>Faculty Information</h2>
 
+                <p>
 
-<form id="feedback-form">
+                    Select your faculty and enter the course details.
 
+                </p>
 
+            </div>
 
-<label>
-Select Faculty
-</label>
+            <div class="faculty-grid">
 
+                <div class="input-group">
 
-<select name="faculty_id" id="faculty" required>
+                    <label for="faculty">
 
-<option value="">
-Loading Faculty...
-</option>
+                        Faculty
 
-</select>
+                    </label>
 
+                    <select
+                        id="faculty"
+                        name="faculty_id"
+                        required>
 
+                        <option value="">
 
+                            Loading Faculty...
 
-<div id="faculty-card" class="faculty-card">
+                        </option>
 
+                    </select>
 
-<div class="faculty-avatar">
-👨‍🏫
-</div>
+                </div>
 
+                <div class="input-group">
 
-<div class="faculty-details">
+                    <label for="department">
 
+                        Department
 
-<h3 id="faculty-name">
-Select Faculty
-</h3>
+                    </label>
 
+                    <input
+                        type="text"
+                        id="department"
+                        name="department"
+                        readonly>
 
-<p id="faculty-dept">
-Department
-</p>
+                </div>
 
+                <div class="input-group full-width">
 
-</div>
+                    <label for="subject">
 
+                        Subject
 
-</div>
+                    </label>
 
+                    <input
+                        type="text"
+                        id="subject"
+                        name="subject"
+                        placeholder="Enter Subject Name"
+                        required>
 
+                </div>
 
+            </div>
 
+        </section>
 
-<label>
-Department
-</label>
+        <!-- =====================================================
+                        PROGRESS BAR
+        ====================================================== -->
 
+        <section class="progress-card">
 
-<input
+            <div class="progress-header">
 
-type="text"
+                <div>
 
-name="department"
+                    <h3>Feedback Progress</h3>
 
-id="department"
+                    <p>
 
-readonly
+                        Complete all questions before submitting.
 
->
+                    </p>
 
+                </div>
 
+                <span id="progress-percent">
 
+                    0%
 
+                </span>
 
+            </div>
 
-<label>
-Subject
-</label>
+            <div class="progress-bar">
 
+                <div
+                    class="progress-fill"
+                    id="progress-fill">
 
-<input
+                </div>
 
-type="text"
+            </div>
 
-name="subject"
+        </section>
 
-placeholder="Enter Subject"
+        <!-- =====================================================
+                    FEEDBACK FORM
+        ====================================================== -->
 
-required
+        <form id="feedback-form">
 
->
+            <!-- =====================================================
+                    COURSE EXPERIENCE
+            ====================================================== -->
 
+            <section class="form-section">
 
+                <div class="section-heading">
 
+                    <h2>Course Experience</h2>
 
+                    <p>
 
+                        Share your experience regarding the course,
+                        lectures and syllabus.
 
+                    </p>
 
-<label>
-Teaching Quality
-</label>
-
-
-<div class="stars">
-
-
-<input id="teach5" type="radio" name="teaching" value="5">
-<label for="teach5">★</label>
-
-
-<input id="teach4" type="radio" name="teaching" value="4">
-<label for="teach4">★</label>
-
-
-<input id="teach3" type="radio" name="teaching" value="3">
-<label for="teach3">★</label>
-
-
-<input id="teach2" type="radio" name="teaching" value="2">
-<label for="teach2">★</label>
-
-
-<input id="teach1" type="radio" name="teaching" value="1" required>
-<label for="teach1">★</label>
-
-
-</div>
-
-
-
-
-
-<label>
-Communication
-</label>
-
-
-<div class="stars">
-
-
-<input id="comm5" type="radio" name="communication" value="5" required>
-<label for="comm5">★</label>
-
-
-<input id="comm4" type="radio" name="communication" value="4">
-<label for="comm4">★</label>
-
-
-<input id="comm3" type="radio" name="communication" value="3">
-<label for="comm3">★</label>
-
-
-<input id="comm2" type="radio" name="communication" value="2">
-<label for="comm2">★</label>
-
-
-<input id="comm1" type="radio" name="communication" value="1">
-<label for="comm1">★</label>
-
-
-</div>
-
-
-
-
-
-<label>
-Behaviour
-</label>
-
-
-<div class="stars">
-
-
-<input id="beh5" type="radio" name="behaviour" value="5" required>
-<label for="beh5">★</label>
-
-
-<input id="beh4" type="radio" name="behaviour" value="4">
-<label for="beh4">★</label>
-
-
-<input id="beh3" type="radio" name="behaviour" value="3">
-<label for="beh3">★</label>
-
-
-<input id="beh2" type="radio" name="behaviour" value="2">
-<label for="beh2">★</label>
-
-
-<input id="beh1" type="radio" name="behaviour" value="1">
-<label for="beh1">★</label>
-
-
-</div>
-<label>
-Comments
-</label>
-
-
-<textarea
-
-id="comments"
-
-name="comments"
-
-maxlength="300"
-
-placeholder="Write your feedback here..."
-
-></textarea>
-
-
-
-<div id="char-count">
-0 / 300 characters
-</div>
-
-
-
-
-<div id="word-warning">
-
-</div>
-
-
-<div id="success-message">
-
-</div>
-
-
-
-
-
-<button type="submit">
-
-✅ Submit Feedback
-
-</button>
-
-
-
-</form>
-
-
-</section>
-
-
-</main>
-
-
-
-
-
-<footer>
-
-<p>
-© 2026 Anonymous Student Feedback System
-</p>
-
-</footer>
-
-
-
-
-
-
-
-
-<script>
-
-// =================================
-// LOAD FACULTY LIST
-// =================================
-
-
-fetch("/feedback/faculty")
-
-.then(response => response.json())
-
-.then(data => {
-
-
-    const facultySelect =
-    document.getElementById("faculty");
-
-
-    facultySelect.innerHTML =
-    '<option value="">Select Faculty</option>';
-
-
-
-    if(data.success && data.faculty.length > 0){
-
-
-        data.faculty.forEach(faculty => {
-
-
-
-            let option =
-            document.createElement("option");
-
-
-
-            option.value =
-            faculty.faculty_id;
-
-
-
-            option.textContent =
-            faculty.name;
-
-
-
-            option.dataset.department =
-            faculty.department;
-
-
-
-            facultySelect.appendChild(option);
-
-
-
-        });
-
-
-    }
-
-    else{
-
-
-        facultySelect.innerHTML =
-        '<option value="">No Faculty Available</option>';
-
-
-    }
-
-
-
-})
-
-
-.catch(error=>{
-
-
-    console.error(
-        "Faculty loading error:",
-        error
-    );
-
-
-});
-
-
-
-
-// =================================
-// FACULTY CARD
-// =================================
-
-
-document
-.getElementById("faculty")
-.addEventListener("change",function(){
-
-
-
-    let selected =
-    this.options[this.selectedIndex];
-
-
-
-    document
-    .getElementById("department")
-    .value =
-    selected.dataset.department || "";
-
-
-
-
-    if(selected.value !== ""){
-
-
-        document
-        .getElementById("faculty-card")
-        .style.display="flex";
-
-
-
-        document
-        .getElementById("faculty-name")
-        .innerHTML =
-        selected.textContent;
-
-
-
-        document
-        .getElementById("faculty-dept")
-        .innerHTML =
-        selected.dataset.department;
-
-
-    }
-
-    else{
-
-
-        document
-        .getElementById("faculty-card")
-        .style.display="none";
-
-
-    }
-
-
-
-});
-
-
-
-
-// =================================
-// CHARACTER COUNTER
-// =================================
-
-
-const commentBox =
-document.getElementById("comments");
-
-
-const charCount =
-document.getElementById("char-count");
-
-
-
-commentBox.addEventListener("input",()=>{
-
-
-    let count =
-    commentBox.value.length;
-
-
-    charCount.innerHTML =
-    count + " / 300 characters";
-
-
-    if(count >= 250){
-
-        charCount.style.color="orange";
-
-    }
-
-    else{
-
-        charCount.style.color="white";
-
-    }
-
-
-});
-
-
-
-
-// =================================
-// ABUSIVE WORD FILTER
-// =================================
-
-
-const form =
-document.getElementById("feedback-form");
-
-
-const warning =
-document.getElementById("word-warning");
-
-
-
-const badWords=[
-
-"idiot",
-"stupid",
-"fool",
-"dumb",
-"hate",
-"useless",
-"worst",
-"mc",
-"bc"
-
-];
-
-
-form.addEventListener("submit",function(e){
-
-    e.preventDefault();
-
-
-    let comment =
-    commentBox.value.toLowerCase();
-
-
-
-    let found =
-    badWords.some(word =>
-    comment.includes(word)
-    );
-
-
-
-    if(found){
-
-
-        warning.style.display="block";
-
-
-        warning.innerHTML =
-        `
-        ⚠️ <strong>Warning!</strong>
-        <br>
-        Please avoid abusive words.
-        <br>
-        Use respectful and constructive feedback.
-        `;
-
-
-        return;
-
-
-    }
-
-
-
-    const formData = {
-
-        faculty_id:
-        document.getElementById("faculty").value,
-
-
-        department:
-        document.getElementById("department").value,
-
-
-        subject:
-        document.querySelector('[name="subject"]').value,
-
-
-        teaching:
-        document.querySelector('[name="teaching"]:checked').value,
-
-
-        communication:
-        document.querySelector('[name="communication"]:checked').value,
-
-
-        behaviour:
-        document.querySelector('[name="behaviour"]:checked').value,
-
-
-        comments:
-        commentBox.value
-
-    };
-
-
-
-    fetch("/feedback/submit",{
-
-        method:"POST",
-
-        headers:{
-
-            "Content-Type":"application/json"
-
-        },
-
-
-        body:JSON.stringify(formData)
-
-    })
-
-
-
-    .then(response=>response.json())
-
-
-    .then(data=>{
-
-
-       if(data.success){
-
-
-    form.reset();
-
-
-    document.getElementById("faculty-card").style.display="none";
-
-
-    document.getElementById("department").value="";
-
-
-    // Go to dashboard with success flag
-
-    window.location.href =
-    "/dashboard/student-dashboard.html?feedback=success";
-
-
-}
-
-
-    })
-
-
-
-    .catch(error=>{
-
-
-    console.error(
-        "Submit Error:",
-        error
-    );
-
-
-
-});
-});
-  // CLOSE form.addEventListener
-
-
-</script>
-
-
-<script src="/js/darkmode.js"></script>
-
-
-</body>
-
-</html>
+                </div>
