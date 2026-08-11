@@ -1,28 +1,62 @@
 require("dotenv").config();
 
-const db = require("./db");
+const mysql = require("mysql2");
 
+const db = mysql.createConnection({
 
-const sql = `
-SELECT *
-FROM feedback
-ORDER BY id DESC
-LIMIT 10
-`;
+    host: process.env.DB_HOST || process.env.MYSQLHOST,
 
+    user: process.env.DB_USER || process.env.MYSQLUSER,
 
-db.query(sql,(err,result)=>{
+    password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD,
 
-    if(err){
+    database: process.env.DB_NAME || process.env.MYSQL_DATABASE,
 
-        console.error("ERROR:",err);
-        process.exit();
+    port: process.env.DB_PORT || process.env.MYSQLPORT,
+
+    ssl: {
+        rejectUnauthorized: false
+    }
+
+});
+
+db.connect((err) => {
+
+    if (err) {
+
+        console.error("❌ Database connection failed:");
+        console.error(err);
+
+        return;
 
     }
 
+    console.log("✅ Connected to Aiven MySQL");
 
-    console.table(result);
+    db.query(
+        "DESCRIBE feedback",
+        (err, result) => {
 
-    process.exit();
+            if (err) {
+
+                console.error("❌ Failed to describe feedback table:");
+                console.error(err);
+
+                db.end();
+
+                return;
+
+            }
+
+            console.log("\n========== FEEDBACK TABLE ==========\n");
+
+            console.table(result);
+
+            console.log("\n====================================\n");
+
+            db.end();
+
+        }
+    );
 
 });

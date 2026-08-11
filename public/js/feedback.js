@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initializeWordFilter();
 
+    initializeFeedbackSubmission();
+
 });
 
 
@@ -51,7 +53,6 @@ function initializeOtherOptions() {
             return;
         }
 
-        // Hide Other input initially
         otherInput.style.display = "none";
         otherInput.required = false;
 
@@ -64,7 +65,6 @@ function initializeOtherOptions() {
                 ) {
 
                     otherInput.style.display = "block";
-
                     otherInput.required = true;
 
                     setTimeout(() => {
@@ -74,9 +74,7 @@ function initializeOtherOptions() {
                 } else {
 
                     otherInput.style.display = "none";
-
                     otherInput.value = "";
-
                     otherInput.required = false;
 
                 }
@@ -87,8 +85,6 @@ function initializeOtherOptions() {
 
         });
 
-
-        // Restore Other field if already selected
         const selected =
             document.querySelector(
                 `input[name="${radioName}"]:checked`
@@ -100,7 +96,6 @@ function initializeOtherOptions() {
         ) {
 
             otherInput.style.display = "block";
-
             otherInput.required = true;
 
         }
@@ -134,7 +129,7 @@ function initializeNavigationButtons() {
 
 
 /* =========================================================
-   3. STUDENT LOGOUT
+   3. LOGOUT
 ========================================================= */
 
 function initializeLogout() {
@@ -166,7 +161,7 @@ function initializeLogout() {
 
 
 /* =========================================================
-   4. FACULTY LOADING
+   4. LOAD FACULTY
 ========================================================= */
 
 function initializeFaculty() {
@@ -181,7 +176,6 @@ function initializeFaculty() {
         return;
     }
 
-
     fetch("/faculty-directory", {
 
         method: "GET",
@@ -192,132 +186,107 @@ function initializeFaculty() {
 
     })
 
-        .then(response => {
+    .then(response => {
 
-            if (!response.ok) {
+        if (!response.ok) {
 
-                throw new Error(
-                    `Faculty request failed: ${response.status}`
-                );
+            throw new Error(
+                `Faculty request failed: ${response.status}`
+            );
 
-            }
+        }
 
-            return response.json();
+        return response.json();
 
-        })
+    })
 
-        .then(data => {
+    .then(data => {
 
-            facultySelect.innerHTML = "";
+        facultySelect.innerHTML = "";
 
-            const defaultOption =
+        const defaultOption =
+            document.createElement("option");
+
+        defaultOption.value = "";
+        defaultOption.textContent = "Select Faculty";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+
+        facultySelect.appendChild(defaultOption);
+
+        const facultyList =
+            Array.isArray(data)
+                ? data
+                : data.faculty ||
+                  data.facultyList ||
+                  data.data ||
+                  [];
+
+        if (!facultyList.length) {
+
+            const emptyOption =
                 document.createElement("option");
 
-            defaultOption.value = "";
+            emptyOption.value = "";
+            emptyOption.textContent =
+                "No faculty available";
+            emptyOption.disabled = true;
 
-            defaultOption.textContent =
-                "Select Faculty";
+            facultySelect.appendChild(emptyOption);
 
-            defaultOption.disabled = true;
+            return;
 
-            defaultOption.selected = true;
+        }
 
-            facultySelect.appendChild(
-                defaultOption
-            );
+        facultyList.forEach(faculty => {
 
-
-            const facultyList =
-                Array.isArray(data)
-                    ? data
-                    : data.faculty ||
-                      data.facultyList ||
-                      data.data ||
-                      [];
-
-
-            if (!facultyList.length) {
-
-                const emptyOption =
-                    document.createElement("option");
-
-                emptyOption.value = "";
-
-                emptyOption.textContent =
-                    "No faculty available";
-
-                emptyOption.disabled = true;
-
-                facultySelect.appendChild(
-                    emptyOption
-                );
-
-                return;
-
-            }
-
-
-            facultyList.forEach(faculty => {
-
-                const option =
-                    document.createElement("option");
-
-
-                option.value =
-                    faculty.faculty_id ??
-                    faculty.id ??
-                    faculty.user_id ??
-                    "";
-
-
-                option.textContent =
-                    faculty.name ??
-                    faculty.faculty_name ??
-                    faculty.full_name ??
-                    faculty.username ??
-                    "Unknown Faculty";
-
-
-                option.dataset.department =
-                    faculty.department ??
-                    faculty.department_name ??
-                    "";
-
-
-                facultySelect.appendChild(
-                    option
-                );
-
-            });
-
-        })
-
-        .catch(error => {
-
-            console.error(
-                "❌ Failed to load faculty:",
-                error
-            );
-
-
-            facultySelect.innerHTML = "";
-
-
-            const errorOption =
+            const option =
                 document.createElement("option");
 
-            errorOption.value = "";
+            option.value =
+                faculty.faculty_id ??
+                faculty.id ??
+                faculty.user_id ??
+                "";
 
-            errorOption.textContent =
-                "Unable to load faculty";
+            option.textContent =
+                faculty.name ??
+                faculty.faculty_name ??
+                faculty.full_name ??
+                faculty.username ??
+                "Unknown Faculty";
 
-            errorOption.disabled = true;
+            option.dataset.department =
+                faculty.department ??
+                faculty.department_name ??
+                "";
 
-            facultySelect.appendChild(
-                errorOption
-            );
+            facultySelect.appendChild(option);
 
         });
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Failed to load faculty:",
+            error
+        );
+
+        facultySelect.innerHTML = "";
+
+        const errorOption =
+            document.createElement("option");
+
+        errorOption.value = "";
+        errorOption.textContent =
+            "Unable to load faculty";
+        errorOption.disabled = true;
+
+        facultySelect.appendChild(errorOption);
+
+    });
 
 
     /* =====================================================
@@ -333,11 +302,9 @@ function initializeFaculty() {
                     facultySelect.selectedIndex
                 ];
 
-
             if (!selectedOption) {
                 return;
             }
-
 
             if (departmentInput) {
 
@@ -345,7 +312,6 @@ function initializeFaculty() {
                     selectedOption.dataset.department || "";
 
             }
-
 
             updateProgress();
 
@@ -368,7 +334,6 @@ function initializeProgress() {
         return;
     }
 
-
     const watchedInputs =
         form.querySelectorAll(
             "input[type='radio'], " +
@@ -376,7 +341,6 @@ function initializeProgress() {
             "input[type='text'], " +
             "textarea"
         );
-
 
     watchedInputs.forEach(input => {
 
@@ -391,7 +355,6 @@ function initializeProgress() {
         );
 
     });
-
 
     updateProgress();
 
@@ -413,41 +376,28 @@ function updateProgress() {
     const progressPercent =
         document.getElementById("progress-percent");
 
-
     if (
         !form ||
         !progressFill ||
         !progressPercent
     ) {
-
         return;
-
     }
-
 
     const questionNames = [
 
         "course_satisfaction",
-
         "syllabus_pace",
-
         "concept_clarity",
-
         "practical_work",
-
         "study_material",
-
         "exam_difficulty",
-
         "faculty_support",
-
         "improvement"
 
     ];
 
-
     let answered = 0;
-
 
     questionNames.forEach(name => {
 
@@ -456,11 +406,9 @@ function updateProgress() {
                 `input[name="${name}"]:checked`
             );
 
-
         if (!selected) {
             return;
         }
-
 
         if (
             selected.value.trim().toLowerCase() ===
@@ -471,7 +419,6 @@ function updateProgress() {
                 form.querySelector(
                     `[name="${name}_other"]`
                 );
-
 
             if (
                 otherInput &&
@@ -490,20 +437,16 @@ function updateProgress() {
 
     });
 
-
     const totalQuestions =
         questionNames.length;
-
 
     const percentage =
         Math.round(
             (answered / totalQuestions) * 100
         );
 
-
     progressFill.style.width =
         `${percentage}%`;
-
 
     progressPercent.textContent =
         `${percentage}%`;
@@ -523,57 +466,42 @@ function initializeCharacterCounter() {
     const counter =
         document.getElementById("char-count");
 
-
     if (
         !comments ||
         !counter
     ) {
-
         return;
-
     }
-
 
     function updateCounter() {
 
         const length =
             comments.value.length;
 
-
         counter.textContent =
             `${length} / 500`;
-
 
         counter.classList.remove(
             "warning",
             "limit"
         );
 
-
         if (length >= 500) {
 
-            counter.classList.add(
-                "limit"
-            );
+            counter.classList.add("limit");
 
-        }
+        } else if (length >= 450) {
 
-        else if (length >= 450) {
-
-            counter.classList.add(
-                "warning"
-            );
+            counter.classList.add("warning");
 
         }
 
     }
 
-
     comments.addEventListener(
         "input",
         updateCounter
     );
-
 
     updateCounter();
 
@@ -592,16 +520,12 @@ function initializeWordFilter() {
     const warning =
         document.getElementById("word-warning");
 
-
     if (
         !comments ||
         !warning
     ) {
-
         return;
-
     }
-
 
     const blockedWords = [
 
@@ -616,14 +540,12 @@ function initializeWordFilter() {
 
     ];
 
-
     comments.addEventListener(
         "input",
         () => {
 
             const text =
                 comments.value.toLowerCase();
-
 
             const foundWord =
                 blockedWords.find(word => {
@@ -638,7 +560,6 @@ function initializeWordFilter() {
 
                 });
 
-
             if (foundWord) {
 
                 warning.textContent =
@@ -647,15 +568,404 @@ function initializeWordFilter() {
                 warning.style.display =
                     "inline";
 
+            } else {
+
+                warning.textContent = "";
+                warning.style.display = "none";
+
             }
 
-            else {
+        }
+    );
 
-                warning.textContent =  
-                    "";
+}
 
-                warning.style.display =
-                    "none";
+
+/* =========================================================
+   9. GET "OTHER" VALUE
+========================================================= */
+
+function getFeedbackValue(form, name) {
+
+    const selected =
+        form.querySelector(
+            `input[name="${name}"]:checked`
+        );
+
+    if (!selected) {
+        return "";
+    }
+
+    if (
+        selected.value.trim().toLowerCase() ===
+        "other"
+    ) {
+
+        const otherInput =
+            form.querySelector(
+                `[name="${name}_other"]`
+            );
+
+        if (otherInput) {
+
+            return otherInput.value.trim();
+
+        }
+
+        return "";
+
+    }
+
+    return selected.value;
+
+}
+
+
+/* =========================================================
+   10. FEEDBACK SUBMISSION
+========================================================= */
+
+function initializeFeedbackSubmission() {
+
+    const form =
+        document.getElementById("feedback-form");
+
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+            /* =========================================
+               GET FACULTY / COURSE INFORMATION
+            ========================================= */
+
+            const facultySelect =
+                document.getElementById("faculty");
+
+            const departmentInput =
+                document.getElementById("department");
+
+            const subjectInput =
+                document.getElementById("subject");
+
+
+            const faculty_id =
+                facultySelect
+                    ? facultySelect.value.trim()
+                    : "";
+
+            const department =
+                departmentInput
+                    ? departmentInput.value.trim()
+                    : "";
+
+            const subject =
+                subjectInput
+                    ? subjectInput.value.trim()
+                    : "";
+
+
+            /* =========================================
+               GET ALL QUESTIONS
+            ========================================= */
+
+            const course_satisfaction =
+                getFeedbackValue(
+                    form,
+                    "course_satisfaction"
+                );
+
+            const syllabus_pace =
+                getFeedbackValue(
+                    form,
+                    "syllabus_pace"
+                );
+
+            const concept_clarity =
+                getFeedbackValue(
+                    form,
+                    "concept_clarity"
+                );
+
+            const practical_work =
+                getFeedbackValue(
+                    form,
+                    "practical_work"
+                );
+
+            const study_material =
+                getFeedbackValue(
+                    form,
+                    "study_material"
+                );
+
+            const exam_difficulty =
+                getFeedbackValue(
+                    form,
+                    "exam_difficulty"
+                );
+
+            const faculty_support =
+                getFeedbackValue(
+                    form,
+                    "faculty_support"
+                );
+
+            const improvement =
+                getFeedbackValue(
+                    form,
+                    "improvement"
+                );
+
+            const comments =
+                document.getElementById("comments")
+                    ? document
+                        .getElementById("comments")
+                        .value
+                        .trim()
+                    : "";
+
+
+            /* =========================================
+               FRONTEND VALIDATION
+            ========================================= */
+
+            const missingFields = [];
+
+            if (!faculty_id) {
+                missingFields.push("faculty");
+            }
+
+            if (!department) {
+                missingFields.push("department");
+            }
+
+            if (!subject) {
+                missingFields.push("subject");
+            }
+
+            if (!course_satisfaction) {
+                missingFields.push("course satisfaction");
+            }
+
+            if (!syllabus_pace) {
+                missingFields.push("syllabus pace");
+            }
+
+            if (!concept_clarity) {
+                missingFields.push("concept clarity");
+            }
+
+            if (!practical_work) {
+                missingFields.push("practical work");
+            }
+
+            if (!study_material) {
+                missingFields.push("study material");
+            }
+
+            if (!exam_difficulty) {
+                missingFields.push("exam difficulty");
+            }
+
+            if (!faculty_support) {
+                missingFields.push("faculty support");
+            }
+
+            if (!improvement) {
+                missingFields.push("improvement");
+            }
+
+
+            if (missingFields.length > 0) {
+
+                alert(
+                    "Please complete:\n\n" +
+                    missingFields.join("\n")
+                );
+
+                return;
+
+            }
+
+
+            /* =========================================
+               CREATE EXACT PAYLOAD
+            ========================================= */
+
+            const feedbackData = {
+
+                faculty_id: faculty_id,
+
+                department: department,
+
+                subject: subject,
+
+                course_satisfaction:
+                    course_satisfaction,
+
+                syllabus_pace:
+                    syllabus_pace,
+
+                concept_clarity:
+                    concept_clarity,
+
+                practical_work:
+                    practical_work,
+
+                study_material:
+                    study_material,
+
+                exam_difficulty:
+                    exam_difficulty,
+
+                faculty_support:
+                    faculty_support,
+
+                improvement:
+                    improvement,
+
+                comments:
+                    comments
+
+            };
+
+
+            /* =========================================
+               DEBUG
+            ========================================= */
+
+            console.log(
+                "Submitting feedback:",
+                feedbackData
+            );
+
+
+            /* =========================================
+               SUBMIT BUTTON
+            ========================================= */
+
+            const submitButton =
+                form.querySelector(
+                    "button[type='submit']"
+                );
+
+            const originalButtonText =
+                submitButton
+                    ? submitButton.textContent
+                    : "Submit Feedback";
+
+
+            if (submitButton) {
+
+                submitButton.disabled = true;
+
+                submitButton.textContent =
+                    "Submitting Feedback...";
+
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/feedback/submit",
+                        {
+
+                            method: "POST",
+
+                            credentials: "include",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "Accept":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    feedbackData
+                                )
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Feedback submission response:",
+                    data
+                );
+
+
+                if (!response.ok || !data.success) {
+
+                    throw new Error(
+                        data.message ||
+                        "Failed to submit feedback"
+                    );
+
+                }
+
+
+                /* =====================================
+                   SUCCESS
+                ===================================== */
+
+                console.log(
+                    "Feedback submitted successfully."
+                );
+
+
+                if (data.redirect) {
+
+                    window.location.href =
+                        data.redirect;
+
+                } else {
+
+                    window.location.href =
+                        "/dashboard/student-dashboard.html?feedback=success";
+
+                }
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Feedback Submission Error:",
+                    error
+                );
+
+                alert(
+                    error.message ||
+                    "Failed to submit feedback. Please try again."
+                );
+
+
+                if (submitButton) {
+
+                    submitButton.disabled = false;
+
+                    submitButton.textContent =
+                        originalButtonText;
+
+                }
 
             }
 

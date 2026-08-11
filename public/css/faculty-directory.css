@@ -1,436 +1,1428 @@
 /* =====================================================
    FACULTY DIRECTORY
-   Anonymous Student Feedback System
+   PREMIUM PROFESSIONAL DARK THEME
+   MATCHES CURRENT HTML EXACTLY
 ===================================================== */
-
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-
-*{
-
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-
-}
-
-
-body{
-
-    min-height:100vh;
-
-    font-family:"Poppins",sans-serif;
-
-    background:
-    linear-gradient(
-        135deg,
-        #dbeafe,
-        #eff6ff,
-        #ffffff
-    );
-
-    color:#1e293b;
-
-    padding:40px;
-
-    transition:.4s ease;
-
-}
-
-
-
-/* ================= HEADER ================= */
-
-
-.header-content{
-
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:45px;
-
-
-    background:
-
-    rgba(255,255,255,.55);
-
-
-    padding:25px 35px;
-
-
-    border-radius:20px;
-
-
-    backdrop-filter:blur(20px);
-
-
-    box-shadow:
-
-    0 12px 35px rgba(0,0,0,.12);
-
-
-}
-
-
-
-.header-content h1{
-
-
-    color:#1e3a8a;
-
-    font-size:30px;
-
-}
-
-
-
-.header-content a{
-
-
-    text-decoration:none;
-
-    color:white;
-
-    background:#2563eb;
-
-    padding:12px 22px;
-
-    border-radius:12px;
-
-    font-weight:600;
-
-    transition:.3s;
-
-
-}
-
-
-
-.header-content a:hover{
-
-
-    background:#1d4ed8;
-
-    transform:translateY(-3px);
-
-
-}
-
-
-
-/* ================= TITLE ================= */
-
-
-#department-title{
-
-
-    text-align:center;
-
-    font-size:28px;
-
-    margin-bottom:35px;
-
-    color:#1e3a8a;
-
-
-}
-
-
-
-
-/* ================= FACULTY GRID ================= */
-
-
-#faculty-container{
-
-
-    display:grid;
-
-    grid-template-columns:
-
-    repeat(auto-fit,minmax(300px,1fr));
-
-
-    gap:30px;
-
-
-}
-
-
-
-
-/* ================= CARD ================= */
-
-
-.faculty-card{
-
-
-    background:
-
-    rgba(255,255,255,.65);
-
-
-    backdrop-filter:blur(20px);
-
-
-    border-radius:22px;
-
-
-    padding:30px;
-
-
-    border:
-
-    1px solid rgba(255,255,255,.4);
-
-
-    box-shadow:
-
-    0 15px 35px rgba(0,0,0,.12);
-
-
-    transition:.35s ease;
-
-
-}
-
-
-
-.faculty-card:hover{
-
-
-    transform:
-
-    translateY(-8px);
-
-
-    box-shadow:
-
-    0 20px 45px rgba(37,99,235,.25);
-
-
-}
-
-
-
-
-.faculty-card h3{
-
-
-    color:#2563eb;
-
-
-    font-size:22px;
-
-
-    margin-bottom:18px;
-
-
-}
-
-
-
-.faculty-card p{
-
-
-    margin:12px 0;
-
-
-    color:#475569;
-
-
-    font-size:15px;
-
-
-}
-
-
-
-/* ================= FEEDBACK BUTTON (future use) ================= */
-
-
-.faculty-card button{
-
-
-    margin-top:20px;
-
-
-    width:100%;
-
-
-    padding:13px;
-
-
-    border:none;
-
-
-    border-radius:12px;
-
-
-    background:#2563eb;
-
-
-    color:white;
-
-
-    font-weight:600;
-
-
-    cursor:pointer;
-
-
-    transition:.3s;
-
-
-}
-
-
-
-.faculty-card button:hover{
-
-
-    background:#1d4ed8;
-
-
-}
-
 
 
 /* =====================================================
-   DARK MODE
+   RESET
 ===================================================== */
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-body.dark{
 
+/* =====================================================
+   ROOT VARIABLES
+===================================================== */
+
+:root {
+
+    --background: #080f1d;
+
+    --header-bg: #101a2c;
+
+    --card-bg: #111d31;
+
+    --card-bg-hover: #14233b;
+
+    --input-bg: #0f1a2d;
+
+    --border: #263754;
+
+    --border-light: #334764;
+
+    --primary: #3b82f6;
+
+    --primary-dark: #2563eb;
+
+    --primary-light: #60a5fa;
+
+    --text: #f8fafc;
+
+    --text-soft: #dbeafe;
+
+    --text-muted: #94a3b8;
+
+    --text-dim: #64748b;
+
+    --danger: #fca5a5;
+
+    --danger-bg: rgba(127, 29, 29, 0.16);
+
+    --danger-border: rgba(248, 113, 113, 0.28);
+}
+
+
+/* =====================================================
+   BODY
+===================================================== */
+
+body {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
 
     background:
+        radial-gradient(
+            circle at 85% -10%,
+            rgba(37, 99, 235, 0.12),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 5% 30%,
+            rgba(59, 130, 246, 0.04),
+            transparent 28%
+        ),
+        var(--background);
 
-    linear-gradient(
+    color: var(--text);
 
-    135deg,
+    font-family:
+        Inter,
+        "Segoe UI",
+        Arial,
+        Helvetica,
+        sans-serif;
 
-    #0f172a,
-
-    #111827,
-
-    #1e293b
-
-    );
-
-
-    color:white;
-
-
+    line-height: 1.5;
 }
 
 
+/* =====================================================
+   HEADER
+===================================================== */
 
+.directory-header {
 
-body.dark .header-content,
-
-
-body.dark .faculty-card{
-
+    width: 100%;
 
     background:
+        linear-gradient(
+            135deg,
+            #121e33 0%,
+            #101a2c 100%
+        );
 
-    rgba(15,23,42,.75);
+    border-bottom: 1px solid var(--border);
+
+    position: relative;
+}
 
 
-    border:
+/* subtle header glow */
 
-    1px solid rgba(255,255,255,.08);
+.directory-header::after {
 
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    width: 420px;
+    height: 100%;
+
+    background:
+        radial-gradient(
+            circle at right center,
+            rgba(37, 99, 235, 0.08),
+            transparent 65%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   HEADER INNER
+===================================================== */
+
+.header-inner {
+
+    width: 100%;
+
+    max-width: 1250px;
+
+    margin: 0 auto;
+
+    padding: 25px 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    position: relative;
+
+    z-index: 2;
+}
+
+
+/* =====================================================
+   HEADER TITLE
+===================================================== */
+
+.header-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    min-width: 0;
+}
+
+
+/* =====================================================
+   HEADER ICON
+===================================================== */
+
+.header-icon {
+
+    width: 54px;
+
+    height: 54px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    border: 1px solid #3b82f6;
+
+    border-radius: 14px;
+
+    font-size: 26px;
+
+    box-shadow:
+        0 8px 20px
+        rgba(37, 99, 235, 0.18);
+}
+
+
+/* =====================================================
+   HEADER H1
+===================================================== */
+
+.header-title h1 {
+
+    color: #ffffff;
+
+    font-size: 29px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.7px;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   HEADER DESCRIPTION
+===================================================== */
+
+.header-title p {
+
+    margin-top: 5px;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+.back-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 11px 17px;
+
+    background: #17243a;
+
+    border: 1px solid var(--border-light);
+
+    border-radius: 10px;
+
+    color: #bfdbfe;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.back-button:hover {
+
+    background: var(--primary-dark);
+
+    border-color: var(--primary);
+
+    color: #ffffff;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 18px
+        rgba(37, 99, 235, 0.18);
+}
+
+
+.back-button:active {
+
+    transform: translateY(0);
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.directory-main {
+
+    width: 100%;
+
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding: 52px 30px 70px;
+
+    flex: 1;
+}
+
+
+/* =====================================================
+   DEPARTMENT SECTION
+===================================================== */
+
+.department-section {
+
+    margin-bottom: 25px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+}
+
+
+/* =====================================================
+   SECTION LABEL
+===================================================== */
+
+.section-label {
+
+    display: inline-block;
+
+    margin-bottom: 8px;
+
+    color: var(--primary-light);
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+    line-height: 1;
+}
+
+
+/* =====================================================
+   DEPARTMENT TITLE
+===================================================== */
+
+.department-section h2 {
+
+    color: #ffffff;
+
+    font-size: 28px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+
+    line-height: 1.25;
+
+    margin-bottom: 7px;
+}
+
+
+/* =====================================================
+   DEPARTMENT DESCRIPTION
+===================================================== */
+
+.department-section p {
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   SEARCH SECTION
+===================================================== */
+
+.search-section {
+
+    width: 100%;
+
+    margin-bottom: 24px;
+}
+
+
+/* =====================================================
+   SEARCH BOX
+===================================================== */
+
+.search-box {
+
+    position: relative;
+
+    width: 100%;
+}
+
+
+/* =====================================================
+   SEARCH ICON
+===================================================== */
+
+.search-icon {
+
+    position: absolute;
+
+    left: 18px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 22px;
+
+    height: 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 16px;
+
+    pointer-events: none;
+
+    z-index: 2;
+}
+
+
+/* =====================================================
+   SEARCH INPUT
+===================================================== */
+
+.search-box input {
+
+    width: 100%;
+
+    height: 56px;
+
+    padding:
+        0
+        20px
+        0
+        50px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #111d31,
+            #0f1a2d
+        );
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+    outline: none;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.search-box input::placeholder {
+
+    color: #64748b;
+}
+
+
+.search-box input:hover {
+
+    border-color: var(--border-light);
+}
+
+
+.search-box input:focus {
+
+    background: #13213a;
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(59, 130, 246, 0.10);
+}
+
+
+/* =====================================================
+   FACULTY GRID
+===================================================== */
+
+.faculty-grid {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(340px, 1fr)
+        );
+
+    gap: 20px;
+
+    align-items: stretch;
+}
+
+
+/* =====================================================
+   FACULTY CARD
+===================================================== */
+
+.faculty-card {
+
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #142239,
+            #101b2f
+        );
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+/* =====================================================
+   CARD TOP ACCENT
+===================================================== */
+
+.faculty-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+
+    height: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #2563eb,
+            #60a5fa
+        );
+}
+
+
+/* =====================================================
+   CARD HOVER
+===================================================== */
+
+.faculty-card:hover {
+
+    transform: translateY(-4px);
+
+    background:
+        linear-gradient(
+            145deg,
+            #172840,
+            #122039
+        );
+
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 18px 40px
+        rgba(0, 0, 0, 0.28),
+        0 0 25px
+        rgba(37, 99, 235, 0.06);
+}
+
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.faculty-card-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 24px;
+}
+
+
+/* =====================================================
+   FACULTY AVATAR
+===================================================== */
+
+.faculty-avatar {
+
+    width: 52px;
+
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    border: 1px solid #3b82f6;
+
+    border-radius: 13px;
+
+    font-size: 24px;
+
+    box-shadow:
+        0 7px 18px
+        rgba(37, 99, 235, 0.15);
+}
+
+
+/* =====================================================
+   FACULTY TITLE
+===================================================== */
+
+.faculty-title {
+
+    min-width: 0;
+}
+
+
+.faculty-title h3 {
+
+    color: #ffffff;
+
+    font-size: 19px;
+
+    font-weight: 750;
+
+    line-height: 1.35;
+
+    margin-bottom: 3px;
+
+    word-break: break-word;
+}
+
+
+.faculty-title span {
+
+    color: var(--text-dim);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.6px;
+}
+
+
+/* =====================================================
+   FACULTY DETAILS
+===================================================== */
+
+.faculty-details {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0;
+
+    margin-bottom: 22px;
+}
+
+
+/* =====================================================
+   DETAIL ROW
+===================================================== */
+
+.faculty-detail {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #202f47;
+}
+
+
+.faculty-detail:first-child {
+
+    padding-top: 0;
+}
+
+
+.faculty-detail:last-child {
+
+    padding-bottom: 0;
+
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   DETAIL ICON
+===================================================== */
+
+.detail-icon {
+
+    width: 34px;
+
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #17263d;
+
+    border: 1px solid #243650;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   DETAIL CONTENT
+===================================================== */
+
+.faculty-detail > div {
+
+    min-width: 0;
+
+    padding-top: 1px;
+}
+
+
+/* =====================================================
+   DETAIL LABEL
+===================================================== */
+
+.faculty-detail small {
+
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: var(--text-dim);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.7px;
+}
+
+
+/* =====================================================
+   DETAIL VALUE
+===================================================== */
+
+.faculty-detail strong {
+
+    display: block;
+
+    color: var(--text-soft);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.5;
+
+    word-break: break-word;
+}
+
+
+/* =====================================================
+   CARD FOOTER
+===================================================== */
+
+.faculty-card-footer {
+
+    margin-top: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #243149;
+}
+
+
+/* =====================================================
+   ANONYMOUS LABEL
+===================================================== */
+
+.anonymous-label {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   FEEDBACK BUTTON
+===================================================== */
+
+.feedback-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 39px;
+
+    padding: 10px 15px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 15px
+        rgba(37, 99, 235, 0.16);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.feedback-button:hover {
+
+    background:
+        linear-gradient(
+            135deg,
+            #3b82f6,
+            #2563eb
+        );
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 9px 20px
+        rgba(37, 99, 235, 0.23);
+}
+
+
+.feedback-button:active {
+
+    transform: translateY(0);
+}
+
+
+/* =====================================================
+   LOADING CARD
+===================================================== */
+
+.loading-card {
+
+    grid-column: 1 / -1;
+
+    min-height: 230px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 14px;
+
+    padding: 35px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #111d31,
+            #0f1a2d
+        );
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    color: var(--text-muted);
+
+    text-align: center;
+}
+
+
+/* =====================================================
+   LOADING TEXT
+===================================================== */
+
+.loading-card p {
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   LOADING SPINNER
+===================================================== */
+
+.loading-spinner {
+
+    width: 32px;
+
+    height: 32px;
+
+    border: 3px solid #263852;
+
+    border-top-color: var(--primary);
+
+    border-right-color: var(--primary-light);
+
+    border-radius: 50%;
+
+    animation:
+        faculty-directory-spin
+        0.8s
+        linear
+        infinite;
+}
+
+
+@keyframes faculty-directory-spin {
+
+    to {
+
+        transform: rotate(360deg);
+
+    }
+}
+
+
+/* =====================================================
+   EMPTY CARD
+===================================================== */
+
+.empty-card {
+
+    grid-column: 1 / -1;
+
+    min-height: 210px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 45px 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #111d31,
+            #0f1a2d
+        );
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    color: var(--text-muted);
+
+    text-align: center;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+/* =====================================================
+   ERROR EMPTY CARD
+===================================================== */
+
+.empty-card small {
+
+    display: block;
+
+    margin-top: 8px;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   ERROR CARD DETECTION
+   Works with current JS .empty-card
+===================================================== */
+
+.empty-card:has(small) {
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(63, 25, 43, 0.45),
+            rgba(30, 15, 28, 0.40)
+        );
+
+    border-color: var(--danger-border);
+
+    color: var(--danger);
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.directory-footer {
+
+    width: 100%;
+
+    padding: 23px 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #101a2d,
+            #0e1728
+        );
+
+    border-top: 1px solid var(--border);
+
+    text-align: center;
+
+    margin-top: auto;
+}
+
+
+/* =====================================================
+   FOOTER TEXT
+===================================================== */
+
+.directory-footer p {
+
+    color: #71819a;
+
+    font-size: 12px;
+
+    font-weight: 500;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .header-inner {
+
+        padding:
+            23px
+            25px;
+    }
+
+
+    .directory-main {
+
+        padding:
+            45px
+            25px
+            60px;
+    }
+
+
+    .faculty-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
 
 }
 
 
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+    .header-inner {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        padding:
+            22px
+            20px;
+
+        gap: 18px;
+    }
 
 
-body.dark .header-content h1,
+    .header-title {
+
+        width: 100%;
+
+        align-items: flex-start;
+    }
 
 
-body.dark #department-title{
+    .header-icon {
+
+        width: 48px;
+
+        height: 48px;
+
+        font-size: 23px;
+    }
 
 
-    color:white;
+    .header-title h1 {
+
+        font-size: 25px;
+    }
 
 
-}
+    .header-title p {
+
+        font-size: 12px;
+    }
 
 
+    .back-button {
 
-body.dark .header-content a{
-
-
-    background:#3b82f6;
-
-
-}
+        width: 100%;
+    }
 
 
+    .directory-main {
+
+        padding:
+            38px
+            20px
+            55px;
+    }
 
 
-body.dark .faculty-card h3{
+    .department-section h2 {
+
+        font-size: 24px;
+    }
 
 
-    color:#60a5fa;
+    .faculty-grid {
 
-
-}
-
-
-
-body.dark .faculty-card p{
-
-
-    color:#cbd5e1;
-
-
-}
-
-
-
-/* ================= MOBILE ================= */
-
-
-@media(max-width:700px){
-
-
-body{
-
-    padding:20px;
-
-}
-
-
-
-.header-content{
-
-
-    flex-direction:column;
-
-    gap:20px;
-
-
-}
-
-
-
-.header-content h1{
-
-
-    font-size:22px;
-
+        grid-template-columns: 1fr;
+    }
 
 }
 
 
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 450px) {
+
+    .header-inner {
+
+        padding:
+            20px
+            15px;
+    }
+
+
+    .header-title {
+
+        gap: 11px;
+    }
+
+
+    .header-icon {
+
+        width: 44px;
+
+        height: 44px;
+
+        border-radius: 11px;
+
+        font-size: 21px;
+    }
+
+
+    .header-title h1 {
+
+        font-size: 21px;
+    }
+
+
+    .header-title p {
+
+        font-size: 11px;
+    }
+
+
+    .directory-main {
+
+        padding:
+            30px
+            15px
+            45px;
+    }
+
+
+    .section-label {
+
+        font-size: 10px;
+    }
+
+
+    .department-section h2 {
+
+        font-size: 21px;
+    }
+
+
+    .department-section p {
+
+        font-size: 12px;
+    }
+
+
+    .search-box input {
+
+        height: 52px;
+
+        font-size: 13px;
+    }
+
+
+    .faculty-card {
+
+        padding: 20px;
+    }
+
+
+    .faculty-card-header {
+
+        margin-bottom: 20px;
+    }
+
+
+    .faculty-title h3 {
+
+        font-size: 18px;
+    }
+
+
+    .faculty-card-footer {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+    }
+
+
+    .anonymous-label {
+
+        justify-content: center;
+    }
+
+
+    .feedback-button {
+
+        width: 100%;
+    }
+
+
+    .directory-footer {
+
+        padding:
+            20px
+            15px;
+    }
 
 }

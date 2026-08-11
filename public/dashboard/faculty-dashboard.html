@@ -1,324 +1,852 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-<title>
-Faculty Dashboard | Anonymous Student Feedback System
-</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<link rel="stylesheet" href="/css/faculty-dashboard.css">
-<link rel="stylesheet" href="/css/darkmode.css">
+    <meta
+        name="description"
+        content="Faculty Dashboard for the Anonymous Student Feedback System"
+    >
+
+    <title>
+        Faculty Dashboard | Anonymous Student Feedback System
+    </title>
+
+    <!-- =====================================================
+         STYLES
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="/css/faculty-dashboard.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/darkmode.css"
+    >
 
 </head>
 
+
 <body>
 
-<!-- ================= HEADER ================= -->
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-<header>
+    <header>
 
-<div class="header-container">
+        <div class="header-container">
 
-<div class="brand">
+            <!-- BRAND -->
 
-<h1>Anonymous Student Feedback System</h1>
+            <div class="brand">
 
-<p>Faculty Dashboard Portal</p>
+                <h1>
+                    Anonymous Student Feedback System
+                </h1>
 
-</div>
+                <p>
+                    Faculty Dashboard Portal
+                </p>
 
-<div class="header-actions">
+            </div>
 
-<button id="dark-mode-btn">
-🌙 Dark Mode
-</button>
 
-<a href="/faculty/logout" class="logout-btn">
-Logout
-</a>
+            <!-- HEADER ACTIONS -->
 
-</div>
+            <div class="header-actions">
 
-</div>
+               
+                <!-- Dark Mode -->
 
-</header>
+                <button
+                    type="button"
+                    id="dark-mode-btn"
+                    aria-label="Toggle dark mode"
+                >
 
-<!-- ================= MAIN ================= -->
+                    🌙 Dark Mode
 
-<main>
+                </button>
 
-<!-- ================= WELCOME ================= -->
 
-<section class="welcome-card">
+                <!-- Logout -->
 
-<div class="welcome-text">
+                <a
+                    href="/faculty/logout"
+                    class="logout-btn"
+                >
 
-<span class="tag">
-Faculty Portal
-</span>
+                    Logout
 
-<h2 id="welcome">
-Welcome Faculty 👋
-</h2>
+                </a>
 
-<p>
-Manage student feedback, view performance ratings,
-and improve teaching quality.
-</p>
+            </div>
 
-</div>
+        </div>
 
-<div class="welcome-avatar">
-👨‍🏫
-</div>
+    </header>
 
-</section>
 
-<!-- ================= PROFILE ================= -->
 
-<section class="profile-card">
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
 
-<div class="section-header">
+    <main>
 
-<h2>👨‍🏫 Faculty Profile</h2>
 
-<p>Registered Faculty Information</p>
+        <!-- =================================================
+             WELCOME SECTION
+        ================================================== -->
 
-</div>
+        <section
+            class="welcome-card"
+            aria-labelledby="welcome"
+        >
 
-<div class="profile-grid">
+            <div class="welcome-text">
 
-<div class="profile-box">
-<span>Faculty ID</span>
-<b id="faculty-id">Loading...</b>
-</div>
+                <span class="tag">
+                    Faculty Portal
+                </span>
 
-<div class="profile-box">
-<span>Faculty Name</span>
-<b id="faculty-name">Loading...</b>
-</div>
 
-<div class="profile-box">
-<span>Email</span>
-<b id="faculty-email">Loading...</b>
-</div>
+                <h2 id="welcome">
+                    Welcome Faculty 👋
+                </h2>
 
-<div class="profile-box">
-<span>Department</span>
-<b id="faculty-department">Loading...</b>
-</div>
 
-<div class="profile-box">
-<span>Subject</span>
-<b id="faculty-subject">Loading...</b>
-</div>
+                <p>
+                    Manage student feedback, view performance
+                    ratings, understand student experiences,
+                    and improve teaching quality.
+                </p>
 
-</div>
+            </div>
 
-</section>
 
-<!-- ================= STATISTICS ================= -->
+            <div
+                class="welcome-avatar"
+                aria-hidden="true"
+            >
 
-<section class="stats-section">
+                👨‍🏫
 
-<div class="section-header">
+            </div>
 
-<h2>📊 Performance Overview</h2>
+        </section>
 
-<p>Student feedback summary</p>
 
-</div>
 
-<div class="stats-grid">
+        <!-- =================================================
+             FACULTY PROFILE
+        ================================================== -->
 
-<div class="stat-card">
-<div class="stat-icon">📝</div>
-<h3 id="total-feedback">0</h3>
-<p>Total Feedback</p>
-</div>
+        <section
+            class="profile-card"
+            aria-labelledby="faculty-profile-title"
+        >
 
-<div class="stat-card">
-<div class="stat-icon">📚</div>
-<h3 id="teaching">0</h3>
-<p>Teaching Rating</p>
-</div>
+            <div class="section-header">
 
-<div class="stat-card">
-<div class="stat-icon">💬</div>
-<h3 id="communication">0</h3>
-<p>Communication</p>
-</div>
+                <h2 id="faculty-profile-title">
+                    👤 Faculty Profile
+                </h2>
 
-<div class="stat-card">
-<div class="stat-icon">🤝</div>
-<h3 id="behaviour">0</h3>
-<p>Behaviour</p>
-</div>
+                <p>
+                    Registered faculty information
+                </p>
 
-<div class="stat-card">
-<div class="stat-icon">⭐</div>
-<h3 id="overall-rating">0</h3>
-<p>Overall Rating</p>
-</div>
+            </div>
 
-</div>
 
-</section>
+            <div class="profile-grid">
+
+
+                <!-- Faculty ID -->
+
+                <div class="profile-box">
+
+                    <span>
+                        Faculty ID
+                    </span>
+
+                    <b id="faculty-id">
+                        Loading...
+                    </b>
+
+                </div>
+
+
+                <!-- Faculty Name -->
+
+                <div class="profile-box">
+
+                    <span>
+                        Faculty Name
+                    </span>
+
+                    <b id="faculty-name">
+                        Loading...
+                    </b>
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="profile-box">
+
+                    <span>
+                        Email
+                    </span>
+
+                    <b id="faculty-email">
+                        Loading...
+                    </b>
+
+                </div>
+
+
+                <!-- Department -->
+
+                <div class="profile-box">
+
+                    <span>
+                        Department
+                    </span>
+
+                    <b id="faculty-department">
+                        Loading...
+                    </b>
+
+                </div>
+
+
+                <!-- Subject -->
+
+                <div class="profile-box">
+
+                    <span>
+                        Subject
+                    </span>
+
+                    <b id="faculty-subject">
+                        Loading...
+                    </b>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PERFORMANCE OVERVIEW
+        ================================================== -->
+
+        <section
+            class="stats-section"
+            aria-labelledby="performance-overview-title"
+        >
+
+            <div class="section-header">
+
+                <h2 id="performance-overview-title">
+                    📊 Performance Overview
+                </h2>
+
+                <p>
+                    Summary of student feedback and ratings
+                </p>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+
+                <!-- Total Feedback -->
+
+                <div class="stat-card">
+
+                    <div
+                        class="stat-icon"
+                        aria-hidden="true"
+                    >
+                        📋
+                    </div>
+
+                    <h3 id="total-feedback">
+                        0
+                    </h3>
+
+                    <p>
+                        Total Feedback
+                    </p>
+
+                </div>
+
+
+                <!-- Teaching -->
+
+                <div class="stat-card">
+
+                    <div
+                        class="stat-icon"
+                        aria-hidden="true"
+                    >
+                        🎓
+                    </div>
+
+                    <h3 id="teaching">
+                        0
+                    </h3>
+
+                    <p>
+                        Teaching Rating
+                    </p>
+
+                </div>
+
+
+                <!-- Communication -->
+
+                <div class="stat-card">
+
+                    <div
+                        class="stat-icon"
+                        aria-hidden="true"
+                    >
+                        💬
+                    </div>
+
+                    <h3 id="communication">
+                        0
+                    </h3>
+
+                    <p>
+                        Communication
+                    </p>
+
+                </div>
+
+
+                <!-- Behaviour -->
+
+                <div class="stat-card">
+
+                    <div
+                        class="stat-icon"
+                        aria-hidden="true"
+                    >
+                        👍
+                    </div>
+
+                    <h3 id="behaviour">
+                        0
+                    </h3>
+
+                    <p>
+                        Behaviour
+                    </p>
+
+                </div>
+
+
+                <!-- Overall -->
+
+                <div class="stat-card">
+
+                    <div
+                        class="stat-icon"
+                        aria-hidden="true"
+                    >
+                        ⭐
+                    </div>
+
+                    <h3 id="overall-rating">
+                        0
+                    </h3>
+
+                    <p>
+                        Overall Rating
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
 <br>
+        <!-- =================================================
+             PERFORMANCE ANALYSIS
+        ================================================== -->
 
-<!-- ================= RATING ANALYTICS ================= -->
+        <section
+            class="analytics-card performance-analysis"
+            aria-labelledby="performance-analysis-title"
+        >
 
-<section class="analytics-card">
+            <div class="section-header">
 
-<div class="section-header">
+                <h2 id="performance-analysis-title">
+                    📈 Performance Analysis
+                </h2>
 
-<h2>📈 Rating Analytics</h2>
+                <p>
+                    Detailed overview of your teaching performance
+                    based on student feedback.
+                </p>
 
-<p>Overall teaching performance</p>
+            </div>
 
-</div>
 
-<div class="rating-row">
+            <!-- OVERALL PERFORMANCE -->
 
-<span>Teaching</span>
+            <div class="overall-performance">
 
-<div class="progress">
-<div class="progress-bar" id="teach-progress"></div>
-</div>
+                <div class="overall-score">
 
-<b id="teach-percent">0%</b>
+                    <div
+                        class="overall-icon"
+                        aria-hidden="true"
+                    >
+                        ⭐
+                    </div>
 
-</div>
+                    <div>
 
-<div class="rating-row">
+                        <span>
+                            Overall Performance
+                        </span>
 
-<span>Communication</span>
+                        <strong id="overall-analysis-score">
+                            0.0 / 5
+                        </strong>
 
-<div class="progress">
-<div class="progress-bar" id="comm-progress"></div>
-</div>
+                    </div>
 
-<b id="comm-percent">0%</b>
+                </div>
 
-</div>
 
-<div class="rating-row">
+                <div
+                    class="overall-description"
+                    id="overall-description"
+                >
 
-<span>Behaviour</span>
+                    Waiting for student feedback data...
 
-<div class="progress">
-<div class="progress-bar" id="behave-progress"></div>
-</div>
+                </div>
 
-<b id="behave-percent">0%</b>
+            </div>
 
-</div>
 
-</section>
 
-<!-- ================= REAL TIME ANALYSIS ================= -->
+            <!-- RATING ANALYSIS -->
 
-<section class="analytics-card">
+            <div class="rating-analysis-list">
 
-<div class="section-header">
 
-<h2>📊 Real-Time Rating Analysis</h2>
+                <!-- TEACHING -->
 
-<p>Live statistics from all submitted feedback</p>
+                <div class="rating-analysis-item">
 
-</div>
+                    <div class="rating-analysis-header">
 
-<div id="real-time-analysis">
+                        <div>
 
-<!-- JavaScript will generate the analytics cards here -->
+                            <span
+                                class="rating-icon"
+                                aria-hidden="true"
+                            >
+                                🎓
+                            </span>
 
-</div>
+                            <strong>
+                                Teaching
+                            </strong>
 
-</section>
+                        </div>
 
-<!-- ================= CHART ANALYTICS ================= -->
+                        <b id="teach-percent">
+                            0%
+                        </b>
 
-<section class="charts-section">
+                    </div>
 
-    <div class="section-header">
 
-        <h2>📊 Feedback Analytics</h2>
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar"
+                            id="teach-progress"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="rating-analysis-footer">
+
+                        <span>
+                            Teaching effectiveness
+                        </span>
+
+                        <b id="teach-score">
+                            0.0 / 5
+                        </b>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- COMMUNICATION -->
+
+                <div class="rating-analysis-item">
+
+                    <div class="rating-analysis-header">
+
+                        <div>
+
+                            <span
+                                class="rating-icon"
+                                aria-hidden="true"
+                            >
+                                💬
+                            </span>
+
+                            <strong>
+                                Communication
+                            </strong>
+
+                        </div>
+
+                        <b id="comm-percent">
+                            0%
+                        </b>
+
+                    </div>
+
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar"
+                            id="comm-progress"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="rating-analysis-footer">
+
+                        <span>
+                            Communication with students
+                        </span>
+
+                        <b id="comm-score">
+                            0.0 / 5
+                        </b>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- BEHAVIOUR -->
+
+                <div class="rating-analysis-item">
+
+                    <div class="rating-analysis-header">
+
+                        <div>
+
+                            <span
+                                class="rating-icon"
+                                aria-hidden="true"
+                            >
+                                👍
+                            </span>
+
+                            <strong>
+                                Behaviour
+                            </strong>
+
+                        </div>
+
+                        <b id="behave-percent">
+                            0%
+                        </b>
+
+                    </div>
+
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar"
+                            id="behave-progress"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="rating-analysis-footer">
+
+                        <span>
+                            Professional behaviour
+                        </span>
+
+                        <b id="behave-score">
+                            0.0 / 5
+                        </b>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- PERFORMANCE INSIGHT -->
+
+            <div class="performance-insight">
+
+                <div
+                    class="insight-icon"
+                    aria-hidden="true"
+                >
+                    💡
+                </div>
+
+                <div>
+
+                    <h3>
+                        Performance Insight
+                    </h3>
+
+                    <p id="performance-insight-text">
+
+                        Your performance insight will appear here
+                        after student feedback is analyzed.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             REAL-TIME ANALYTICS
+        ================================================== -->
+
+        <section
+            class="analytics-card"
+            aria-labelledby="real-time-title"
+        >
+
+            <div class="section-header">
+
+                <h2 id="real-time-title">
+                    ⚡ Real-Time Rating Analysis
+                </h2>
+
+                <p>
+                    Live statistics calculated from submitted
+                    student feedback.
+                </p>
+
+            </div>
+
+
+            <div id="real-time-analysis">
+
+                <!-- Generated by faculty-dashboard.js -->
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CHARTS
+        ================================================== -->
+
+        <section
+            class="charts-section"
+            aria-labelledby="charts-title"
+        >
+
+            <div class="section-header">
+
+                <h2 id="charts-title">
+                    📊 Feedback Analytics
+                </h2>
+
+                <p>
+                    Visual representation of student feedback
+                    ratings.
+                </p>
+
+            </div>
+
+
+            <div class="charts-grid">
+
+
+                <!-- DOUGHNUT CHART -->
+
+                <div class="chart-card">
+
+                    <h3>
+                        ⭐ Overall Ratings
+                    </h3>
+
+                    <div class="chart-container">
+
+                        <canvas
+                            id="ratingChart"
+                            aria-label="Overall faculty rating chart"
+                        ></canvas>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BAR CHART -->
+
+                <div class="chart-card">
+
+                    <h3>
+                        📊 Teaching vs Communication vs Behaviour
+                    </h3>
+
+                    <div class="chart-container">
+
+                        <canvas
+                            id="barChart"
+                            aria-label="Teaching communication and behaviour rating chart"
+                        ></canvas>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             RECENT ANONYMOUS FEEDBACK
+        ================================================== -->
+
+        <section
+            class="feedback-section"
+            aria-labelledby="recent-feedback-title"
+        >
+
+            <div class="section-header">
+
+                <h2 id="recent-feedback-title">
+                    💬 Recent Anonymous Feedback
+                </h2>
+
+                <p>
+                    Latest student responses submitted anonymously.
+                </p>
+
+            </div>
+
+
+            <div
+                id="feedback-list"
+                class="feedback-grid"
+            >
+
+                <div class="loading-card">
+
+                    ⏳ Loading Feedback...
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
 
         <p>
-            Visual representation of student feedback
+            © 2026 Anonymous Student Feedback System
         </p>
 
-    </div>
+    </footer>
 
-    <div class="charts-grid">
 
-        <!-- Doughnut Chart -->
 
-        <div class="chart-card">
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
 
-            <h3>⭐ Overall Ratings</h3>
+    <!-- Chart.js -->
 
-            <canvas id="ratingChart"></canvas>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
 
-        </div>
 
-        <!-- Bar Chart -->
+    <!-- Dark Mode -->
 
-        <div class="chart-card">
+    <script
+        src="/js/darkmode.js"
+    ></script>
 
-            <h3>📈 Teaching vs Communication vs Behaviour</h3>
 
-            <canvas id="barChart"></canvas>
+    <!-- Faculty Dashboard -->
 
-        </div>
+    <script
+        src="/js/faculty-dashboard.js"
+    ></script>
 
-    </div>
-
-</section>
-
-<!-- ================= FEEDBACK ================= -->
-
-<section class="feedback-section">
-
-<div class="section-header">
-
-<h2>📝 Recent Anonymous Feedback</h2>
-
-<p>Latest student responses</p>
-
-</div>
-
-<div id="feedback-list" class="feedback-grid">
-
-<div class="loading-card">
-
-⏳ Loading Feedback...
-
-</div>
-
-</div>
-
-</section>
-
-</main>
-
-<!-- ================= FOOTER ================= -->
-
-<footer>
-
-<p>
-© 2026 Anonymous Student Feedback System
-</p>
-
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/js/darkmode.js"></script>
-<script src="/js/faculty-dashboard.js"></script>
 
 </body>
+
 </html>
