@@ -3,13 +3,21 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-<title>HOD Login | Anonymous Student Feedback System</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<link rel="stylesheet" href="../css/hod.css">
-<link rel="stylesheet" href="../css/darkmode.css">
+    <title>
+        HOD Login | Anonymous Student Feedback System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../css/hod-login.css"
+    >
 
 </head>
 
@@ -17,158 +25,325 @@
 <body>
 
 
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <header>
 
-    <button id="dark-mode-btn">
-        🌙 Dark Mode
-    </button>
+    <div class="header-content">
+
+        <div>
+
+            <h1>
+                Anonymous Student Feedback System
+            </h1>
+
+            <p>
+                Head of Department Portal
+            </p>
+
+        </div>
 
 
-    <h1>
-        Anonymous Student Feedback System
-    </h1>
+        <button
+            id="dark-mode-btn"
+            type="button"
+        >
+            🌙 Dark Mode
+        </button>
 
-
-    <p>
-        Head of Department Login Portal
-    </p>
-
-
-    <span class="login-note">
-        Authorized Department Heads Only
-    </span>
-
+    </div>
 
 </header>
 
 
 
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <main>
 
 
-<section class="login-box">
+    <section class="login-box">
 
 
-    <div class="icon">
-        🏢
-    </div>
+        <h2>
+            HOD Secure Login
+        </h2>
 
 
-    <h2>
-        HOD Secure Login
-    </h2>
+        <!-- ERROR MESSAGE -->
+
+        <div id="login-error"></div>
 
 
-    <form action="/hod/login" method="POST">
 
+        <!-- =================================================
+             LOGIN FORM
+        ================================================== -->
 
-        <label for="hodid">
-            HOD Employee ID
-        </label>
-
-
-        <input
-            type="text"
-            id="hodid"
-            name="hodid"
-            placeholder="Enter Employee ID"
-            required
+        <form
+            action="/hod/login"
+            method="POST"
         >
 
 
+            <!-- HOD ID -->
 
-        <label for="password">
-            Password
-        </label>
-
-
-        <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter Password"
-            required
-        >
-
-
-
-        <div class="checkbox">
-
-            <input
-                type="checkbox"
-                id="remember"
-            >
-
-            <label for="remember">
-                Remember Me
+            <label for="hodid">
+                HOD Employee ID
             </label>
 
+
+            <input
+                type="text"
+                id="hodid"
+                name="hodid"
+                placeholder="Enter Employee ID"
+                autocomplete="username"
+                autocapitalize="none"
+                spellcheck="false"
+                required
+            >
+
+
+
+            <!-- PASSWORD -->
+
+            <label for="password">
+                Password
+            </label>
+
+
+            <div class="password-box">
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter Password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <span
+                    class="eye-icon"
+                    id="password-toggle"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Show password"
+                >
+                    👁
+                </span>
+
+            </div>
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="button-group">
+
+
+                <button type="submit">
+
+                    Secure Login
+
+                </button>
+
+
+                <button type="reset">
+
+                    Clear
+
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+
+        <!-- =================================================
+             SECURITY NOTICE
+        ================================================== -->
+
+        <div class="security-notice">
+
+            <strong>
+                ✓ Authorized Personnel Only
+            </strong>
+
+            <p>
+                This portal is restricted to registered
+                department heads.
+            </p>
+
         </div>
 
 
 
-        <div class="button-group">
+        <!-- BACK -->
 
+        <div class="links">
 
-            <button type="submit">
-
-                Secure Login
-
-            </button>
-
-
-
-            <button type="reset">
-
-                Clear
-
-            </button>
-
+            <a href="/">
+                ← Back to Portal
+            </a>
 
         </div>
 
 
-    </form>
-
-
-
-    <div class="auth-message">
-
-
-        <strong>
-            Authorized Personnel Only
-        </strong>
-
-
-        This portal is restricted to<br>
-        registered department heads.
-
-
-    </div>
-
-
-
-</section>
+    </section>
 
 
 </main>
 
 
 
+<!-- =====================================================
+     FOOTER
+===================================================== -->
 
 <footer>
 
-<p>
-© 2026 Anonymous Student Feedback System
-</p>
+    <p>
+        © 2026 Anonymous Student Feedback System
+    </p>
 
 </footer>
 
 
 
+<!-- =====================================================
+     DARK MODE
+===================================================== -->
+
 <script src="/js/darkmode.js"></script>
 
 
+
+<!-- =====================================================
+     PASSWORD TOGGLE
+===================================================== -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const password =
+        document.getElementById("password");
+
+    const toggle =
+        document.getElementById("password-toggle");
+
+
+    if(!password || !toggle){
+        return;
+    }
+
+
+    function togglePassword(){
+
+        if(password.type === "password"){
+
+            password.type = "text";
+
+            toggle.textContent = "🙈";
+
+            toggle.setAttribute(
+                "aria-label",
+                "Hide password"
+            );
+
+        }else{
+
+            password.type = "password";
+
+            toggle.textContent = "👁";
+
+            toggle.setAttribute(
+                "aria-label",
+                "Show password"
+            );
+
+        }
+
+    }
+
+
+    toggle.addEventListener(
+        "click",
+        togglePassword
+    );
+
+
+    toggle.addEventListener(
+        "keydown",
+        function(event){
+
+            if(
+                event.key === "Enter" ||
+                event.key === " "
+            ){
+
+                event.preventDefault();
+
+                togglePassword();
+
+            }
+
+        }
+    );
+
+});
+
+</script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const error = params.get("error");
+
+    const errorBox =
+        document.getElementById("login-error");
+
+
+    if (error && errorBox) {
+
+        errorBox.className = "error-box";
+
+        errorBox.textContent = error;
+
+        errorBox.style.display = "block";
+
+    }
+
+
+    // Remove error from URL without refreshing
+
+    if (window.history.replaceState) {
+
+        window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+        );
+
+    }
+
+});
+
+</script>
 </body>
 
 </html>

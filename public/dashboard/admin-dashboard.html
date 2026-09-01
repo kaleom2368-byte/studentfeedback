@@ -3,189 +3,517 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Admin Dashboard</title>
+    <title>Admin Dashboard</title>
 
-<link rel="stylesheet" href="../css/admin-dashboard.css">
+    <link
+        rel="stylesheet"
+        href="../css/admin-dashboard.css"
+    >
 
-<link rel="stylesheet" href="/css/darkmode.css">`n</head>
+    <link
+        rel="stylesheet"
+        href="/css/darkmode.css"
+    >
+
+</head>
 
 
 <body>
 
 
-<header>
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-<button id="dark-mode-btn">
-?? Dark Mode
-</button>
+    <header>
 
+        <button
+            id="dark-mode-btn"
+            type="button"
+        >
+            🌙 Dark Mode
+        </button>
 
-<h1>
-Anonymous Student Feedback System
-</h1>
+        <h1>
+            Anonymous Student Feedback System
+        </h1>
 
-<p>
-Admin Dashboard
-</p>
+        <p>
+            Admin Dashboard
+        </p>
 
-</header>
+    </header>
 
 
 
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
 
-<nav>
+    <nav>
 
-<a href="admin-dashboard.html">
-Home
-</a>
+        <a href="admin-dashboard.html">
+            Home
+        </a>
 
-<a href="#">
-Profile
-</a>
+        <a href="#">
+            Profile
+        </a>
 
-<a href="#">
-Settings
-</a>
+        <a href="#">
+            Settings
+        </a>
 
-<a href="../index.html">
-Logout
-</a>
+        <a href="/admin/logout">
+            Logout
+        </a>
 
-</nav>
+    </nav>
 
 
 
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
 
+    <main>
 
-<main>
 
+        <!-- =================================================
+             WELCOME
+        ================================================== -->
 
+        <section class="welcome-box">
 
-<section class="welcome-box">
+            <h2>
+                Welcome Admin 👋
+            </h2>
 
-<h2>
-Welcome Admin 👋
-</h2>
+            <p>
+                Manage students, faculty members, feedback reports,
+                and feedback cycles from this dashboard.
+            </p>
 
-<p>
-Manage students, faculty members and feedback reports from this dashboard.
-</p>
+        </section>
 
-</section>
 
 
+        <!-- =================================================
+             FEEDBACK CYCLE MANAGEMENT
+        ================================================== -->
 
+        <section class="cycle-management">
 
 
-<section class="dashboard-grid">
+            <!-- SECTION HEADER -->
 
+            <div class="section-header">
 
+                <div>
 
-<div class="dashboard-card">
+                    <h2>
+                        🔄 Feedback Cycle Management
+                    </h2>
 
-<h3>
-👨‍🎓 Students
-</h3>
+                    <p>
+                        Control when students can submit feedback.
+                    </p>
 
-<p>
-Manage registered students.
-</p>
+                </div>
 
-<a href="#">
-View Students
-</a>
 
-</div>
+                <div
+                    id="cycle-status-badge"
+                    class="cycle-status inactive"
+                >
+                    No Active Cycle
+                </div>
 
+            </div>
 
 
 
+            <!-- =================================================
+                 CURRENT CYCLE
+            ================================================== -->
 
-<div class="dashboard-card">
+            <div class="current-cycle-card">
 
-<h3>
-👨‍🏫 Faculty
-</h3>
+                <h3>
+                    Current Feedback Cycle
+                </h3>
 
-<p>
-Add and manage faculty members.
-</p>
+                <div id="current-cycle-content">
 
-<a href="../admin/add-faculty.html">
-Add Faculty
-</a>
+                    <p class="cycle-empty">
+                        No feedback cycle is currently active.
+                    </p>
 
-</div>
+                </div>
 
+            </div>
 
 
 
+            <!-- =================================================
+                 CREATE CYCLE
+            ================================================== -->
 
-<div class="dashboard-card">
+            <div class="create-cycle-card">
 
-<h3>
-📝 Feedback
-</h3>
+                <h3>
+                    ➕ Create New Feedback Cycle
+                </h3>
 
-<p>
-View student feedback reports.
-</p>
+                <p>
+                    Create a new cycle before activating it.
+                    Previous cycles will remain available for history.
+                </p>
 
-<a href="#">
-View Feedback
-</a>
 
-</div>
+                <!--
+                    autocomplete="off" prevents normal browser
+                    autofill behaviour.
 
+                    novalidate is NOT used because we still want
+                    the browser's required-field validation.
+                -->
 
+                <form
+                    id="create-cycle-form"
+                    autocomplete="off"
+                    onsubmit="return false;"
+                >
 
 
+                    <!-- =================================================
+                         CYCLE NAME
+                    ================================================== -->
 
-<div class="dashboard-card">
+                    <div class="form-group">
 
-<h3>
-📊 Reports
-</h3>
+                        <label for="cycle-name">
+                            Cycle Name
+                        </label>
 
-<p>
-Analyze department performance.
-</p>
+                        <input
+    type="text"
+    id="cycle-name"
+    name="name"
+    placeholder="Example: August 2026 Feedback"
+    maxlength="100"
+    required
+    autocomplete="off"
+    autocapitalize="sentences"
+    spellcheck="false"
+>
 
-<a href="#">
-View Reports
-</a>
+                    </div>
 
-</div>
 
 
+                    <!-- =================================================
+                         DATES
+                    ================================================== -->
 
-</section>
+                    <div class="cycle-date-row">
 
 
+                        <!-- START DATE -->
 
-</main>
+                        <div class="form-group">
 
+                            <label for="cycle-start-date">
+                                Start Date
+                            </label>
 
+                            <input
+                                type="date"
+                                id="cycle-start-date"
+                                name="start_date"
+                                required
+                                autocomplete="off"
+                                readonly
+                                onfocus="this.removeAttribute('readonly');"
+                            >
 
+                        </div>
 
 
-<footer>
 
-<p>
-© 2026 Anonymous Student Feedback System
-</p>
+                        <!-- END DATE -->
 
-</footer>
+                        <div class="form-group">
 
+                            <label for="cycle-end-date">
+                                End Date
+                            </label>
 
+                            <input
+                                type="date"
+                                id="cycle-end-date"
+                                name="end_date"
+                                required
+                                autocomplete="off"
+                                readonly
+                                onfocus="this.removeAttribute('readonly');"
+                            >
 
-<script src="/js/darkmode.js"></script>`n</body>
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         CREATE BUTTON
+                    ================================================== -->
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="create-cycle-btn"
+                    >
+                        Create Cycle
+                    </button>
+
+
+                </form>
+
+
+
+                <!-- =================================================
+                     MESSAGE
+                ================================================== -->
+
+                <div
+                    id="cycle-message"
+                    class="cycle-message"
+                    aria-live="polite"
+                ></div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 EXISTING CYCLES
+            ================================================== -->
+
+            <div class="cycle-history-card">
+
+
+                <div class="cycle-history-header">
+
+                    <div>
+
+                        <h3>
+                            📋 Feedback Cycle History
+                        </h3>
+
+                        <p>
+                            Manage existing feedback cycles.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="refresh-cycles-btn"
+                        class="secondary-btn"
+                    >
+                        ↻ Refresh
+                    </button>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     TABLE
+                ================================================== -->
+
+                <div class="cycle-table-wrapper">
+
+                    <table class="cycle-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Cycle
+                                </th>
+
+                                <th>
+                                    Start Date
+                                </th>
+
+                                <th>
+                                    End Date
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="cycle-list">
+
+                            <tr>
+
+                                <td colspan="5">
+                                    Loading cycles...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =====================================================
+             EXISTING DASHBOARD CARDS
+        ====================================================== -->
+
+        <section class="dashboard-grid">
+
+
+            <!-- STUDENTS -->
+
+            <div class="dashboard-card">
+
+                <h3>
+                    👨‍🎓 Students
+                </h3>
+
+                <p>
+                    Manage registered students.
+                </p>
+
+                <a href="#">
+                    View Students
+                </a>
+
+            </div>
+
+
+
+            <!-- FACULTY -->
+
+            <div class="dashboard-card">
+
+                <h3>
+                    👨‍🏫 Faculty
+                </h3>
+
+                <p>
+                    Add and manage faculty members.
+                </p>
+
+                <a href="../admin/add-faculty.html">
+                    Add Faculty
+                </a>
+
+            </div>
+
+
+
+            <!-- FEEDBACK -->
+
+            <div class="dashboard-card">
+
+                <h3>
+                    📝 Feedback
+                </h3>
+
+                <p>
+                    View student feedback reports.
+                </p>
+
+                <a href="#">
+                    View Feedback
+                </a>
+
+            </div>
+
+
+
+            <!-- REPORTS -->
+
+            <div class="dashboard-card">
+
+                <h3>
+                    📊 Reports
+                </h3>
+
+                <p>
+                    Analyze department performance.
+                </p>
+
+                <a href="#">
+                    View Reports
+                </a>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <p>
+            © 2026 Anonymous Student Feedback System
+        </p>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="/js/darkmode.js"></script>
+
+    <script src="/js/admin-dashboard.js"></script>
+
+
+</body>
 
 </html>
-
-
-

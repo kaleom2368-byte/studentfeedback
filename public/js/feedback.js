@@ -1,319 +1,221 @@
-/* =========================================================
-   ANONYMOUS STUDENT FEEDBACK SYSTEM
-   FEEDBACK JAVASCRIPT
-========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    initializeOtherOptions();
-
-    initializeNavigationButtons();
-
-    initializeLogout();
-
-    initializeFaculty();
-
-    initializeProgress();
-
-    initializeCharacterCounter();
-
-    initializeWordFilter();
-
-    initializeFeedbackSubmission();
-
-});
+// =====================================================
+// FEEDBACK PAGE JAVASCRIPT
+// FACULTY / SUBJECT / DEPARTMENT AUTO-SELECTION
+// + FEEDBACK PROGRESS TRACKING
+// =====================================================
 
 
-/* =========================================================
-   1. OTHER OPTION HANDLER
-========================================================= */
+// =====================================================
+// ELEMENTS
+// =====================================================
 
-function initializeOtherOptions() {
+const facultySelect = document.getElementById("faculty");
+const subjectSelect = document.getElementById("subject");
+const departmentInput = document.getElementById("department");
 
-    const otherInputs =
-        document.querySelectorAll(".other-input");
+const progressPercent = document.getElementById("progress-percent");
+const progressFill = document.getElementById("progress-fill");
 
-    otherInputs.forEach((otherInput) => {
+let facultyData = [];
 
-        const inputName = otherInput.name;
 
-        if (!inputName) {
-            return;
+// =====================================================
+// FEEDBACK QUESTIONS
+// =====================================================
+
+// Each radio group represents one question.
+
+const questionGroups = [
+    "course_satisfaction",
+    "syllabus_pace",
+    "concept_clarity",
+    "practical_work",
+    "study_material",
+    "exam_difficulty",
+    "faculty_support",
+    "improvement"
+];
+
+
+// =====================================================
+// LOAD FACULTY DATA
+// =====================================================
+
+async function loadFaculty() {
+
+    try {
+
+        const response = await fetch("/feedback/faculty");
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch faculty");
         }
 
-        const radioName =
-            inputName.replace("_other", "");
+        const data = await response.json();
 
-        const radioButtons =
-            document.querySelectorAll(
-                `input[name="${radioName}"]`
+        if (!data.success) {
+            throw new Error(
+                data.message || "Failed to load faculty"
             );
-
-        if (!radioButtons.length) {
-            return;
         }
 
-        otherInput.style.display = "none";
-        otherInput.required = false;
+        facultyData = data.faculty || [];
 
-        radioButtons.forEach((radio) => {
+        populateFaculty();
+        populateSubjects();
 
-            radio.addEventListener("change", () => {
+    } catch (error) {
 
-                if (
-                    radio.value.trim().toLowerCase() === "other"
-                ) {
+        console.error(
+            "❌ Faculty loading error:",
+            error
+        );
 
-                    otherInput.style.display = "block";
-                    otherInput.required = true;
-
-                    setTimeout(() => {
-                        otherInput.focus();
-                    }, 50);
-
-                } else {
-
-                    otherInput.style.display = "none";
-                    otherInput.value = "";
-                    otherInput.required = false;
-
-                }
-
-                updateProgress();
-
-            });
-
-        });
-
-        const selected =
-            document.querySelector(
-                `input[name="${radioName}"]:checked`
-            );
-
-        if (
-            selected &&
-            selected.value.trim().toLowerCase() === "other"
-        ) {
-
-            otherInput.style.display = "block";
-            otherInput.required = true;
-
+        if (facultySelect) {
+            facultySelect.innerHTML =
+                '<option value="">Failed to load faculty</option>';
         }
 
-    });
+        if (subjectSelect) {
+            subjectSelect.innerHTML =
+                '<option value="">Failed to load subjects</option>';
+        }
 
-}
-
-
-/* =========================================================
-   2. BACK TO DASHBOARD
-========================================================= */
-
-function initializeNavigationButtons() {
-
-    const backButton =
-        document.getElementById("back-dashboard-btn");
-
-    if (!backButton) {
-        return;
+        if (departmentInput) {
+            departmentInput.value = "";
+        }
     }
-
-    backButton.addEventListener("click", () => {
-
-        window.location.href =
-            "/dashboard/student-dashboard.html";
-
-    });
-
 }
 
 
-/* =========================================================
-   3. LOGOUT
-========================================================= */
+// =====================================================
+// POPULATE FACULTY DROPDOWN
+// =====================================================
 
-function initializeLogout() {
-
-    const logoutButton =
-        document.getElementById("logout-btn");
-
-    if (!logoutButton) {
-        return;
-    }
-
-    logoutButton.addEventListener("click", () => {
-
-        const confirmLogout =
-            window.confirm(
-                "Are you sure you want to logout?"
-            );
-
-        if (!confirmLogout) {
-            return;
-        }
-
-        window.location.href =
-            "/student/logout";
-
-    });
-
-}
-
-
-/* =========================================================
-   4. LOAD FACULTY
-========================================================= */
-
-function initializeFaculty() {
-
-    const facultySelect =
-        document.getElementById("faculty");
-
-    const departmentInput =
-        document.getElementById("department");
+function populateFaculty() {
 
     if (!facultySelect) {
         return;
     }
 
-    fetch("/faculty-directory", {
+    facultySelect.innerHTML =
+        '<option value="">Select Faculty</option>';
 
-        method: "GET",
+    facultyData.forEach(faculty => {
 
-        credentials: "include",
-
-        cache: "no-store"
-
-    })
-
-    .then(response => {
-
-        if (!response.ok) {
-
-            throw new Error(
-                `Faculty request failed: ${response.status}`
-            );
-
-        }
-
-        return response.json();
-
-    })
-
-    .then(data => {
-
-        facultySelect.innerHTML = "";
-
-        const defaultOption =
+        const option =
             document.createElement("option");
 
-        defaultOption.value = "";
-        defaultOption.textContent = "Select Faculty";
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
+        option.value =
+            faculty.faculty_id;
 
-        facultySelect.appendChild(defaultOption);
+        option.textContent =
+            faculty.name;
 
-        const facultyList =
-            Array.isArray(data)
-                ? data
-                : data.faculty ||
-                  data.facultyList ||
-                  data.data ||
-                  [];
-
-        if (!facultyList.length) {
-
-            const emptyOption =
-                document.createElement("option");
-
-            emptyOption.value = "";
-            emptyOption.textContent =
-                "No faculty available";
-            emptyOption.disabled = true;
-
-            facultySelect.appendChild(emptyOption);
-
-            return;
-
-        }
-
-        facultyList.forEach(faculty => {
-
-            const option =
-                document.createElement("option");
-
-            option.value =
-                faculty.faculty_id ??
-                faculty.id ??
-                faculty.user_id ??
-                "";
-
-            option.textContent =
-                faculty.name ??
-                faculty.faculty_name ??
-                faculty.full_name ??
-                faculty.username ??
-                "Unknown Faculty";
-
-            option.dataset.department =
-                faculty.department ??
-                faculty.department_name ??
-                "";
-
-            facultySelect.appendChild(option);
-
-        });
-
-    })
-
-    .catch(error => {
-
-        console.error(
-            "Failed to load faculty:",
-            error
-        );
-
-        facultySelect.innerHTML = "";
-
-        const errorOption =
-            document.createElement("option");
-
-        errorOption.value = "";
-        errorOption.textContent =
-            "Unable to load faculty";
-        errorOption.disabled = true;
-
-        facultySelect.appendChild(errorOption);
+        facultySelect.appendChild(option);
 
     });
+}
 
 
-    /* =====================================================
-       FACULTY CHANGE
-    ===================================================== */
+// =====================================================
+// POPULATE SUBJECT DROPDOWN
+// =====================================================
+
+function populateSubjects() {
+
+    if (!subjectSelect) {
+        return;
+    }
+
+    subjectSelect.innerHTML =
+        '<option value="">Select Subject</option>';
+
+    const subjects = [
+        ...new Set(
+
+            facultyData
+                .map(faculty => faculty.subject)
+                .filter(subject =>
+                    subject &&
+                    String(subject).trim()
+                )
+
+        )
+    ];
+
+    subjects.sort((a, b) =>
+        String(a).localeCompare(
+            String(b)
+        )
+    );
+
+    subjects.forEach(subject => {
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            subject;
+
+        option.textContent =
+            subject;
+
+        subjectSelect.appendChild(option);
+
+    });
+}
+
+
+// =====================================================
+// FACULTY → SUBJECT + DEPARTMENT
+// =====================================================
+
+if (facultySelect) {
 
     facultySelect.addEventListener(
         "change",
-        () => {
+        function () {
 
-            const selectedOption =
-                facultySelect.options[
-                    facultySelect.selectedIndex
-                ];
+            const selectedFacultyId =
+                this.value;
 
-            if (!selectedOption) {
+            const faculty =
+                facultyData.find(
+                    item =>
+                        String(item.faculty_id) ===
+                        String(selectedFacultyId)
+                );
+
+            // Nothing selected
+            if (!faculty) {
+
+                if (subjectSelect) {
+                    subjectSelect.value = "";
+                }
+
+                if (departmentInput) {
+                    departmentInput.value = "";
+                }
+
                 return;
             }
 
-            if (departmentInput) {
+            // Automatically select subject
+            if (subjectSelect) {
 
-                departmentInput.value =
-                    selectedOption.dataset.department || "";
+                subjectSelect.value =
+                    faculty.subject || "";
 
             }
 
-            updateProgress();
+            // Automatically select department
+            if (departmentInput) {
+
+                departmentInput.value =
+                    faculty.department || "";
+
+            }
 
         }
     );
@@ -321,655 +223,182 @@ function initializeFaculty() {
 }
 
 
-/* =========================================================
-   5. PROGRESS INITIALIZATION
-========================================================= */
+// =====================================================
+// SUBJECT → FACULTY + DEPARTMENT
+// =====================================================
 
-function initializeProgress() {
+if (subjectSelect) {
 
-    const form =
-        document.getElementById("feedback-form");
+    subjectSelect.addEventListener(
+        "change",
+        function () {
 
-    if (!form) {
-        return;
-    }
+            const selectedSubject =
+                String(this.value)
+                    .trim()
+                    .toLowerCase();
 
-    const watchedInputs =
-        form.querySelectorAll(
-            "input[type='radio'], " +
-            "select, " +
-            "input[type='text'], " +
-            "textarea"
-        );
+            const faculty =
+                facultyData.find(
+                    item =>
+                        String(item.subject || "")
+                            .trim()
+                            .toLowerCase() ===
+                        selectedSubject
+                );
 
-    watchedInputs.forEach(input => {
+            // Nothing selected / subject not found
+            if (!faculty) {
 
-        input.addEventListener(
-            "change",
-            updateProgress
-        );
+                if (facultySelect) {
+                    facultySelect.value = "";
+                }
 
-        input.addEventListener(
-            "input",
-            updateProgress
-        );
+                if (departmentInput) {
+                    departmentInput.value = "";
+                }
+
+                return;
+            }
+
+            // Automatically select faculty
+            if (facultySelect) {
+
+                facultySelect.value =
+                    faculty.faculty_id;
+
+            }
+
+            // Automatically select department
+            if (departmentInput) {
+
+                departmentInput.value =
+                    faculty.department || "";
+
+            }
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// CALCULATE FEEDBACK PROGRESS
+// =====================================================
+
+function updateProgress() {
+
+    let answeredQuestions = 0;
+
+    questionGroups.forEach(groupName => {
+
+        const selectedAnswer =
+            document.querySelector(
+                `input[name="${groupName}"]:checked`
+            );
+
+        if (selectedAnswer) {
+            answeredQuestions++;
+        }
 
     });
 
+
+    // Calculate percentage
+    const totalQuestions =
+        questionGroups.length;
+
+    const percentage =
+        Math.round(
+            (answeredQuestions / totalQuestions) * 100
+        );
+
+
+    // =================================================
+    // UPDATE PERCENTAGE TEXT
+    // =================================================
+
+    if (progressPercent) {
+
+        progressPercent.textContent =
+            `${percentage}%`;
+
+    }
+
+
+    // =================================================
+    // UPDATE PROGRESS BAR
+    // =================================================
+
+    if (progressFill) {
+
+        progressFill.style.width =
+            `${percentage}%`;
+
+    }
+
+
+    // Optional accessibility support
+    if (progressFill) {
+
+        progressFill.setAttribute(
+            "aria-valuenow",
+            percentage
+        );
+
+    }
+
+
+    console.log(
+        `📊 Feedback Progress: ${answeredQuestions}/${totalQuestions} (${percentage}%)`
+    );
+
+}
+
+
+// =====================================================
+// SETUP PROGRESS LISTENERS
+// =====================================================
+
+function setupProgressTracking() {
+
+    questionGroups.forEach(groupName => {
+
+        const radios =
+            document.querySelectorAll(
+                `input[name="${groupName}"]`
+            );
+
+        radios.forEach(radio => {
+
+            radio.addEventListener(
+                "change",
+                updateProgress
+            );
+
+        });
+
+    });
+
+
+    // Calculate initial progress
     updateProgress();
 
 }
 
 
-/* =========================================================
-   6. UPDATE PROGRESS
-========================================================= */
+// =====================================================
+// START
+// =====================================================
 
-function updateProgress() {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    const form =
-        document.getElementById("feedback-form");
+        loadFaculty();
 
-    const progressFill =
-        document.getElementById("progress-fill");
-
-    const progressPercent =
-        document.getElementById("progress-percent");
-
-    if (
-        !form ||
-        !progressFill ||
-        !progressPercent
-    ) {
-        return;
-    }
-
-    const questionNames = [
-
-        "course_satisfaction",
-        "syllabus_pace",
-        "concept_clarity",
-        "practical_work",
-        "study_material",
-        "exam_difficulty",
-        "faculty_support",
-        "improvement"
-
-    ];
-
-    let answered = 0;
-
-    questionNames.forEach(name => {
-
-        const selected =
-            form.querySelector(
-                `input[name="${name}"]:checked`
-            );
-
-        if (!selected) {
-            return;
-        }
-
-        if (
-            selected.value.trim().toLowerCase() ===
-            "other"
-        ) {
-
-            const otherInput =
-                form.querySelector(
-                    `[name="${name}_other"]`
-                );
-
-            if (
-                otherInput &&
-                otherInput.value.trim() !== ""
-            ) {
-
-                answered++;
-
-            }
-
-        } else {
-
-            answered++;
-
-        }
-
-    });
-
-    const totalQuestions =
-        questionNames.length;
-
-    const percentage =
-        Math.round(
-            (answered / totalQuestions) * 100
-        );
-
-    progressFill.style.width =
-        `${percentage}%`;
-
-    progressPercent.textContent =
-        `${percentage}%`;
-
-}
-
-
-/* =========================================================
-   7. CHARACTER COUNTER
-========================================================= */
-
-function initializeCharacterCounter() {
-
-    const comments =
-        document.getElementById("comments");
-
-    const counter =
-        document.getElementById("char-count");
-
-    if (
-        !comments ||
-        !counter
-    ) {
-        return;
-    }
-
-    function updateCounter() {
-
-        const length =
-            comments.value.length;
-
-        counter.textContent =
-            `${length} / 500`;
-
-        counter.classList.remove(
-            "warning",
-            "limit"
-        );
-
-        if (length >= 500) {
-
-            counter.classList.add("limit");
-
-        } else if (length >= 450) {
-
-            counter.classList.add("warning");
-
-        }
+        setupProgressTracking();
 
     }
-
-    comments.addEventListener(
-        "input",
-        updateCounter
-    );
-
-    updateCounter();
-
-}
-
-
-/* =========================================================
-   8. WORD FILTER
-========================================================= */
-
-function initializeWordFilter() {
-
-    const comments =
-        document.getElementById("comments");
-
-    const warning =
-        document.getElementById("word-warning");
-
-    if (
-        !comments ||
-        !warning
-    ) {
-        return;
-    }
-
-    const blockedWords = [
-
-        "fuck",
-        "fucking",
-        "shit",
-        "bitch",
-        "asshole",
-        "bastard",
-        "idiot",
-        "stupid"
-
-    ];
-
-    comments.addEventListener(
-        "input",
-        () => {
-
-            const text =
-                comments.value.toLowerCase();
-
-            const foundWord =
-                blockedWords.find(word => {
-
-                    const pattern =
-                        new RegExp(
-                            `\\b${word}\\b`,
-                            "i"
-                        );
-
-                    return pattern.test(text);
-
-                });
-
-            if (foundWord) {
-
-                warning.textContent =
-                    "Please remove inappropriate language from your feedback.";
-
-                warning.style.display =
-                    "inline";
-
-            } else {
-
-                warning.textContent = "";
-                warning.style.display = "none";
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   9. GET "OTHER" VALUE
-========================================================= */
-
-function getFeedbackValue(form, name) {
-
-    const selected =
-        form.querySelector(
-            `input[name="${name}"]:checked`
-        );
-
-    if (!selected) {
-        return "";
-    }
-
-    if (
-        selected.value.trim().toLowerCase() ===
-        "other"
-    ) {
-
-        const otherInput =
-            form.querySelector(
-                `[name="${name}_other"]`
-            );
-
-        if (otherInput) {
-
-            return otherInput.value.trim();
-
-        }
-
-        return "";
-
-    }
-
-    return selected.value;
-
-}
-
-
-/* =========================================================
-   10. FEEDBACK SUBMISSION
-========================================================= */
-
-function initializeFeedbackSubmission() {
-
-    const form =
-        document.getElementById("feedback-form");
-
-    if (!form) {
-        return;
-    }
-
-    form.addEventListener(
-        "submit",
-        async (event) => {
-
-            event.preventDefault();
-
-            /* =========================================
-               GET FACULTY / COURSE INFORMATION
-            ========================================= */
-
-            const facultySelect =
-                document.getElementById("faculty");
-
-            const departmentInput =
-                document.getElementById("department");
-
-            const subjectInput =
-                document.getElementById("subject");
-
-
-            const faculty_id =
-                facultySelect
-                    ? facultySelect.value.trim()
-                    : "";
-
-            const department =
-                departmentInput
-                    ? departmentInput.value.trim()
-                    : "";
-
-            const subject =
-                subjectInput
-                    ? subjectInput.value.trim()
-                    : "";
-
-
-            /* =========================================
-               GET ALL QUESTIONS
-            ========================================= */
-
-            const course_satisfaction =
-                getFeedbackValue(
-                    form,
-                    "course_satisfaction"
-                );
-
-            const syllabus_pace =
-                getFeedbackValue(
-                    form,
-                    "syllabus_pace"
-                );
-
-            const concept_clarity =
-                getFeedbackValue(
-                    form,
-                    "concept_clarity"
-                );
-
-            const practical_work =
-                getFeedbackValue(
-                    form,
-                    "practical_work"
-                );
-
-            const study_material =
-                getFeedbackValue(
-                    form,
-                    "study_material"
-                );
-
-            const exam_difficulty =
-                getFeedbackValue(
-                    form,
-                    "exam_difficulty"
-                );
-
-            const faculty_support =
-                getFeedbackValue(
-                    form,
-                    "faculty_support"
-                );
-
-            const improvement =
-                getFeedbackValue(
-                    form,
-                    "improvement"
-                );
-
-            const comments =
-                document.getElementById("comments")
-                    ? document
-                        .getElementById("comments")
-                        .value
-                        .trim()
-                    : "";
-
-
-            /* =========================================
-               FRONTEND VALIDATION
-            ========================================= */
-
-            const missingFields = [];
-
-            if (!faculty_id) {
-                missingFields.push("faculty");
-            }
-
-            if (!department) {
-                missingFields.push("department");
-            }
-
-            if (!subject) {
-                missingFields.push("subject");
-            }
-
-            if (!course_satisfaction) {
-                missingFields.push("course satisfaction");
-            }
-
-            if (!syllabus_pace) {
-                missingFields.push("syllabus pace");
-            }
-
-            if (!concept_clarity) {
-                missingFields.push("concept clarity");
-            }
-
-            if (!practical_work) {
-                missingFields.push("practical work");
-            }
-
-            if (!study_material) {
-                missingFields.push("study material");
-            }
-
-            if (!exam_difficulty) {
-                missingFields.push("exam difficulty");
-            }
-
-            if (!faculty_support) {
-                missingFields.push("faculty support");
-            }
-
-            if (!improvement) {
-                missingFields.push("improvement");
-            }
-
-
-            if (missingFields.length > 0) {
-
-                alert(
-                    "Please complete:\n\n" +
-                    missingFields.join("\n")
-                );
-
-                return;
-
-            }
-
-
-            /* =========================================
-               CREATE EXACT PAYLOAD
-            ========================================= */
-
-            const feedbackData = {
-
-                faculty_id: faculty_id,
-
-                department: department,
-
-                subject: subject,
-
-                course_satisfaction:
-                    course_satisfaction,
-
-                syllabus_pace:
-                    syllabus_pace,
-
-                concept_clarity:
-                    concept_clarity,
-
-                practical_work:
-                    practical_work,
-
-                study_material:
-                    study_material,
-
-                exam_difficulty:
-                    exam_difficulty,
-
-                faculty_support:
-                    faculty_support,
-
-                improvement:
-                    improvement,
-
-                comments:
-                    comments
-
-            };
-
-
-            /* =========================================
-               DEBUG
-            ========================================= */
-
-            console.log(
-                "Submitting feedback:",
-                feedbackData
-            );
-
-
-            /* =========================================
-               SUBMIT BUTTON
-            ========================================= */
-
-            const submitButton =
-                form.querySelector(
-                    "button[type='submit']"
-                );
-
-            const originalButtonText =
-                submitButton
-                    ? submitButton.textContent
-                    : "Submit Feedback";
-
-
-            if (submitButton) {
-
-                submitButton.disabled = true;
-
-                submitButton.textContent =
-                    "Submitting Feedback...";
-
-            }
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        "/feedback/submit",
-                        {
-
-                            method: "POST",
-
-                            credentials: "include",
-
-                            headers: {
-
-                                "Content-Type":
-                                    "application/json",
-
-                                "Accept":
-                                    "application/json"
-
-                            },
-
-                            body:
-                                JSON.stringify(
-                                    feedbackData
-                                )
-
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                console.log(
-                    "Feedback submission response:",
-                    data
-                );
-
-
-                if (!response.ok || !data.success) {
-
-                    throw new Error(
-                        data.message ||
-                        "Failed to submit feedback"
-                    );
-
-                }
-
-
-                /* =====================================
-                   SUCCESS
-                ===================================== */
-
-                console.log(
-                    "Feedback submitted successfully."
-                );
-
-
-                if (data.redirect) {
-
-                    window.location.href =
-                        data.redirect;
-
-                } else {
-
-                    window.location.href =
-                        "/dashboard/student-dashboard.html?feedback=success";
-
-                }
-
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Feedback Submission Error:",
-                    error
-                );
-
-                alert(
-                    error.message ||
-                    "Failed to submit feedback. Please try again."
-                );
-
-
-                if (submitButton) {
-
-                    submitButton.disabled = false;
-
-                    submitButton.textContent =
-                        originalButtonText;
-
-                }
-
-            }
-
-        }
-    );
-
-}
+);

@@ -1,29 +1,56 @@
-/* =========================
+/* =========================================================
    GLOBAL DARK MODE
-========================= */
+   Shared by Student / Faculty / HOD / Admin
+   ========================================================= */
 
-body.dark{
+/* =========================================================
+   BODY
+   ========================================================= */
 
-    background:#0b1120;
-    color:#f8fafc;
-
+body.dark {
+    background: #0b1120;
+    color: #f8fafc;
 }
 
-
-/* =========================
+/* =========================================================
    HEADER
-========================= */
+   ========================================================= */
 
-body.dark header{
+body.dark header {
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b
+    );
 
-    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color: #f8fafc;
 
+    border-color: #334155;
 }
 
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
 
-/* =========================
-   CARDS
-========================= */
+body.dark nav {
+    background: #111827;
+
+    border-color: #334155;
+}
+
+body.dark nav a {
+    color: #cbd5e1;
+}
+
+body.dark nav a:hover {
+    color: #60a5fa;
+
+    background: rgba(59, 130, 246, 0.08);
+}
+
+/* =========================================================
+   COMMON CARDS
+   ========================================================= */
 
 body.dark .portal-card,
 body.dark .feature-card,
@@ -31,126 +58,302 @@ body.dark .login-box,
 body.dark .welcome-card,
 body.dark .profile-card,
 body.dark .stat-card,
-body.dark .feedback-card{
+body.dark .feedback-card {
+    background: #1e293b;
 
-    background:#1e293b;
+    color: #f8fafc;
 
-    color:#f8fafc;
-
-    border:1px solid #334155;
-
+    border: 1px solid #334155;
 }
 
+/* =========================================================
+   ADMIN CARDS
+   ========================================================= */
 
+body.dark .welcome-box,
+body.dark .current-cycle-card,
+body.dark .create-cycle-card,
+body.dark .cycle-history-card,
+body.dark .dashboard-card {
+    background: #1e293b;
 
-/* =========================
-   TEXT
-========================= */
+    color: #f8fafc;
 
+    border: 1px solid #334155;
+}
+
+/* =========================================================
+   ADMIN CYCLE DETAILS
+   ========================================================= */
+
+body.dark .cycle-detail,
+body.dark .cycle-empty {
+    background: #111827;
+
+    color: #cbd5e1;
+
+    border-color: #334155;
+}
+
+/* =========================================================
+   ADMIN TABLE
+   ========================================================= */
+
+body.dark .cycle-table-wrapper {
+    border-color: #334155;
+}
+
+body.dark .cycle-table th {
+    background: #111827;
+
+    color: #94a3b8;
+
+    border-color: #334155;
+}
+
+body.dark .cycle-table td {
+    background: #1e293b;
+
+    color: #f8fafc;
+
+    border-color: #334155;
+}
+
+body.dark .cycle-table tbody tr:hover td {
+    background: #273449;
+}
+
+/* =========================================================
+   GENERAL TEXT
+   ========================================================= */
 
 body.dark h1,
 body.dark h2,
-body.dark h3{
-
-    color:white;
-
+body.dark h3,
+body.dark h4,
+body.dark h5,
+body.dark h6 {
+    color: #ffffff;
 }
-
 
 body.dark p,
 body.dark span,
-body.dark label{
-
-    color:#cbd5e1;
-
+body.dark label {
+    color: #cbd5e1;
 }
 
+/* =========================================================
+   SECONDARY TEXT
+   ========================================================= */
 
+body.dark .section-header p,
+body.dark .create-cycle-card > p,
+body.dark .cycle-history-header p,
+body.dark .welcome-box p,
+body.dark .dashboard-card p,
+body.dark .cycle-detail-label {
+    color: #94a3b8;
+}
 
-/* =========================
+/* =========================================================
    INPUTS
-========================= */
-
+   ========================================================= */
 
 body.dark input,
 body.dark select,
-body.dark textarea{
+body.dark textarea {
+    background: #0f172a;
 
-    background:#0f172a;
+    color: #f8fafc;
 
-    color:white;
-
-    border:1px solid #334155;
-
+    border: 1px solid #334155;
 }
-
-
 
 body.dark input::placeholder,
-body.dark textarea::placeholder{
-
-    color:#94a3b8;
-
+body.dark textarea::placeholder {
+    color: #94a3b8;
 }
-
-
 
 body.dark input:focus,
 body.dark select:focus,
-body.dark textarea:focus{
+body.dark textarea:focus {
+    border-color: #3b82f6;
 
-    border-color:#3b82f6;
-
-    box-shadow:0 0 10px rgba(59,130,246,.3);
-
+    box-shadow:
+        0 0 0 3px
+        rgba(59, 130, 246, 0.18);
 }
 
+/* =========================================================
+   DATE INPUT
+   ========================================================= */
 
-
-/* =========================
-   BUTTONS
-========================= */
-
-
-body.dark #dark-mode-btn{
-
-    background:#2563eb;
-
-    color:white;
-
+body.dark input[type="date"] {
+    color-scheme: dark;
 }
 
+/* =========================================================
+   DARK MODE BUTTON
+   ========================================================= */
 
-body.dark #dark-mode-btn:hover{
+body.dark #dark-mode-btn {
+    background: #2563eb;
 
-    background:#3b82f6;
+    color: #ffffff;
 
+    border-color: #3b82f6;
 }
 
+body.dark #dark-mode-btn:hover {
+    background: #3b82f6;
 
+    border-color: #60a5fa;
+}
 
-/* =========================
+/* =========================================================
    LINKS
-========================= */
+   ========================================================= */
 
-
-body.dark a{
-
-    color:#60a5fa;
-
+body.dark a {
+    color: #60a5fa;
 }
 
+/* =========================================================
+   ADMIN BUTTONS
+   ========================================================= */
 
+body.dark .primary-btn {
+    background: #2563eb;
 
-/* =========================
+    color: #ffffff;
+
+    border-color: #3b82f6;
+}
+
+body.dark .primary-btn:hover {
+    background: #3b82f6;
+}
+
+body.dark .secondary-btn {
+    background: #1e293b;
+
+    color: #f8fafc;
+
+    border-color: #334155;
+}
+
+body.dark .secondary-btn:hover {
+    background: #273449;
+
+    color: #60a5fa;
+
+    border-color: #3b82f6;
+}
+
+body.dark .activate-btn {
+    background: #16a34a;
+
+    color: #ffffff;
+
+    border-color: #22c55e;
+}
+
+body.dark .activate-btn:hover {
+    background: #22c55e;
+}
+
+body.dark .deactivate-btn {
+    background: #dc2626;
+
+    color: #ffffff;
+
+    border-color: #ef4444;
+}
+
+body.dark .deactivate-btn:hover {
+    background: #ef4444;
+}
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+body.dark .status-badge.inactive,
+body.dark .cycle-status.inactive {
+    background: #0f172a;
+
+    color: #94a3b8;
+
+    border-color: #334155;
+}
+
+body.dark .status-badge.active,
+body.dark .cycle-status.active {
+    background: rgba(34, 197, 94, 0.14);
+
+    color: #4ade80;
+
+    border-color: rgba(34, 197, 94, 0.25);
+}
+
+/* =========================================================
+   SUCCESS / ERROR
+   ========================================================= */
+
+body.dark .cycle-message.success {
+    background: rgba(34, 197, 94, 0.14);
+
+    color: #4ade80;
+
+    border-color: rgba(34, 197, 94, 0.25);
+}
+
+body.dark .cycle-message.error {
+    background: rgba(239, 68, 68, 0.14);
+
+    color: #f87171;
+
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+/* =========================================================
    FOOTER
-========================= */
+   ========================================================= */
 
+body.dark footer {
+    background: #0f172a;
 
-body.dark footer{
+    color: #94a3b8;
 
-    background:#0f172a;
+    border-top: 1px solid #334155;
+}
 
-    border-top:1px solid #334155;
+/* =========================================================
+   SMOOTH TRANSITIONS
+   ========================================================= */
 
+body,
+header,
+nav,
+main,
+footer,
+.welcome-box,
+.current-cycle-card,
+.create-cycle-card,
+.cycle-history-card,
+.dashboard-card,
+.cycle-detail,
+.cycle-empty,
+.cycle-table-wrapper,
+.cycle-table th,
+.cycle-table td,
+input,
+select,
+textarea,
+button {
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
 }

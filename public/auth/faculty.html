@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>
@@ -16,16 +15,13 @@ Faculty Login | Anonymous Student Feedback System
 
 </head>
 
-
 <body>
-
 
 <!-- ================= HEADER ================= -->
 
 <header>
 
 <div class="header-content">
-
 
 <div class="header-left">
 
@@ -37,274 +33,167 @@ Anonymous Student Feedback System
 Faculty Login Portal
 </p>
 
-
 </div>
 
-
 <button id="dark-mode-btn">
-
 🌙 Dark Mode
-
 </button>
-
 
 </div>
 
 </header>
 
 
-
 <!-- ================= MAIN ================= -->
 
 <main>
 
-
 <section class="login-box">
-
 
 <!-- Faculty Icon -->
 
 <div class="login-icon">
-
 👨‍🏫
-
 </div>
-
-
 
 <h2>
 Faculty Login
 </h2>
 
-
 <p class="login-subtitle">
-
 Access your faculty dashboard
-
 </p>
-
 
 
 <div id="login-error"></div>
 
 
-
 <form action="/faculty/login" method="POST" id="faculty-login-form">
+
 
 <!-- Faculty ID -->
 
 <label>
-
 👤 Faculty ID
-
 </label>
 
-
 <input
-
-type="text"
-
-name="faculty_id"
-
-class="form-input"
-
-placeholder="Enter Faculty ID"
-
-required
-
+    type="text"
+    name="faculty_id"
+    class="form-input"
+    placeholder="Enter Faculty ID"
+    required
 >
-
-
-
-
-<!-- Email -->
-
-<label>
-
-✉ College Email
-
-</label>
-
-
-<input
-
-type="email"
-
-name="email"
-
-class="form-input"
-
-placeholder="Enter College Email"
-
-required
-
->
-
-
 
 
 <!-- Department -->
 
 <label>
-
 🏢 Department
-
 </label>
 
-
 <select
-
-name="department"
-
-class="form-input"
-
-required
-
+    name="department"
+    class="form-input"
+    required
 >
 
-
 <option value="">
-
 Select Department
-
 </option>
 
-
 <option>
-
 Computer Engineering
-
 </option>
 
-
 <option>
-
 Information Technology
-
 </option>
 
-
 <option>
-
 Mechanical Engineering
-
 </option>
 
-
 <option>
-
 Civil Engineering
-
 </option>
 
-
 <option>
-
 Electrical Engineering
-
 </option>
-
 
 <option>
-
 Electronics Engineering
-
 </option>
-
 
 </select>
 
 
-
-
-
 <!-- Password -->
-<label>Password</label>
+
+<label>
+Password
+</label>
 
 <div class="password-box">
 
-    <input
-        type="password"
-        id="password"
-        name="password"
-        class="form-input"
-        placeholder="Enter Password"
-        required
-    >
+<input
+    type="password"
+    id="password"
+    name="password"
+    class="form-input"
+    placeholder="Enter Password"
+    required
+>
 
-    <span id="togglePassword" class="eye-icon">
-        👁
-    </span>
+<span id="togglePassword" class="eye-icon">
+👁
+</span>
 
 </div>
-
 
 
 <!-- Buttons -->
 
 <div class="button-group">
 
-
 <button type="submit">
-
 Login
-
 </button>
-
 
 <button type="reset">
-
 Clear
-
 </button>
-
 
 </div>
 
 
-
 </form>
-
-
-
 
 
 <!-- Links -->
 
 <div class="links">
 
-
 <a href="../index.html">
 ← Back to Home
 </a>
 
-
 </div>
-
 
 
 </section>
 
-
-
 </main>
-
-
-
 
 
 <footer>
 
 <p>
-
 © 2026 Anonymous Student Feedback System
-
 </p>
 
 </footer>
-
-
-
 
 
 <script src="/js/darkmode.js"></script>
@@ -312,90 +201,74 @@ Clear
 
 <script>
 
-
 function loginLoading(){
 
+    const btn =
+        document.querySelector(
+            ".button-group button[type='submit']"
+        );
 
-const btn =
-document.querySelector(
-".button-group button[type='submit']"
-);
+    btn.innerHTML = "⏳ Logging in...";
 
-
-btn.innerHTML="⏳ Logging in...";
-
-btn.disabled=true;
-
+    btn.disabled = true;
 
 }
-
-
 
 </script>
 
 
-
-
 <script>
 
-
 const params =
-new URLSearchParams(window.location.search);
-
+    new URLSearchParams(window.location.search);
 
 const error =
-params.get("error");
-
+    params.get("error");
 
 if(error){
 
+    document.getElementById("login-error").innerHTML =
 
-document.getElementById("login-error").innerHTML =
-
-`
-
-<div class="error-box">
-
-❌ ${decodeURIComponent(error)}
-
-</div>
-
-`;
+    `
+    <div class="error-box">
+        ❌ ${decodeURIComponent(error)}
+    </div>
+    `;
 
 }
 
-
 </script>
+
+
 <script>
 
-const passwordInput = document.getElementById("password");
-const togglePassword = document.getElementById("togglePassword");
+const passwordInput =
+    document.getElementById("password");
+
+const togglePassword =
+    document.getElementById("togglePassword");
 
 
-togglePassword.addEventListener("click",()=>{
-
+togglePassword.addEventListener("click", () => {
 
     if(passwordInput.type === "password"){
 
-        passwordInput.type="text";
+        passwordInput.type = "text";
 
-        togglePassword.innerHTML="🙈";
+        togglePassword.innerHTML = "🙈";
 
     }
     else{
 
-        passwordInput.type="password";
+        passwordInput.type = "password";
 
-        togglePassword.innerHTML="👁";
+        togglePassword.innerHTML = "👁";
 
     }
 
-
 });
 
-
 </script>
-
 
 
 </body>

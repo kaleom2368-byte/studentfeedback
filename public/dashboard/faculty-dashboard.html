@@ -1,40 +1,24 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="description"
+        content="Faculty Dashboard for the Anonymous Student Feedback System">
 
-    <meta
-        name="description"
-        content="Faculty Dashboard for the Anonymous Student Feedback System"
-    >
+    <title>Faculty Dashboard | Anonymous Student Feedback System</title>
 
-    <title>
-        Faculty Dashboard | Anonymous Student Feedback System
-    </title>
-
-    <!-- =====================================================
-         STYLES
-    ====================================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
-        rel="stylesheet"
-        href="/css/faculty-dashboard.css"
-    >
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="/css/darkmode.css"
-    >
-
+    <link rel="stylesheet" href="/css/faculty-dashboard.css">
 </head>
-
 
 <body>
 
@@ -42,52 +26,40 @@
          HEADER
     ====================================================== -->
 
-    <header>
+    <header class="app-header">
 
-        <div class="header-container">
-
-            <!-- BRAND -->
+        <div class="container header-container">
 
             <div class="brand">
-
-                <h1>
-                    Anonymous Student Feedback System
-                </h1>
-
-                <p>
-                    Faculty Dashboard Portal
-                </p>
-
+                <h1>Anonymous Student Feedback System</h1>
+                <p>Faculty Dashboard Portal</p>
             </div>
 
+            <div class="header-meta">
 
-            <!-- HEADER ACTIONS -->
+                <div class="cycle-info">
+                    <span class="header-label">Current Cycle</span>
+                    <strong id="cycle-label">—</strong>
+                </div>
 
-            <div class="header-actions">
-
-               
-                <!-- Dark Mode -->
+                <div class="faculty-meta">
+                    <strong id="faculty-name-header">Faculty</strong>
+                    <span id="faculty-department-header">Department</span>
+                </div>
 
                 <button
-                    type="button"
                     id="dark-mode-btn"
+                    class="icon-btn"
+                    type="button"
                     aria-label="Toggle dark mode"
-                >
-
-                    🌙 Dark Mode
-
+                    title="Toggle theme">
+                    ☀️
                 </button>
-
-
-                <!-- Logout -->
 
                 <a
                     href="/faculty/logout"
-                    class="logout-btn"
-                >
-
+                    class="logout-btn">
                     Logout
-
                 </a>
 
             </div>
@@ -97,755 +69,483 @@
     </header>
 
 
-
     <!-- =====================================================
          MAIN CONTENT
     ====================================================== -->
 
-    <main>
+    <main class="container dashboard-main">
 
 
         <!-- =================================================
-             WELCOME SECTION
+             WELCOME
         ================================================== -->
 
-        <section
-            class="welcome-card"
-            aria-labelledby="welcome"
-        >
+        <section class="welcome-section">
 
-            <div class="welcome-text">
+            <div class="welcome-card">
 
-                <span class="tag">
-                    Faculty Portal
-                </span>
+                <div class="welcome-content">
 
+                    <div class="welcome-text">
 
-                <h2 id="welcome">
-                    Welcome Faculty 👋
-                </h2>
+                        <span class="tag">
+                            Faculty Portal
+                        </span>
 
+                        <h2 id="welcome-heading">
+                            Welcome Faculty 👋
+                        </h2>
 
-                <p>
-                    Manage student feedback, view performance
-                    ratings, understand student experiences,
-                    and improve teaching quality.
-                </p>
+                        <p id="welcome-sub" class="muted">
+                            Loading department • subject
+                        </p>
 
-            </div>
+                    </div>
 
+                    <div class="welcome-icon" aria-hidden="true">
+                        👋
+                    </div>
 
-            <div
-                class="welcome-avatar"
-                aria-hidden="true"
-            >
-
-                👨‍🏫
+                </div>
 
             </div>
 
         </section>
 
 
-
         <!-- =================================================
-             FACULTY PROFILE
+             PROFILE
         ================================================== -->
 
-        <section
-            class="profile-card"
-            aria-labelledby="faculty-profile-title"
-        >
+        <section class="top-row">
 
-            <div class="section-header">
+            <aside class="profile-card">
 
-                <h2 id="faculty-profile-title">
-                    👤 Faculty Profile
-                </h2>
+                <div class="panel-header">
 
-                <p>
-                    Registered faculty information
-                </p>
+                    <div>
+                        <h3>👤 Profile</h3>
 
-            </div>
-
-
-            <div class="profile-grid">
-
-
-                <!-- Faculty ID -->
-
-                <div class="profile-box">
-
-                    <span>
-                        Faculty ID
-                    </span>
-
-                    <b id="faculty-id">
-                        Loading...
-                    </b>
+                        <p class="panel-description">
+                            Faculty account information
+                        </p>
+                    </div>
 
                 </div>
 
+                <div class="profile-grid">
 
-                <!-- Faculty Name -->
+                    <div class="profile-box">
+                        <span>Faculty ID</span>
+                        <strong id="faculty-id">—</strong>
+                    </div>
 
-                <div class="profile-box">
+                    <div class="profile-box">
+                        <span>Name</span>
+                        <strong id="faculty-name">—</strong>
+                    </div>
 
-                    <span>
-                        Faculty Name
-                    </span>
+                    <div class="profile-box">
+                        <span>Department</span>
+                        <strong id="faculty-department">—</strong>
+                    </div>
 
-                    <b id="faculty-name">
-                        Loading...
-                    </b>
+                    <div class="profile-box">
+                        <span>Email</span>
+                        <strong id="faculty-email">—</strong>
+                    </div>
 
-                </div>
-
-
-                <!-- Email -->
-
-                <div class="profile-box">
-
-                    <span>
-                        Email
-                    </span>
-
-                    <b id="faculty-email">
-                        Loading...
-                    </b>
-
-                </div>
-
-
-                <!-- Department -->
-
-                <div class="profile-box">
-
-                    <span>
-                        Department
-                    </span>
-
-                    <b id="faculty-department">
-                        Loading...
-                    </b>
+                    <div class="profile-box">
+                        <span>Subject</span>
+                        <strong id="faculty-subject">—</strong>
+                    </div>
 
                 </div>
 
-
-                <!-- Subject -->
-
-                <div class="profile-box">
-
-                    <span>
-                        Subject
-                    </span>
-
-                    <b id="faculty-subject">
-                        Loading...
-                    </b>
-
-                </div>
-
-
-            </div>
+            </aside>
 
         </section>
 
 
-
         <!-- =================================================
-             PERFORMANCE OVERVIEW
+             KPI
         ================================================== -->
 
-        <section
-            class="stats-section"
-            aria-labelledby="performance-overview-title"
-        >
+        <section class="kpi-row">
 
-            <div class="section-header">
+            <div class="kpi">
 
-                <h2 id="performance-overview-title">
-                    📊 Performance Overview
-                </h2>
-
-                <p>
-                    Summary of student feedback and ratings
-                </p>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <!-- Total Feedback -->
-
-                <div class="stat-card">
-
-                    <div
-                        class="stat-icon"
-                        aria-hidden="true"
-                    >
-                        📋
-                    </div>
-
-                    <h3 id="total-feedback">
-                        0
-                    </h3>
-
-                    <p>
-                        Total Feedback
-                    </p>
-
+                <div class="kpi-icon rating-icon">
+                    ⭐
                 </div>
 
+                <div class="kpi-body">
 
-                <!-- Teaching -->
-
-                <div class="stat-card">
-
-                    <div
-                        class="stat-icon"
-                        aria-hidden="true"
-                    >
-                        🎓
+                    <div class="kpi-value" id="overall-rating">
+                        0.0
                     </div>
 
-                    <h3 id="teaching">
-                        0
-                    </h3>
-
-                    <p>
-                        Teaching Rating
-                    </p>
-
-                </div>
-
-
-                <!-- Communication -->
-
-                <div class="stat-card">
-
-                    <div
-                        class="stat-icon"
-                        aria-hidden="true"
-                    >
-                        💬
-                    </div>
-
-                    <h3 id="communication">
-                        0
-                    </h3>
-
-                    <p>
-                        Communication
-                    </p>
-
-                </div>
-
-
-                <!-- Behaviour -->
-
-                <div class="stat-card">
-
-                    <div
-                        class="stat-icon"
-                        aria-hidden="true"
-                    >
-                        👍
-                    </div>
-
-                    <h3 id="behaviour">
-                        0
-                    </h3>
-
-                    <p>
-                        Behaviour
-                    </p>
-
-                </div>
-
-
-                <!-- Overall -->
-
-                <div class="stat-card">
-
-                    <div
-                        class="stat-icon"
-                        aria-hidden="true"
-                    >
-                        ⭐
-                    </div>
-
-                    <h3 id="overall-rating">
-                        0
-                    </h3>
-
-                    <p>
+                    <div class="kpi-label">
                         Overall Rating
-                    </p>
+                    </div>
 
                 </div>
 
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon feedback-icon">
+                    📝
+                </div>
+
+                <div class="kpi-body">
+
+                    <div class="kpi-value" id="total-feedback">
+                        0
+                    </div>
+
+                    <div class="kpi-label">
+                        Total Feedback
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon response-icon">
+                    📊
+                </div>
+
+                <div class="kpi-body">
+
+                    <div class="kpi-value" id="cycle-responses">
+                        0
+                    </div>
+
+                    <div class="kpi-label">
+                        Responses This Cycle
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon cycle-icon">
+                    📅
+                </div>
+
+                <div class="kpi-body">
+
+                    <div class="kpi-value cycle-value" id="cycle-label-small">
+                        —
+                    </div>
+
+                    <div class="kpi-label">
+                        Current Cycle
+                    </div>
+
+                </div>
 
             </div>
 
         </section>
 
 
-<br>
         <!-- =================================================
-             PERFORMANCE ANALYSIS
+             ANALYTICS
         ================================================== -->
 
-        <section
-            class="analytics-card performance-analysis"
-            aria-labelledby="performance-analysis-title"
-        >
-
-            <div class="section-header">
-
-                <h2 id="performance-analysis-title">
-                    📈 Performance Analysis
-                </h2>
-
-                <p>
-                    Detailed overview of your teaching performance
-                    based on student feedback.
-                </p>
-
-            </div>
+        <section class="analytics-grid">
 
 
-            <!-- OVERALL PERFORMANCE -->
+            <!-- PERFORMANCE -->
 
-            <div class="overall-performance">
+            <div class="panel analytics-panel performance-panel">
 
-                <div class="overall-score">
-
-                    <div
-                        class="overall-icon"
-                        aria-hidden="true"
-                    >
-                        ⭐
-                    </div>
+                <div class="panel-header">
 
                     <div>
 
-                        <span>
-                            Overall Performance
-                        </span>
+                        <h3>📈 Performance Trend</h3>
 
-                        <strong id="overall-analysis-score">
-                            0.0 / 5
-                        </strong>
+                        <p class="panel-description">
+                            Overall faculty rating across feedback cycles
+                        </p>
 
                     </div>
 
                 </div>
 
+                <div class="panel-body chart-wrap">
 
-                <div
-                    class="overall-description"
-                    id="overall-description"
-                >
-
-                    Waiting for student feedback data...
+                    <canvas
+                        id="perfTrendChart"
+                        aria-label="Faculty performance trend chart">
+                    </canvas>
 
                 </div>
 
             </div>
 
 
+            <!-- BREAKDOWN -->
 
-            <!-- RATING ANALYSIS -->
+            <div class="panel analytics-panel">
 
-            <div class="rating-analysis-list">
+                <div class="panel-header">
 
+                    <div>
 
-                <!-- TEACHING -->
+                        <h3>⭐ Rating Breakdown</h3>
 
-                <div class="rating-analysis-item">
-
-                    <div class="rating-analysis-header">
-
-                        <div>
-
-                            <span
-                                class="rating-icon"
-                                aria-hidden="true"
-                            >
-                                🎓
-                            </span>
-
-                            <strong>
-                                Teaching
-                            </strong>
-
-                        </div>
-
-                        <b id="teach-percent">
-                            0%
-                        </b>
-
-                    </div>
-
-
-                    <div class="progress">
-
-                        <div
-                            class="progress-bar"
-                            id="teach-progress"
-                        ></div>
-
-                    </div>
-
-
-                    <div class="rating-analysis-footer">
-
-                        <span>
-                            Teaching effectiveness
-                        </span>
-
-                        <b id="teach-score">
-                            0.0 / 5
-                        </b>
+                        <p class="panel-description">
+                            Average ratings across feedback parameters
+                        </p>
 
                     </div>
 
                 </div>
 
+                <div
+                    class="panel-body rating-breakdown-body"
+                    id="rating-breakdown">
 
-
-                <!-- COMMUNICATION -->
-
-                <div class="rating-analysis-item">
-
-                    <div class="rating-analysis-header">
-
-                        <div>
-
-                            <span
-                                class="rating-icon"
-                                aria-hidden="true"
-                            >
-                                💬
-                            </span>
-
-                            <strong>
-                                Communication
-                            </strong>
-
-                        </div>
-
-                        <b id="comm-percent">
-                            0%
-                        </b>
-
-                    </div>
-
-
-                    <div class="progress">
-
-                        <div
-                            class="progress-bar"
-                            id="comm-progress"
-                        ></div>
-
-                    </div>
-
-
-                    <div class="rating-analysis-footer">
-
-                        <span>
-                            Communication with students
-                        </span>
-
-                        <b id="comm-score">
-                            0.0 / 5
-                        </b>
-
+                    <div class="loading-card">
+                        Loading rating analysis...
                     </div>
 
                 </div>
-
-
-
-                <!-- BEHAVIOUR -->
-
-                <div class="rating-analysis-item">
-
-                    <div class="rating-analysis-header">
-
-                        <div>
-
-                            <span
-                                class="rating-icon"
-                                aria-hidden="true"
-                            >
-                                👍
-                            </span>
-
-                            <strong>
-                                Behaviour
-                            </strong>
-
-                        </div>
-
-                        <b id="behave-percent">
-                            0%
-                        </b>
-
-                    </div>
-
-
-                    <div class="progress">
-
-                        <div
-                            class="progress-bar"
-                            id="behave-progress"
-                        ></div>
-
-                    </div>
-
-
-                    <div class="rating-analysis-footer">
-
-                        <span>
-                            Professional behaviour
-                        </span>
-
-                        <b id="behave-score">
-                            0.0 / 5
-                        </b>
-
-                    </div>
-
-                </div>
-
 
             </div>
 
+        </section>
 
 
-            <!-- PERFORMANCE INSIGHT -->
+        <!-- =================================================
+             FEEDBACK HISTORY
+        ================================================== -->
 
-            <div class="performance-insight">
+        <section class="panel full history">
 
-                <div
-                    class="insight-icon"
-                    aria-hidden="true"
-                >
-                    💡
-                </div>
+            <div class="panel-header history-header">
 
                 <div>
 
-                    <h3>
-                        Performance Insight
-                    </h3>
+                    <h3>📁 Feedback History</h3>
 
-                    <p id="performance-insight-text">
+                    <p class="panel-description">
+                        View feedback performance across cycles
+                    </p>
 
-                        Your performance insight will appear here
-                        after student feedback is analyzed.
+                </div>
 
+                <div class="filters">
+
+                    <button
+                        class="filter active"
+                        type="button"
+                        data-period="current">
+                        Current Cycle
+                    </button>
+
+                    <button
+                        class="filter"
+                        type="button"
+                        data-period="previous">
+                        Previous Cycle
+                    </button>
+
+                    <button
+                        class="filter"
+                        type="button"
+                        data-period="all">
+                        All Cycles
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="panel-body">
+
+                <div
+                    id="monthly-table"
+                    class="table-wrap">
+
+                    <div class="loading-card">
+                        Loading feedback history...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PARTICIPATION + INSIGHTS
+        ================================================== -->
+
+        <section class="two-up">
+
+
+            <!-- PARTICIPATION -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>✅ Feedback Participation</h3>
+
+                        <p class="panel-description">
+                            Current student response participation
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="panel-body"
+                    id="participation">
+
+                    <div class="loading-card">
+                        Loading participation data...
+                    </div>
+
+                </div>
+
+                <!-- =================================================
+                     SUBMISSION CHECKLIST BUTTON
+                ================================================== -->
+
+                <div class="panel-action">
+
+                    <button
+                        type="button"
+                        id="view-submission-checklist-btn"
+                        class="dashboard-action-btn">
+                        ✅ View Submission Checklist
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- INSIGHTS -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>💡 Teaching &amp; Feedback Insights</h3>
+
+                        <p class="panel-description">
+                            Key observations from student feedback
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="panel-body"
+                    id="insights">
+
+                    <div class="loading-card">
+                        Loading insights...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             COMMENTS / RECENT FEEDBACK
+        ================================================== -->
+
+        <section class="panel full comments">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h3>💬 Recent Anonymous Feedback</h3>
+
+                    <p class="panel-description">
+                        Comments submitted anonymously by students
                     </p>
 
                 </div>
 
             </div>
 
-        </section>
-
-
-
-        <!-- =================================================
-             REAL-TIME ANALYTICS
-        ================================================== -->
-
-        <section
-            class="analytics-card"
-            aria-labelledby="real-time-title"
-        >
-
-            <div class="section-header">
-
-                <h2 id="real-time-title">
-                    ⚡ Real-Time Rating Analysis
-                </h2>
-
-                <p>
-                    Live statistics calculated from submitted
-                    student feedback.
-                </p>
-
-            </div>
-
-
-            <div id="real-time-analysis">
-
-                <!-- Generated by faculty-dashboard.js -->
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             CHARTS
-        ================================================== -->
-
-        <section
-            class="charts-section"
-            aria-labelledby="charts-title"
-        >
-
-            <div class="section-header">
-
-                <h2 id="charts-title">
-                    📊 Feedback Analytics
-                </h2>
-
-                <p>
-                    Visual representation of student feedback
-                    ratings.
-                </p>
-
-            </div>
-
-
-            <div class="charts-grid">
-
-
-                <!-- DOUGHNUT CHART -->
-
-                <div class="chart-card">
-
-                    <h3>
-                        ⭐ Overall Ratings
-                    </h3>
-
-                    <div class="chart-container">
-
-                        <canvas
-                            id="ratingChart"
-                            aria-label="Overall faculty rating chart"
-                        ></canvas>
-
-                    </div>
-
-                </div>
-
-
-                <!-- BAR CHART -->
-
-                <div class="chart-card">
-
-                    <h3>
-                        📊 Teaching vs Communication vs Behaviour
-                    </h3>
-
-                    <div class="chart-container">
-
-                        <canvas
-                            id="barChart"
-                            aria-label="Teaching communication and behaviour rating chart"
-                        ></canvas>
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             RECENT ANONYMOUS FEEDBACK
-        ================================================== -->
-
-        <section
-            class="feedback-section"
-            aria-labelledby="recent-feedback-title"
-        >
-
-            <div class="section-header">
-
-                <h2 id="recent-feedback-title">
-                    💬 Recent Anonymous Feedback
-                </h2>
-
-                <p>
-                    Latest student responses submitted anonymously.
-                </p>
-
-            </div>
-
-
             <div
-                id="feedback-list"
-                class="feedback-grid"
-            >
+                class="panel-body"
+                id="feedback-list">
 
                 <div class="loading-card">
-
-                    ⏳ Loading Feedback...
-
+                    Loading anonymous feedback...
                 </div>
 
             </div>
 
+            <!-- =================================================
+                 VIEW ALL FEEDBACK BUTTON
+            ================================================== -->
+
+            <div class="panel-action">
+
+                <button
+                    type="button"
+                    id="view-all-feedback-btn"
+                    class="dashboard-action-btn">
+                    📝 View All Feedback
+                </button>
+
+            </div>
+
         </section>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="site-footer">
+            © 2026 Anonymous Student Feedback System
+        </footer>
 
 
     </main>
-
-
-
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
-
-    <footer>
-
-        <p>
-            © 2026 Anonymous Student Feedback System
-        </p>
-
-    </footer>
-
 
 
     <!-- =====================================================
          JAVASCRIPT
     ====================================================== -->
 
-    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/chart.js"
-    ></script>
+    <script src="/js/darkmode.js"></script>
 
-
-    <!-- Dark Mode -->
-
-    <script
-        src="/js/darkmode.js"
-    ></script>
-
-
-    <!-- Faculty Dashboard -->
-
-    <script
-        src="/js/faculty-dashboard.js"
-    ></script>
-
+    <script src="/js/faculty-dashboard.js"></script>
 
 </body>
 

@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
 const helmet = require("helmet");
 const cors = require("cors");
 
@@ -24,7 +25,8 @@ const facultyDirectoryRoute = require("./routes/faculty-directory");
 // DATABASE
 // =====================================================
 
-require("./db");
+const dbPool = require("./db");
+const sessionStore = new MySQLStore({}, dbPool);
 
 
 // =====================================================
@@ -157,13 +159,15 @@ app.use(
             process.env.SESSION_SECRET ||
             "StudentFeedback2026",
 
+        store: sessionStore,
+
         resave: false,
 
         saveUninitialized: false,
 
         cookie: {
 
-            secure: false,
+            secure: process.env.NODE_ENV === "production",
 
             httpOnly: true,
 

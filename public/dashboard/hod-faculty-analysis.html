@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Faculty Analysis | Anonymous Student Feedback System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/css/hod.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/hod-faculty-analysis.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/darkmode.css"
+    >
+
+</head>
+
+
+<body>
+
+<header class="analysis-header">
+
+    <div class="analysis-header-inner">
+
+        <div class="brand-section">
+
+            <div class="brand-title">
+                Anonymous Student Feedback System
+            </div>
+
+            <div class="brand-subtitle">
+                Faculty Performance Analysis
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <button
+                type="button"
+                id="dark-mode-btn"
+                class="mode-btn"
+            >
+                🌙 Dark Mode
+            </button>
+
+            <button
+                type="button"
+                id="back-button"
+                class="back-btn"
+            >
+                ← Back to Dashboard
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<main class="analysis-container">
+
+
+    <!-- =========================================
+         PAGE TITLE
+    ========================================== -->
+
+    <div class="page-heading">
+
+        <div>
+
+            <span class="eyebrow">
+                FACULTY ANALYSIS
+            </span>
+
+            <h1>
+                Performance Overview
+            </h1>
+
+            <p>
+                Anonymous, aggregated student feedback
+                for this faculty member.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================
+         FACULTY PROFILE
+    ========================================== -->
+
+    <section class="profile-card">
+
+        <div class="profile-main">
+
+            <div
+                class="faculty-avatar-large"
+                id="faculty-avatar"
+            >
+                --
+            </div>
+
+
+            <div class="profile-information">
+
+                <span class="profile-label">
+                    Faculty Member
+                </span>
+
+                <h2 id="faculty-name">
+                    Loading...
+                </h2>
+
+                <p id="faculty-department">
+                    Loading department...
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="faculty-id-container">
+
+            <span>
+                Faculty ID
+            </span>
+
+            <strong id="faculty-id">
+                --
+            </strong>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         FACULTY DETAILS
+    ========================================== -->
+
+    <section class="analysis-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <span class="section-number">
+                    01
+                </span>
+
+                <div>
+
+                    <h2>
+                        Faculty Details
+                    </h2>
+
+                    <p>
+                        Academic information for this faculty member.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="metric-grid">
+
+
+            <div class="metric-card">
+
+                <span class="metric-label">
+                    Academic Year
+                </span>
+
+                <strong id="faculty-year">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <span class="metric-label">
+                    Division
+                </span>
+
+                <strong id="faculty-division">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <span class="metric-label">
+                    Total Responses
+                </span>
+
+                <strong id="total-feedback">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="metric-card highlight">
+
+                <span class="metric-label">
+                    Overall Rating
+                </span>
+
+                <div class="rating-value">
+
+                    <strong id="overall-rating">
+                        0.0
+                    </strong>
+
+                    <span>
+                        / 5
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         CORE PERFORMANCE
+    ========================================== -->
+
+    <section class="analysis-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <span class="section-number">
+                    02
+                </span>
+
+                <div>
+
+                    <h2>
+                        Core Faculty Performance
+                    </h2>
+
+                    <p>
+                        Average anonymous student ratings.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="metric-grid three-columns">
+
+
+            <div class="performance-card">
+
+                <div class="performance-top">
+
+                    <span>
+                        Teaching
+                    </span>
+
+                    <span class="performance-icon">
+                        T
+                    </span>
+
+                </div>
+
+                <div class="performance-value">
+
+                    <strong id="teaching">
+                        0.0
+                    </strong>
+
+                    <span>
+                        / 5
+                    </span>
+
+                </div>
+
+                <div class="rating-bar">
+
+                    <div
+                        id="teaching-bar"
+                        class="rating-fill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="performance-card">
+
+                <div class="performance-top">
+
+                    <span>
+                        Communication
+                    </span>
+
+                    <span class="performance-icon">
+                        C
+                    </span>
+
+                </div>
+
+                <div class="performance-value">
+
+                    <strong id="communication">
+                        0.0
+                    </strong>
+
+                    <span>
+                        / 5
+                    </span>
+
+                </div>
+
+                <div class="rating-bar">
+
+                    <div
+                        id="communication-bar"
+                        class="rating-fill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="performance-card">
+
+                <div class="performance-top">
+
+                    <span>
+                        Behaviour
+                    </span>
+
+                    <span class="performance-icon">
+                        B
+                    </span>
+
+                </div>
+
+                <div class="performance-value">
+
+                    <strong id="behaviour">
+                        0.0
+                    </strong>
+
+                    <span>
+                        / 5
+                    </span>
+
+                </div>
+
+                <div class="rating-bar">
+
+                    <div
+                        id="behaviour-bar"
+                        class="rating-fill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         COURSE & LEARNING
+    ========================================== -->
+
+    <section class="analysis-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <span class="section-number">
+                    03
+                </span>
+
+                <div>
+
+                    <h2>
+                        Course & Learning Feedback
+                    </h2>
+
+                    <p>
+                        Aggregated feedback from submitted responses.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="learning-grid">
+
+
+            <div class="learning-card">
+
+                <span>
+                    Course Satisfaction
+                </span>
+
+                <strong id="course-satisfaction">
+                    0.0
+                </strong>
+
+                <small>
+                    / 5
+                </small>
+
+            </div>
+
+
+
+            <div class="learning-card">
+
+                <span>
+                    Syllabus Pace
+                </span>
+
+                <strong id="syllabus-pace">
+                    0.0
+                </strong>
+
+                <small>
+                    / 5
+                </small>
+
+            </div>
+
+
+
+            <div class="learning-card">
+
+                <span>
+                    Concept Clarity
+                </span>
+
+                <strong id="concept-clarity">
+                    0.0
+                </strong>
+
+                <small>
+                    / 5
+                </small>
+
+            </div>
+
+
+
+            <div class="learning-card">
+
+                <span>
+                    Practical Work
+                </span>
+
+                <strong id="practical-work">
+                    0.0
+                </strong>
+
+                <small>
+                    / 5
+                </small>
+
+            </div>
+
+
+
+            <div class="learning-card">
+
+                <span>
+                    Study Material
+                </span>
+
+                <strong id="study-material">
+                    0.0
+                </strong>
+
+                <small>
+                    / 5
+                </small>
+
+            </div>
+
+
+
+            <div class="learning-card">
+
+                <span>
+                    Exam Difficulty
+                </span>
+
+                <strong id="exam-difficulty">
+                    0.0
+                </strong>
+
+                <small>
+                    / 5
+                </small>
+
+            </div>
+
+
+
+            <div class="learning-card">
+
+                <span>
+                    Faculty Support
+                </span>
+
+                <strong id="faculty-support">
+                    0.0
+                </strong>
+
+                <small>
+                    / 5
+                </small>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         PRIVACY
+    ========================================== -->
+
+    <section class="privacy-card">
+
+        <div class="privacy-icon">
+            ✓
+        </div>
+
+        <div>
+
+            <h3>
+                Anonymous Feedback Protected
+            </h3>
+
+            <p>
+                This analysis contains aggregated feedback only.
+                Individual student identities and personal
+                information are never displayed.
+            </p>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<footer class="analysis-footer">
+
+    <p>
+        © 2026 Anonymous Student Feedback System
+    </p>
+
+</footer>
+
+
+
+<script src="/js/darkmode.js"></script>
+
+<script src="/js/hod-faculty-analysis.js"></script>
+
+</body>
+
+</html>

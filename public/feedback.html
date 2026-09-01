@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -10,13 +9,12 @@
 
     <link rel="stylesheet" href="/css/feedback.css">
     <link rel="stylesheet" href="/css/darkmode.css">
-
 </head>
 
 <body>
 
     <!-- =====================================================
-                        HEADER
+                         HEADER
     ====================================================== -->
 
     <header class="page-header">
@@ -28,8 +26,8 @@
                 <h1>Anonymous Student Feedback System</h1>
 
                 <p>
-                    Help us improve the quality of teaching by sharing your
-                    honest and anonymous feedback.
+                    Help us improve the quality of teaching by sharing
+                    your honest and anonymous feedback.
                 </p>
 
             </div>
@@ -47,46 +45,49 @@
 
     </header>
 
+
     <!-- =====================================================
-                    MAIN CONTAINER
+                         MAIN
     ====================================================== -->
 
     <main class="feedback-container">
 
-        <!-- Back Button -->
 
-       <div class="top-actions">
+        <!-- =================================================
+                         TOP ACTIONS
+        ================================================== -->
 
-   <button
-    type="button"
-    class="back-btn"
-    id="back-dashboard-btn">
+        <div class="top-actions">
 
-    ← Back to Dashboard
+            <button
+                type="button"
+                class="back-btn"
+                id="back-dashboard-btn">
 
-</button>
+                ← Back to Dashboard
 
-   <button
-    type="button"
-    id="logout-btn"
-    class="logout-btn">
+            </button>
 
-    Logout
+            <button
+                type="button"
+                id="logout-btn"
+                class="logout-btn">
 
-</button>
+                Logout
 
-</div>
+            </button>
 
-        <!-- =====================================================
-                    ANONYMOUS NOTICE
-        ====================================================== -->
+        </div>
+
+
+        <!-- =================================================
+                       ANONYMOUS NOTICE
+        ================================================== -->
 
         <section class="notice-card">
 
             <div class="notice-icon">
-
                 🔒
-
             </div>
 
             <div class="notice-content">
@@ -94,20 +95,19 @@
                 <h2>Anonymous Feedback</h2>
 
                 <p>
-
                     Your identity is never shared with faculty members.
                     Please answer honestly. Your feedback is used only
                     for academic quality improvement.
-
                 </p>
 
             </div>
 
         </section>
 
-        <!-- =====================================================
-                    FACULTY INFORMATION
-        ====================================================== -->
+
+        <!-- =================================================
+                     FACULTY INFORMATION
+        ================================================== -->
 
         <section class="faculty-card">
 
@@ -116,21 +116,25 @@
                 <h2>Faculty Information</h2>
 
                 <p>
-
-                    Select your faculty and enter the course details.
-
+                    Select the faculty member or subject.
+                    The related subject and department will be
+                    selected automatically.
                 </p>
 
             </div>
 
+
             <div class="faculty-grid">
+
+
+                <!-- ================================
+                             FACULTY
+                ================================= -->
 
                 <div class="input-group">
 
                     <label for="faculty">
-
                         Faculty
-
                     </label>
 
                     <select
@@ -139,45 +143,55 @@
                         required>
 
                         <option value="">
-
-                            Loading Faculty...
-
+                            Select Faculty
                         </option>
 
                     </select>
 
                 </div>
 
+
+                <!-- ================================
+                             SUBJECT
+                ================================= -->
+
                 <div class="input-group">
 
+                    <label for="subject">
+                        Subject
+                    </label>
+
+                    <select
+                        id="subject"
+                        name="subject"
+                        required>
+
+                        <option value="">
+                            Select Subject
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- ================================
+                           DEPARTMENT
+                ================================= -->
+
+                <div class="input-group full-width">
+
                     <label for="department">
-
                         Department
-
                     </label>
 
                     <input
                         type="text"
                         id="department"
                         name="department"
-                        readonly>
-
-                </div>
-
-                <div class="input-group full-width">
-
-                    <label for="subject">
-
-                        Subject
-
-                    </label>
-
-                    <input
-                        type="text"
-                        id="subject"
-                        name="subject"
-                        placeholder="Enter Subject Name"
-                        required>
+                        readonly
+                        required
+                        placeholder="Automatically selected">
 
                 </div>
 
@@ -185,9 +199,10 @@
 
         </section>
 
-        <!-- =====================================================
-                        PROGRESS BAR
-        ====================================================== -->
+
+        <!-- =================================================
+                         PROGRESS
+        ================================================== -->
 
         <section class="progress-card">
 
@@ -195,806 +210,2858 @@
 
                 <div>
 
-                    <h3>Feedback Progress</h3>
+                    <h3>
+                        Feedback Progress
+                    </h3>
 
                     <p>
-
                         Complete all questions before submitting.
-
                     </p>
 
                 </div>
 
                 <span id="progress-percent">
-
                     0%
-
                 </span>
 
             </div>
+
 
             <div class="progress-bar">
 
                 <div
                     class="progress-fill"
                     id="progress-fill">
-
                 </div>
 
             </div>
 
         </section>
 
-        <!-- =====================================================
-                    FEEDBACK FORM
-        ====================================================== -->
+
+        <!-- =================================================
+                         FEEDBACK FORM
+        ================================================== -->
 
         <form id="feedback-form">
 
-            <!-- =====================================================
-                    COURSE EXPERIENCE
-            ====================================================== -->
+
+            <!-- =================================================
+                         COURSE EXPERIENCE
+            ================================================== -->
 
             <section class="form-section">
 
                 <div class="section-heading">
 
-                    <h2>Course Experience</h2>
+                    <h2>
+                        Course Experience
+                    </h2>
 
                     <p>
-
                         Share your experience regarding the course,
                         lectures and syllabus.
-
                     </p>
 
                 </div>
-                <!-- =====================================================
-                    QUESTION 1
-====================================================== -->
 
-<div class="question-card">
 
-    <h3>
-        1. How would you rate your overall experience and satisfaction with this course?
-    </h3>
+                <!-- QUESTION 1 -->
 
-    <div class="options-grid">
+                <div class="question-card">
 
-        <label class="option-card">
+                    <h3>
+                        1. How would you rate your overall experience
+                        and satisfaction with this course?
+                    </h3>
 
-            <input
-                type="radio"
-                name="course_satisfaction"
-                value="Excellent"
-                required>
+                    <div class="options-grid">
 
-            <span>⭐ Excellent</span>
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Excellent"
+                                required>
 
-        </label>
+                            <span>
+                                ⭐ Excellent
+                            </span>
+                        </label>
 
-        <label class="option-card">
 
-            <input
-                type="radio"
-                name="course_satisfaction"
-                value="Good">
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Good">
 
-            <span>👍 Good</span>
+                            <span>
+                                👍 Good
+                            </span>
+                        </label>
 
-        </label>
 
-        <label class="option-card">
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Average">
 
-            <input
-                type="radio"
-                name="course_satisfaction"
-                value="Average">
+                            <span>
+                                😐 Average
+                            </span>
+                        </label>
 
-            <span>😐 Average</span>
 
-        </label>
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Poor">
 
-        <label class="option-card">
+                            <span>
+                                👎 Poor
+                            </span>
+                        </label>
 
-            <input
-                type="radio"
-                name="course_satisfaction"
-                value="Poor">
 
-            <span>👎 Poor</span>
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Other">
 
-        </label>
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
 
-        <label class="option-card other-option">
+                    </div>
 
-            <input
-                type="radio"
-                name="course_satisfaction"
-                value="Other">
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="course_satisfaction_other"
+                        placeholder="Please specify">
 
-            <span>✏ Other</span>
+                </div>
 
-        </label>
 
-    </div>
+                <!-- QUESTION 2 -->
 
-    <input
-        type="text"
-        class="other-input"
-        name="course_satisfaction_other"
-        placeholder="Please specify">
+                <div class="question-card">
 
-</div>
+                    <h3>
+                        2. How would you describe the pace at which
+                        the syllabus was covered?
+                    </h3>
 
-<!-- =====================================================
-                    QUESTION 2
-====================================================== -->
+                    <div class="options-grid">
 
-<div class="question-card">
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Too Fast"
+                                required>
 
-    <h3>
-        2. How would you describe the pace at which the syllabus was covered?
-    </h3>
+                            <span>
+                                ⚡ Too Fast
+                            </span>
+                        </label>
 
-    <div class="options-grid">
 
-        <label class="option-card">
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Just Right">
 
-            <input
-                type="radio"
-                name="syllabus_pace"
-                value="Too Fast"
-                required>
+                            <span>
+                                ✅ Just Right
+                            </span>
+                        </label>
 
-            <span>⚡ Too Fast</span>
 
-        </label>
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Too Slow">
 
-        <label class="option-card">
+                            <span>
+                                🐢 Too Slow
+                            </span>
+                        </label>
 
-            <input
-                type="radio"
-                name="syllabus_pace"
-                value="Just Right">
 
-            <span>✅ Just Right</span>
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Other">
 
-        </label>
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
 
-        <label class="option-card">
+                    </div>
 
-            <input
-                type="radio"
-                name="syllabus_pace"
-                value="Too Slow">
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="syllabus_pace_other"
+                        placeholder="Please specify">
 
-            <span>🐢 Too Slow</span>
+                </div>
 
-        </label>
 
-        <label class="option-card other-option">
+                <!-- QUESTION 3 -->
 
-            <input
-                type="radio"
-                name="syllabus_pace"
-                value="Other">
+                <div class="question-card">
 
-            <span>✏ Other</span>
+                    <h3>
+                        3. How clear and understandable were the
+                        concepts explained during lectures?
+                    </h3>
 
-        </label>
+                    <div class="options-grid">
 
-    </div>
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Very Clear"
+                                required>
 
-    <input
-        type="text"
-        class="other-input"
-        name="syllabus_pace_other"
-        placeholder="Please specify">
+                            <span>
+                                🌟 Very Clear
+                            </span>
+                        </label>
 
-</div>
 
-<!-- =====================================================
-                    QUESTION 3
-====================================================== -->
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Mostly Clear">
 
-<div class="question-card">
+                            <span>
+                                👍 Mostly Clear
+                            </span>
+                        </label>
 
-    <h3>
-        3. How clear and understandable were the concepts explained during lectures?
-    </h3>
 
-    <div class="options-grid">
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Rarely Clear">
 
-        <label class="option-card">
+                            <span>
+                                ⚠ Rarely Clear
+                            </span>
+                        </label>
 
-            <input
-                type="radio"
-                name="concept_clarity"
-                value="Very Clear"
-                required>
 
-            <span>🌟 Very Clear</span>
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Other">
 
-        </label>
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
 
-        <label class="option-card">
+                    </div>
 
-            <input
-                type="radio"
-                name="concept_clarity"
-                value="Mostly Clear">
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="concept_clarity_other"
+                        placeholder="Please specify">
 
-            <span>👍 Mostly Clear</span>
+                </div>
 
-        </label>
+            </section>
 
-        <label class="option-card">
 
-            <input
-                type="radio"
-                name="concept_clarity"
-                value="Rarely Clear">
+            <!-- =================================================
+                       PRACTICAL LEARNING
+            ================================================== -->
 
-            <span>⚠ Rarely Clear</span>
+            <section class="form-section">
 
-        </label>
+                <div class="section-heading">
 
-        <label class="option-card other-option">
+                    <h2>
+                        Practical Learning
+                    </h2>
 
-            <input
-                type="radio"
-                name="concept_clarity"
-                value="Other">
+                    <p>
+                        Tell us about your practical sessions
+                        and learning resources.
+                    </p>
 
-            <span>✏ Other</span>
+                </div>
 
-        </label>
 
-    </div>
+                <!-- QUESTION 4 -->
 
-    <input
-        type="text"
-        class="other-input"
-        name="concept_clarity_other"
-        placeholder="Please specify">
+                <div class="question-card">
 
-</div>
+                    <h3>
+                        4. How effective were the practical sessions?
+                    </h3>
 
-</section>
-<!-- =====================================================
-                PRACTICAL LEARNING
-====================================================== -->
+                    <div class="options-grid">
 
-<section class="form-section">
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Highly Effective"
+                                required>
 
-    <div class="section-heading">
+                            <span>
+                                🚀 Highly Effective
+                            </span>
+                        </label>
 
-        <h2>Practical Learning</h2>
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Moderately Effective">
+
+                            <span>
+                                👍 Moderately Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Slightly Effective">
+
+                            <span>
+                                🙂 Slightly Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Not Effective">
+
+                            <span>
+                                👎 Not Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="practical_work_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 5 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        5. How helpful were the study materials?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Very Helpful"
+                                required>
+
+                            <span>
+                                📘 Very Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Somewhat Helpful">
+
+                            <span>
+                                📗 Somewhat Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Neutral">
+
+                            <span>
+                                ⚖ Neutral
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Not Helpful">
+
+                            <span>
+                                📕 Not Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="study_material_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                          ASSESSMENTS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Assessments
+                    </h2>
+
+                    <p>
+                        Share your experience with exams
+                        and faculty support.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 6 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        6. How would you rate the difficulty
+                        level of assessments?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Too Difficult"
+                                required>
+
+                            <span>
+                                📚 Too Difficult
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Challenging but Fair">
+
+                            <span>
+                                ✅ Challenging but Fair
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Too Easy">
+
+                            <span>
+                                😄 Too Easy
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="exam_difficulty_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 7 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        7. How available was the faculty outside
+                        regular class hours?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Always Available"
+                                required>
+
+                            <span>
+                                🟢 Always Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Sometimes Available">
+
+                            <span>
+                                🟡 Sometimes Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Rarely Available">
+
+                            <span>
+                                🟠 Rarely Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Did not Contact">
+
+                            <span>
+                                ⚪ Did not Contact
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="faculty_support_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       FUTURE IMPROVEMENTS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Future Improvements
+                    </h2>
+
+                    <p>
+                        Help us improve future courses.
+                    </p>
+
+                </div>
+
+<!-- =================================================
+                         FEEDBACK FORM
+        ================================================== -->
+
+        <form id="feedback-form">
+
+
+            <!-- =================================================
+                         COURSE EXPERIENCE
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Course Experience
+                    </h2>
+
+                    <p>
+                        Share your experience regarding the course,
+                        lectures and syllabus.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 1 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        1. How would you rate your overall experience
+                        and satisfaction with this course?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Excellent"
+                                required>
+
+                            <span>
+                                ⭐ Excellent
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Good">
+
+                            <span>
+                                👍 Good
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Average">
+
+                            <span>
+                                😐 Average
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Poor">
+
+                            <span>
+                                👎 Poor
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="course_satisfaction_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 2 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        2. How would you describe the pace at which
+                        the syllabus was covered?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Too Fast"
+                                required>
+
+                            <span>
+                                ⚡ Too Fast
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Just Right">
+
+                            <span>
+                                ✅ Just Right
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Too Slow">
+
+                            <span>
+                                🐢 Too Slow
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="syllabus_pace_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 3 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        3. How clear and understandable were the
+                        concepts explained during lectures?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Very Clear"
+                                required>
+
+                            <span>
+                                🌟 Very Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Mostly Clear">
+
+                            <span>
+                                👍 Mostly Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Rarely Clear">
+
+                            <span>
+                                ⚠ Rarely Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="concept_clarity_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       PRACTICAL LEARNING
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Practical Learning
+                    </h2>
+
+                    <p>
+                        Tell us about your practical sessions
+                        and learning resources.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 4 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        4. How effective were the practical sessions?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Highly Effective"
+                                required>
+
+                            <span>
+                                🚀 Highly Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Moderately Effective">
+
+                            <span>
+                                👍 Moderately Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Slightly Effective">
+
+                            <span>
+                                🙂 Slightly Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Not Effective">
+
+                            <span>
+                                👎 Not Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="practical_work_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 5 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        5. How helpful were the study materials?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Very Helpful"
+                                required>
+
+                            <span>
+                                📘 Very Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Somewhat Helpful">
+
+                            <span>
+                                📗 Somewhat Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Neutral">
+
+                            <span>
+                                ⚖ Neutral
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Not Helpful">
+
+                            <span>
+                                📕 Not Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="study_material_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                          ASSESSMENTS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Assessments
+                    </h2>
+
+                    <p>
+                        Share your experience with exams
+                        and faculty support.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 6 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        6. How would you rate the difficulty
+                        level of assessments?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Too Difficult"
+                                required>
+
+                            <span>
+                                📚 Too Difficult
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Challenging but Fair">
+
+                            <span>
+                                ✅ Challenging but Fair
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Too Easy">
+
+                            <span>
+                                😄 Too Easy
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="exam_difficulty_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 7 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        7. How available was the faculty outside
+                        regular class hours?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Always Available"
+                                required>
+
+                            <span>
+                                🟢 Always Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Sometimes Available">
+
+                            <span>
+                                🟡 Sometimes Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Rarely Available">
+
+                            <span>
+                                🟠 Rarely Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Did not Contact">
+
+                            <span>
+                                ⚪ Did not Contact
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="faculty_support_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       FUTURE IMPROVEMENTS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Future Improvements
+                    </h2>
+
+                    <p>
+                        Help us improve future courses.
+                    </p>
+
+                </div>
+                <!-- QUESTION 8 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        8. What is your primary suggestion
+                        for improving this course?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="More Practical Sessions"
+                                required>
+
+                            <span>
+                                🛠 More Practical Sessions
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="Better Study Materials">
+
+                            <span>
+                                📚 Better Study Materials
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="Better Grading Guidelines">
+
+                            <span>
+                                📝 Better Grading Guidelines
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="Reduce Workload">
+
+                            <span>
+                                ⚖ Reduce Workload
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="improvement_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       ADDITIONAL SUGGESTIONS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Additional Suggestions
+                    </h2>
+
+                    <p>
+                        Share anything else that could improve
+                        the learning experience.
+                    </p>
+
+                </div>
+
+
+                <div class="question-card">
+
+                    <textarea
+                        id="comments"
+                        name="comments"
+                        maxlength="500"
+                        rows="8"
+                        placeholder="Write your suggestions here..."></textarea>
+
+
+                    <div class="textarea-footer">
+
+                        <span id="word-warning"></span>
+
+                        <span id="char-count">
+                            0 / 500
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                         SUBMIT
+            ================================================== -->
+
+            <div class="submit-section">
+
+                <button
+                    type="submit"
+                    class="submit-btn">
+
+                    Submit Feedback
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </main>
+ <!-- =================================================
+                         FEEDBACK FORM
+        ================================================== -->
+
+        <form id="feedback-form">
+
+
+            <!-- =================================================
+                         COURSE EXPERIENCE
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Course Experience
+                    </h2>
+
+                    <p>
+                        Share your experience regarding the course,
+                        lectures and syllabus.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 1 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        1. How would you rate your overall experience
+                        and satisfaction with this course?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Excellent"
+                                required>
+
+                            <span>
+                                ⭐ Excellent
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Good">
+
+                            <span>
+                                👍 Good
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Average">
+
+                            <span>
+                                😐 Average
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Poor">
+
+                            <span>
+                                👎 Poor
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="course_satisfaction_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 2 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        2. How would you describe the pace at which
+                        the syllabus was covered?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Too Fast"
+                                required>
+
+                            <span>
+                                ⚡ Too Fast
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Just Right">
+
+                            <span>
+                                ✅ Just Right
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Too Slow">
+
+                            <span>
+                                🐢 Too Slow
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="syllabus_pace_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 3 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        3. How clear and understandable were the
+                        concepts explained during lectures?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Very Clear"
+                                required>
+
+                            <span>
+                                🌟 Very Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Mostly Clear">
+
+                            <span>
+                                👍 Mostly Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Rarely Clear">
+
+                            <span>
+                                ⚠ Rarely Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="concept_clarity_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       PRACTICAL LEARNING
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Practical Learning
+                    </h2>
+
+                    <p>
+                        Tell us about your practical sessions
+                        and learning resources.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 4 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        4. How effective were the practical sessions?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Highly Effective"
+                                required>
+
+                            <span>
+                                🚀 Highly Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Moderately Effective">
+
+                            <span>
+                                👍 Moderately Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Slightly Effective">
+
+                            <span>
+                                🙂 Slightly Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Not Effective">
+
+                            <span>
+                                👎 Not Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="practical_work_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 5 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        5. How helpful were the study materials?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Very Helpful"
+                                required>
+
+                            <span>
+                                📘 Very Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Somewhat Helpful">
+
+                            <span>
+                                📗 Somewhat Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Neutral">
+
+                            <span>
+                                ⚖ Neutral
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Not Helpful">
+
+                            <span>
+                                📕 Not Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="study_material_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                          ASSESSMENTS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Assessments
+                    </h2>
+
+                    <p>
+                        Share your experience with exams
+                        and faculty support.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 6 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        6. How would you rate the difficulty
+                        level of assessments?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Too Difficult"
+                                required>
+
+                            <span>
+                                📚 Too Difficult
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Challenging but Fair">
+
+                            <span>
+                                ✅ Challenging but Fair
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Too Easy">
+
+                            <span>
+                                😄 Too Easy
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="exam_difficulty_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 7 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        7. How available was the faculty outside
+                        regular class hours?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Always Available"
+                                required>
+
+                            <span>
+                                🟢 Always Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Sometimes Available">
+
+                            <span>
+                                🟡 Sometimes Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Rarely Available">
+
+                            <span>
+                                🟠 Rarely Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Did not Contact">
+
+                            <span>
+                                ⚪ Did not Contact
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="faculty_support_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       FUTURE IMPROVEMENTS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Future Improvements
+                    </h2>
+
+                    <p>
+                        Help us improve future courses.
+                    </p>
+
+                </div>
+
+<!-- =================================================
+                         FEEDBACK FORM
+        ================================================== -->
+
+        <form id="feedback-form">
+
+
+            <!-- =================================================
+                         COURSE EXPERIENCE
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Course Experience
+                    </h2>
+
+                    <p>
+                        Share your experience regarding the course,
+                        lectures and syllabus.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 1 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        1. How would you rate your overall experience
+                        and satisfaction with this course?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Excellent"
+                                required>
+
+                            <span>
+                                ⭐ Excellent
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Good">
+
+                            <span>
+                                👍 Good
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Average">
+
+                            <span>
+                                😐 Average
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Poor">
+
+                            <span>
+                                👎 Poor
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="course_satisfaction"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="course_satisfaction_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 2 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        2. How would you describe the pace at which
+                        the syllabus was covered?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Too Fast"
+                                required>
+
+                            <span>
+                                ⚡ Too Fast
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Just Right">
+
+                            <span>
+                                ✅ Just Right
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Too Slow">
+
+                            <span>
+                                🐢 Too Slow
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="syllabus_pace"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="syllabus_pace_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 3 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        3. How clear and understandable were the
+                        concepts explained during lectures?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Very Clear"
+                                required>
+
+                            <span>
+                                🌟 Very Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Mostly Clear">
+
+                            <span>
+                                👍 Mostly Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Rarely Clear">
+
+                            <span>
+                                ⚠ Rarely Clear
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="concept_clarity"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="concept_clarity_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       PRACTICAL LEARNING
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Practical Learning
+                    </h2>
+
+                    <p>
+                        Tell us about your practical sessions
+                        and learning resources.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 4 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        4. How effective were the practical sessions?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Highly Effective"
+                                required>
+
+                            <span>
+                                🚀 Highly Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Moderately Effective">
+
+                            <span>
+                                👍 Moderately Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Slightly Effective">
+
+                            <span>
+                                🙂 Slightly Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Not Effective">
+
+                            <span>
+                                👎 Not Effective
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="practical_work"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="practical_work_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 5 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        5. How helpful were the study materials?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Very Helpful"
+                                required>
+
+                            <span>
+                                📘 Very Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Somewhat Helpful">
+
+                            <span>
+                                📗 Somewhat Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Neutral">
+
+                            <span>
+                                ⚖ Neutral
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Not Helpful">
+
+                            <span>
+                                📕 Not Helpful
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="study_material"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="study_material_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                          ASSESSMENTS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Assessments
+                    </h2>
+
+                    <p>
+                        Share your experience with exams
+                        and faculty support.
+                    </p>
+
+                </div>
+
+
+                <!-- QUESTION 6 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        6. How would you rate the difficulty
+                        level of assessments?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Too Difficult"
+                                required>
+
+                            <span>
+                                📚 Too Difficult
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Challenging but Fair">
+
+                            <span>
+                                ✅ Challenging but Fair
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Too Easy">
+
+                            <span>
+                                😄 Too Easy
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="exam_difficulty"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="exam_difficulty_other"
+                        placeholder="Please specify">
+
+                </div>
+
+
+                <!-- QUESTION 7 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        7. How available was the faculty outside
+                        regular class hours?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Always Available"
+                                required>
+
+                            <span>
+                                🟢 Always Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Sometimes Available">
+
+                            <span>
+                                🟡 Sometimes Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Rarely Available">
+
+                            <span>
+                                🟠 Rarely Available
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Did not Contact">
+
+                            <span>
+                                ⚪ Did not Contact
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="faculty_support"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="faculty_support_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       FUTURE IMPROVEMENTS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Future Improvements
+                    </h2>
+
+                    <p>
+                        Help us improve future courses.
+                    </p>
+
+                </div>
+                <!-- QUESTION 8 -->
+
+                <div class="question-card">
+
+                    <h3>
+                        8. What is your primary suggestion
+                        for improving this course?
+                    </h3>
+
+                    <div class="options-grid">
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="More Practical Sessions"
+                                required>
+
+                            <span>
+                                🛠 More Practical Sessions
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="Better Study Materials">
+
+                            <span>
+                                📚 Better Study Materials
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="Better Grading Guidelines">
+
+                            <span>
+                                📝 Better Grading Guidelines
+                            </span>
+                        </label>
+
+
+                        <label class="option-card">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="Reduce Workload">
+
+                            <span>
+                                ⚖ Reduce Workload
+                            </span>
+                        </label>
+
+
+                        <label class="option-card other-option">
+                            <input
+                                type="radio"
+                                name="improvement"
+                                value="Other">
+
+                            <span>
+                                ✏ Other
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        class="other-input"
+                        name="improvement_other"
+                        placeholder="Please specify">
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                       ADDITIONAL SUGGESTIONS
+            ================================================== -->
+
+            <section class="form-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Additional Suggestions
+                    </h2>
+
+                    <p>
+                        Share anything else that could improve
+                        the learning experience.
+                    </p>
+
+                </div>
+
+
+                <div class="question-card">
+
+                    <textarea
+                        id="comments"
+                        name="comments"
+                        maxlength="500"
+                        rows="8"
+                        placeholder="Write your suggestions here..."></textarea>
+
+
+                    <div class="textarea-footer">
+
+                        <span id="word-warning"></span>
+
+                        <span id="char-count">
+                            0 / 500
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                         SUBMIT
+            ================================================== -->
+
+            <div class="submit-section">
+
+                <button
+                    type="submit"
+                    class="submit-btn">
+
+                    Submit Feedback
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </main>
+
+
+    <!-- =====================================================
+                          FOOTER
+    ====================================================== -->
+
+    <footer>
 
         <p>
-
-            Tell us about your practical sessions and learning resources.
-
+            © 2026 Anonymous Student Feedback System
         </p>
 
-    </div>
+    </footer>
 
-    <!-- ==============================================
-                    QUESTION 4
-    =============================================== -->
 
-    <div class="question-card">
+    <!-- =====================================================
+                         JAVASCRIPT
+    ====================================================== -->
 
-        <h3>
-
-            4. How effective were the practical sessions?
-
-        </h3>
-
-        <div class="options-grid">
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="practical_work"
-                    value="Highly Effective"
-                    required>
-
-                <span>🚀 Highly Effective</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="practical_work"
-                    value="Moderately Effective">
-
-                <span>👍 Moderately Effective</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="practical_work"
-                    value="Slightly Effective">
-
-                <span>🙂 Slightly Effective</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="practical_work"
-                    value="Not Effective">
-
-                <span>👎 Not Effective</span>
-
-            </label>
-
-            <label class="option-card other-option">
-
-                <input
-                    type="radio"
-                    name="practical_work"
-                    value="Other">
-
-                <span>✏ Other</span>
-
-            </label>
-
-        </div>
-
-        <input
-            type="text"
-            class="other-input"
-            name="practical_work_other"
-            placeholder="Please specify">
-
-    </div>
-
-    <!-- ==============================================
-                    QUESTION 5
-    =============================================== -->
-
-    <div class="question-card">
-
-        <h3>
-
-            5. How helpful were the study materials?
-
-        </h3>
-
-        <div class="options-grid">
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="study_material"
-                    value="Very Helpful"
-                    required>
-
-                <span>📘 Very Helpful</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="study_material"
-                    value="Somewhat Helpful">
-
-                <span>📗 Somewhat Helpful</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="study_material"
-                    value="Neutral">
-
-                <span>⚖ Neutral</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="study_material"
-                    value="Not Helpful">
-
-                <span>📕 Not Helpful</span>
-
-            </label>
-
-            <label class="option-card other-option">
-
-                <input
-                    type="radio"
-                    name="study_material"
-                    value="Other">
-
-                <span>✏ Other</span>
-
-            </label>
-
-        </div>
-
-        <input
-            type="text"
-            class="other-input"
-            name="study_material_other"
-            placeholder="Please specify">
-
-    </div>
-
-</section>
-<!-- =====================================================
-                    ASSESSMENT
-====================================================== -->
-
-<section class="form-section">
-
-    <div class="section-heading">
-
-        <h2>Assessments</h2>
-
-        <p>
-
-            Share your experience with exams and faculty support.
-
-        </p>
-
-    </div>
-
-    <!-- ==============================================
-                    QUESTION 6
-    =============================================== -->
-
-    <div class="question-card">
-
-        <h3>
-
-            6. How would you rate the difficulty level of assessments?
-
-        </h3>
-
-        <div class="options-grid">
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="exam_difficulty"
-                    value="Too Difficult"
-                    required>
-
-                <span>📚 Too Difficult</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="exam_difficulty"
-                    value="Challenging but Fair">
-
-                <span>✅ Challenging but Fair</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="exam_difficulty"
-                    value="Too Easy">
-
-                <span>😄 Too Easy</span>
-
-            </label>
-
-            <label class="option-card other-option">
-
-                <input
-                    type="radio"
-                    name="exam_difficulty"
-                    value="Other">
-
-                <span>✏ Other</span>
-
-            </label>
-
-        </div>
-
-        <input
-            type="text"
-            class="other-input"
-            name="exam_difficulty_other"
-            placeholder="Please specify">
-
-    </div>
-
-    <!-- ==============================================
-                    QUESTION 7
-    =============================================== -->
-
-    <div class="question-card">
-
-        <h3>
-
-            7. How available was the faculty outside regular class hours?
-
-        </h3>
-
-        <div class="options-grid">
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="faculty_support"
-                    value="Always Available"
-                    required>
-
-                <span>🟢 Always Available</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="faculty_support"
-                    value="Sometimes Available">
-
-                <span>🟡 Sometimes Available</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="faculty_support"
-                    value="Rarely Available">
-
-                <span>🟠 Rarely Available</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="faculty_support"
-                    value="Did not Contact">
-
-                <span>⚪ Did not Contact</span>
-
-            </label>
-
-            <label class="option-card other-option">
-
-                <input
-                    type="radio"
-                    name="faculty_support"
-                    value="Other">
-
-                <span>✏ Other</span>
-
-            </label>
-
-        </div>
-
-        <input
-            type="text"
-            class="other-input"
-            name="faculty_support_other"
-            placeholder="Please specify">
-
-    </div>
-
-</section>
-<!-- =====================================================
-                FUTURE IMPROVEMENTS
-====================================================== -->
-
-<section class="form-section">
-
-    <div class="section-heading">
-
-        <h2>Future Improvements</h2>
-
-        <p>
-
-            Help us improve future courses.
-
-        </p>
-
-    </div>
-
-    <!-- ==============================================
-                    QUESTION 8
-    =============================================== -->
-
-    <div class="question-card">
-
-        <h3>
-
-            8. What is your primary suggestion for improving this course?
-
-        </h3>
-
-        <div class="options-grid">
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="improvement"
-                    value="More Practical Sessions"
-                    required>
-
-                <span>🛠 More Practical Sessions</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="improvement"
-                    value="Better Study Materials">
-
-                <span>📚 Better Study Materials</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="improvement"
-                    value="Better Grading Guidelines">
-
-                <span>📝 Better Grading Guidelines</span>
-
-            </label>
-
-            <label class="option-card">
-
-                <input
-                    type="radio"
-                    name="improvement"
-                    value="Reduce Workload">
-
-                <span>⚖ Reduce Workload</span>
-
-            </label>
-
-            <label class="option-card other-option">
-
-                <input
-                    type="radio"
-                    name="improvement"
-                    value="Other">
-
-                <span>✏ Other</span>
-
-            </label>
-
-        </div>
-
-        <input
-            type="text"
-            class="other-input"
-            name="improvement_other"
-            placeholder="Please specify">
-
-    </div>
-
-</section>
-
-<!-- =====================================================
-            ADDITIONAL SUGGESTIONS
-====================================================== -->
-
-<section class="form-section">
-
-    <div class="section-heading">
-
-        <h2>Additional Suggestions</h2>
-
-        <p>
-
-            Share anything else that could improve the learning experience.
-
-        </p>
-
-    </div>
-
-    <div class="question-card">
-
-        <textarea
-
-            id="comments"
-
-            name="comments"
-
-            maxlength="500"
-
-            rows="8"
-
-            placeholder="Write your suggestions here..."></textarea>
-
-        <div class="textarea-footer">
-
-            <span id="word-warning"></span>
-
-            <span id="char-count">
-
-                0 / 500
-
-            </span>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- =====================================================
-                SUBMIT BUTTON
-====================================================== -->
-
-<div class="submit-section">
-
-    <button
-
-        type="submit"
-
-        class="submit-btn">
-
-        Submit Feedback
-
-    </button>
-
-</div>
-
-</form>
-
-</main>
-
-<!-- =====================================================
-                    FOOTER
-====================================================== -->
-
-<footer>
-
-    <p>
-
-        © 2026 Anonymous Student Feedback System
-
-    </p>
-
-</footer>
-
-<script src="/js/feedback.js"></script>
-<script src="/js/darkmode.js"></script>
+    <script src="/js/feedback.js"></script>
+    <script src="/js/darkmode.js"></script>
 
 </body>
 

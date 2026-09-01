@@ -1,670 +1,1100 @@
-﻿/* =====================================================
-   FACULTY DASHBOARD JAVASCRIPT
-   UPGRADED COMPLETE REPLACEMENT
-===================================================== */
-
-let ratingChartInstance = null;
-let barChartInstance = null;
-
-
-/* =====================================================
+"use strict";
+/* ==========================================================
+   GLOBAL VARIABLES
+========================================================== */
+let performanceChart = null;
+let lastFetchedData = null;
+let realtimeRefreshTimer = null;
+let isRealtimeRefreshing = false;
+const REALTIME_REFRESH_INTERVAL = 10000;
+/* ==========================================================
+   CURRENT FEEDBACK PARAMETERS
+========================================================== */
+const FEEDBACK_PARAMETERS = [
+    {
+        key: "course_satisfaction",
+        label: "Course Satisfaction"
+    },
+    {
+        key: "syllabus_pace",
+        label: "Syllabus Pace"
+    },
+    {
+        key: "concept_clarity",
+        label: "Concept Clarity"
+    },
+    {
+        key: "practical_work",
+        label: "Practical Work"
+    },
+    {
+        key: "study_material",
+        label: "Study Material"
+    },
+    {
+        key: "exam_difficulty",
+        label: "Exam Difficulty"
+    },
+    {
+        key: "faculty_support",
+        label: "Faculty Support"
+    },
+    {
+        key: "improvement",
+        label: "Improvement"
+    }
+];
+/* ==========================================================
    PAGE INITIALIZATION
-===================================================== */
-
+========================================================== */
 document.addEventListener("DOMContentLoaded", () => {
 
-    console.log("======================================");
-    console.log("FACULTY DASHBOARD INITIALIZING");
-    console.log("======================================");
+    initializeTheme();
 
-    loadDashboard();
+    initializeFilters();
+
+    initializeSubmissionChecklist();
+
+    loadFaculty();
+
+    loadFeedback();
+
+    startRealtimeRefresh();
 
 });
-
-
-/* =====================================================
-   MAIN DASHBOARD LOADER
-===================================================== */
-
-async function loadDashboard() {
-
-    try {
-
-        const facultyLoaded = await loadFaculty();
-
-        if (!facultyLoaded) {
-            return;
-        }
-
-        await loadFeedback();
-
-        console.log("======================================");
-        console.log("FACULTY DASHBOARD LOADED");
-        console.log("======================================");
-
-    } catch (error) {
-
-        console.error(
-            "Dashboard Initialization Error:",
-            error
-        );
-
-    }
-
+/* ==========================================================
+   SAFE DOM HELPERS
+========================================================== */
+function getElement(id) {
+    return document.getElementById(id);
 }
+function setText(id, value) {
 
-
-/* =====================================================
-   LOAD FACULTY INFORMATION
-===================================================== */
-
-async function loadFaculty() {
-
-    try {
-
-        const response = await fetch(
-            "/faculty/info",
-            {
-                credentials: "include",
-                cache: "no-store"
-            }
-        );
-
-
-        if (response.status === 401) {
-
-            window.location.replace(
-                "/auth/faculty.html"
-            );
-
-            return false;
-
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Faculty info request failed: " +
-                response.status
-            );
-
-        }
-
-
-        const data = await response.json();
-
-
-        if (!data.success || !data.faculty) {
-
-            window.location.replace(
-                "/auth/faculty.html"
-            );
-
-            return false;
-
-        }
-
-
-        const faculty = data.faculty;
-
-
-        /* =============================================
-           BASIC FACULTY INFORMATION
-        ============================================= */
-
-        setText(
-    "welcome",
-    "Welcome, " +
-    (faculty.name || "Faculty") +
-    " " +
-    htmlEntity("wave")
-);
-
-
-        setText(
-            "faculty-id",
-            faculty.faculty_id || "N/A"
-        );
-
-
-        setText(
-            "faculty-name",
-            faculty.name || "N/A"
-        );
-
-
-        setText(
-            "faculty-email",
-            faculty.email || "N/A"
-        );
-
-
-        setText(
-            "faculty-department",
-            faculty.department || "N/A"
-        );
-
-
-        /* =============================================
-           SUBJECTS
-
-           BACKEND RETURNS:
-
-           subjects: []
-
-           NOT:
-
-           subject: ""
-        ============================================= */
-
-        const subjects = Array.isArray(
-            faculty.subjects
-        )
-            ? faculty.subjects
-                .map(subject =>
-                    String(subject || "").trim()
-                )
-                .filter(Boolean)
-            : [];
-
-
-        setFacultySubjects(
-            subjects
-        );
-
-
-        console.log(
-            "Faculty:",
-            faculty
-        );
-
-
-        console.log(
-            "Faculty Subjects:",
-            subjects
-        );
-
-
-        return true;
-
-    } catch (error) {
-
-        console.error(
-            "Faculty Info Error:",
-            error
-        );
-
-        showFacultyInfoError();
-
-        return false;
-
-    }
-
-}
-
-
-/* =====================================================
-   SET FACULTY SUBJECTS
-===================================================== */
-
-function setFacultySubjects(subjects) {
-
-    const element =
-        document.getElementById(
-            "faculty-subject"
-        );
-
+    const element = getElement(id);
 
     if (!element) {
         return;
     }
 
+    element.textContent =
+        value === null ||
+        value === undefined ||
+        value === ""
+            ? "—"
+            : String(value);
+}
+/* ==========================================================
+   THEME
+========================================================== */
+function initializeTheme() {
 
-    if (
-        !Array.isArray(subjects) ||
-        subjects.length === 0
-    ) {
+    const button = getElement("dark-mode-btn");
 
-        element.textContent =
-            "Not Assigned";
-
+    if (!button) {
         return;
+    }
+    const isAlreadyLight =
+        document.body.classList.contains("light-mode") ||
+        document.documentElement.dataset.theme === "light" ||
+        document.documentElement.classList.contains("light");
+    applyTheme(
+        isAlreadyLight
+            ? "light"
+            : "dark"
+    );
+    button.addEventListener("click", () => {
+        const isLight =
+            document.body.classList.contains("light-mode") ||
+            document.documentElement.dataset.theme === "light" ||
+            document.documentElement.classList.contains("light");
+        applyTheme(
+            isLight
+                ? "dark"
+                : "light"
+        );
+    });
+}
+function applyTheme(theme) {
+    const body = document.body;
+    const html = document.documentElement;
+    const button = getElement("dark-mode-btn");
+    if (theme === "light") {
+        body.classList.add("light-mode");
+        body.classList.remove("dark-mode");
+        body.classList.remove("dark");
+        html.dataset.theme = "light";
+        html.classList.add("light");
+        html.classList.remove("dark");
+        if (button) {
+            button.textContent = "🌙";
+            button.setAttribute(
+                "aria-label",
+                "Switch to dark mode"
+            );
+            button.setAttribute(
+                "title",
+                "Switch to dark mode"
+            );
+        }
+    } else {
+        body.classList.remove("light-mode");
+        body.classList.add("dark-mode");
+        body.classList.remove("dark");
+        html.dataset.theme = "dark";
+        html.classList.add("dark");
+        html.classList.remove("light");
+        if (button) {
+            button.textContent = "☀️";
+            button.setAttribute(
+                "aria-label",
+                "Switch to light mode"
+            );
+            button.setAttribute(
+                "title",
+                "Switch to light mode"
+            );
+        }
+    }
+    updatePerformanceChartTheme();
+}
+/* ==========================================================
+   API HELPER
+========================================================== */
+async function apiGet(path) {
+    const response = await fetch(path, {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+        headers: {
+            "Accept": "application/json"
+        }
+    });
+    if (!response.ok) {
+        throw new Error(
+            `Request failed: ${response.status} ${response.statusText}`
+        );
+    }
+    return await response.json();
+}
+/* ==========================================================
+   FACULTY INFORMATION
+========================================================== */
+async function loadFaculty() {
+    try {
+        const data =
+            await apiGet("/faculty/info");
+        console.log(
+            "Faculty information:",
+            data
+        );
+        if (!data || data.success === false) {
+            console.warn(
+                "Faculty information unavailable."
+            );
+            return;
+        }
+        const faculty =
+            data.faculty ||
+            data.user ||
+            data.data ||
+            data;
+        const facultyId =
+            faculty.faculty_id ||
+            faculty.facultyId ||
+            faculty.id ||
+            "—";
+        const facultyName =
+            faculty.name ||
+            faculty.faculty_name ||
+            faculty.facultyName ||
+            "Faculty";
+        const department =
+            faculty.department ||
+            faculty.dept ||
+            faculty.department_name ||
+            "—";
+        const email =
+            faculty.email ||
+            faculty.faculty_email ||
+            "—";
+        let subject = "—";
+        if (Array.isArray(faculty.subjects)) {
+            subject =
+                faculty.subjects.join(", ");
+        } else {
+            subject =
+                faculty.subject ||
+                faculty.subject_name ||
+                faculty.subjects ||
+                "—";
+        }
+        setText(
+            "faculty-id",
+            facultyId
+        );
+        setText(
+            "faculty-name",
+            facultyName
+        );
+        setText(
+            "faculty-department",
+            department
+        );
+        setText(
+            "faculty-email",
+            email
+        );
+        setText(
+            "faculty-subject",
+            subject
+        );
+        setText(
+            "faculty-name-header",
+            facultyName
+        );
+        setText(
+            "faculty-department-header",
+            department
+        );
+        setText(
+            "welcome-heading",
+            `Welcome back, ${facultyName} 👋`
+        );
+        setText(
+            "welcome-sub",
+            `${subject} • ${department}`
+        );
+    } catch (error) {
+        console.error(
+            "Failed to load faculty information:",
+            error
+        );
+    }
+}
+/* ==========================================================
+   FEEDBACK DATA
+========================================================== */
+async function loadFeedback() {
+    try {
+        const data =
+            await apiGet("/faculty/feedback");
+        console.log(
+            "Faculty feedback:",
+            data
+        );
+        if (!data || data.success === false) {
+            console.warn(
+                "Faculty feedback data unavailable."
+            );
+            showNoFeedbackState();
+            return;
+        }
+        lastFetchedData = data;
+        /* --------------------------------------------------
+           TOTAL FEEDBACK
+        -------------------------------------------------- */
+        const totalFeedback =
+            getNumberFromObjects(
+                [
+                    data,
+                    data.statistics,
+                    data.stats,
+                    data.summary,
+                    data.overview
+                ],
+                [
+                    "totalFeedback",
+                    "total",
+                    "count",
+                    "feedbackCount"
+                ]
+            );
+        /* --------------------------------------------------
+           RATINGS
+        -------------------------------------------------- */
+        const ratings =
+            extractRatings(data);
+        const overall =
+            getNumberFromObjects(
+                [
+                    data,
+                    data.statistics,
+                    data.stats,
+                    data.summary,
+                    data.averages
+                ],
+                [
+                    "overall",
+                    "overallRating",
+                    "overallAverage",
+                    "averageRating"
+                ]
+            ) ||
+            calculateAverage(
+                Object.values(ratings)
+            );
+        setText(
+            "overall-rating",
+            formatRating(overall)
+        );
+        setText(
+            "total-feedback",
+            totalFeedback
+        );
+        /* --------------------------------------------------
+           ACTIVE / CURRENT CYCLE
+        -------------------------------------------------- */
+        const cycles =
+            getCycles(data);
+        const currentCycle =
+            getActiveCycle(data, cycles);
+        const cycleLabel =
+            getCycleLabel(
+                data,
+                currentCycle
+            );
+        setText(
+            "cycle-label",
+            cycleLabel
+        );
+        setText(
+            "cycle-label-small",
+            cycleLabel
+        );
+        /* --------------------------------------------------
+           CURRENT RESPONSES
+        -------------------------------------------------- */
+        const cycleResponses =
+            getCurrentCycleResponses(
+                data,
+                currentCycle
+            );
+        setText(
+            "cycle-responses",
+            cycleResponses
+        );
+        /* --------------------------------------------------
+           RATING BREAKDOWN
+        -------------------------------------------------- */
+        renderRatingBreakdown(
+            ratings
+        );
+        /* --------------------------------------------------
+           PERFORMANCE CHART
+        -------------------------------------------------- */
+        renderPerformanceChart(
+            cycles
+        );
+        /* --------------------------------------------------
+           FEEDBACK HISTORY
+        -------------------------------------------------- */
+        populateFeedbackHistory(
+            cycles
+        );
+        /* --------------------------------------------------
+           PARTICIPATION
+        -------------------------------------------------- */
+        renderParticipation(
+            data,
+            currentCycle
+        );
+        /* --------------------------------------------------
+           INSIGHTS
+        -------------------------------------------------- */
+        renderInsights(
+            data,
+            ratings,
+            currentCycle
+        );
+        /* --------------------------------------------------
+           COMMENTS
+        -------------------------------------------------- */
+        renderComments(
+            data.feedback ||
+            data.comments ||
+            data.recentFeedback ||
+            []
+        );
+    } catch (error) {
+        console.error(
+            "Failed to load faculty feedback:",
+            error
+        );
+        showFeedbackError();
+    }
+}
+/* ==========================================================
+   GET ACTIVE CYCLE
+========================================================== */
+function getActiveCycle(data, cycles) {
+    /*
+       Preferred source:
 
+       data.activeCycle
+
+       This allows the backend to explicitly tell the
+       dashboard which cycle is active.
+
+       Example:
+
+       {
+           activeCycle: {
+               id: 2,
+               name: "August 2026",
+               status: "active"
+           }
+       }
+    */
+    const backendActiveCycle =
+        data?.activeCycle ||
+        data?.currentCycle ||
+        data?.active_cycle ||
+        null;
+    if (
+        backendActiveCycle &&
+        typeof backendActiveCycle === "object"
+    ) {
+        return backendActiveCycle;
+    }
+    /*
+       If the backend returns cycles containing status,
+       search specifically for status = active.
+
+       We DO NOT assume cycles[0] is active.
+    */
+    if (Array.isArray(cycles)) {
+
+        const activeCycle =
+            cycles.find(
+                cycle =>
+                    String(
+                        cycle?.status || ""
+                    ).toLowerCase() === "active"
+            );
+
+        if (activeCycle) {
+            return activeCycle;
+        }
     }
 
 
     /*
-       Display all unique subjects.
+       No active cycle.
+
+       This is intentional.
+
+       The dashboard should not silently treat an old
+       cycle as the current cycle.
     */
 
-    const uniqueSubjects = [
-        ...new Set(subjects)
+    return null;
+}
+
+
+/* ==========================================================
+   CYCLE LABEL
+========================================================== */
+
+function getCycleLabel(
+    data,
+    currentCycle
+) {
+
+    if (!currentCycle) {
+
+        return "No Active Cycle";
+    }
+
+    return (
+        currentCycle.label ||
+        currentCycle.name ||
+        currentCycle.key ||
+        currentCycle.cycle_name ||
+        "Active Cycle"
+    );
+}
+
+
+/* ==========================================================
+   EXTRACT ALL 8 RATINGS
+========================================================== */
+
+function extractRatings(data) {
+
+    const sourceObjects = [
+
+        data?.ratings,
+        data?.averages,
+        data?.statistics,
+        data?.stats,
+        data?.summary,
+        data
+
+    ].filter(Boolean);
+
+
+    const ratings = {};
+
+
+    FEEDBACK_PARAMETERS.forEach(
+        parameter => {
+
+            ratings[parameter.key] =
+                getNumberFromObjects(
+                    sourceObjects,
+                    getParameterAliases(
+                        parameter.key
+                    )
+                );
+
+        }
+    );
+
+
+    return ratings;
+}
+
+
+/* ==========================================================
+   PARAMETER ALIASES
+========================================================== */
+
+function getParameterAliases(key) {
+
+    const aliases = {
+
+        course_satisfaction: [
+            "course_satisfaction",
+            "courseSatisfaction",
+            "course_satisfaction_avg",
+            "courseSatisfactionAvg",
+            "course_satisfaction_average",
+            "courseSatisfactionAverage",
+            "course"
+        ],
+
+        syllabus_pace: [
+            "syllabus_pace",
+            "syllabusPace",
+            "syllabus_pace_avg",
+            "syllabusPaceAvg",
+            "syllabus_pace_average",
+            "syllabusPaceAverage",
+            "pace"
+        ],
+
+        concept_clarity: [
+            "concept_clarity",
+            "conceptClarity",
+            "concept_clarity_avg",
+            "conceptClarityAvg",
+            "concept_clarity_average",
+            "conceptClarityAverage",
+            "clarity"
+        ],
+
+        practical_work: [
+            "practical_work",
+            "practicalWork",
+            "practical_work_avg",
+            "practicalWorkAvg",
+            "practical_work_average",
+            "practicalWorkAverage",
+            "practical"
+        ],
+
+        study_material: [
+            "study_material",
+            "studyMaterial",
+            "study_material_avg",
+            "studyMaterialAvg",
+            "study_material_average",
+            "studyMaterialAverage",
+            "material"
+        ],
+
+        exam_difficulty: [
+            "exam_difficulty",
+            "examDifficulty",
+            "exam_difficulty_avg",
+            "examDifficultyAvg",
+            "exam_difficulty_average",
+            "examDifficultyAverage",
+            "exam"
+        ],
+
+        faculty_support: [
+            "faculty_support",
+            "facultySupport",
+            "faculty_support_avg",
+            "facultySupportAvg",
+            "faculty_support_average",
+            "facultySupportAverage",
+            "support"
+        ],
+
+        improvement: [
+            "improvement",
+            "improvement_avg",
+            "improvementAvg",
+            "improvement_average",
+            "improvementAverage"
+        ]
+    };
+
+
+    return aliases[key] || [key];
+}
+
+
+/* ==========================================================
+   NUMBER HELPERS
+========================================================== */
+
+function getNumber(object, keys) {
+
+    if (!object) {
+        return 0;
+    }
+
+    for (const key of keys) {
+
+        if (
+            object[key] !== undefined &&
+            object[key] !== null &&
+            object[key] !== ""
+        ) {
+
+            const value =
+                Number(object[key]);
+
+            if (!Number.isNaN(value)) {
+                return value;
+            }
+        }
+    }
+
+    return 0;
+}
+
+
+function getNumberFromObjects(
+    objects,
+    keys
+) {
+
+    for (const object of objects) {
+
+        if (!object) {
+            continue;
+        }
+
+        const value =
+            getNumber(
+                object,
+                keys
+            );
+
+        if (value > 0) {
+            return value;
+        }
+    }
+
+    return 0;
+}
+
+
+/* ==========================================================
+   AVERAGE
+========================================================== */
+
+function calculateAverage(values) {
+
+    const validValues =
+        values.filter(
+            value =>
+                typeof value === "number" &&
+                !Number.isNaN(value) &&
+                value > 0
+        );
+
+
+    if (validValues.length === 0) {
+        return 0;
+    }
+
+
+    return (
+        validValues.reduce(
+            (sum, value) =>
+                sum + value,
+            0
+        ) /
+        validValues.length
+    );
+}
+
+
+/* ==========================================================
+   FORMAT RATING
+========================================================== */
+
+function formatRating(value) {
+
+    const number =
+        Number(value) || 0;
+
+    return number.toFixed(1);
+}
+
+
+/* ==========================================================
+   GET CYCLES
+========================================================== */
+
+function getCycles(data) {
+
+    const cycles =
+        data?.cycles ||
+        data?.history ||
+        data?.months ||
+        data?.monthlyTrend ||
+        [];
+
+
+    if (!Array.isArray(cycles)) {
+        return [];
+    }
+
+
+    return cycles;
+}
+
+
+/* ==========================================================
+   CURRENT CYCLE RESPONSES
+========================================================== */
+
+function getCurrentCycleResponses(
+    data,
+    currentCycle
+) {
+
+    if (!currentCycle) {
+        return 0;
+    }
+
+
+    const participation =
+        data?.participation ||
+        {};
+
+
+    const possibleValues = [
+
+        participation.submittedCurrent,
+
+        participation.currentResponses,
+
+        currentCycle.count,
+
+        currentCycle.responses,
+
+        currentCycle.feedbackCount,
+
+        currentCycle.totalResponses,
+
+        data.currentCycle?.responses,
+
+        data.currentCycle?.count,
+
+        data.currentCycle?.feedbackCount
+
     ];
 
 
-    element.textContent =
-        uniqueSubjects.join(", ");
+    for (const value of possibleValues) {
 
-}
+        if (
+            value !== undefined &&
+            value !== null &&
+            value !== ""
+        ) {
 
+            const number =
+                Number(value);
 
-/* =====================================================
-   FACULTY INFO ERROR
-===================================================== */
-
-function showFacultyInfoError() {
-
-    setText(
-        "faculty-id",
-        "Unavailable"
-    );
-
-    setText(
-        "faculty-name",
-        "Unable to load"
-    );
-
-    setText(
-        "faculty-email",
-        "Unable to load"
-    );
-
-    setText(
-        "faculty-department",
-        "Unable to load"
-    );
-
-    setText(
-        "faculty-subject",
-        "Unable to load"
-    );
-
-}
-
-
-/* =====================================================
-   LOAD FEEDBACK
-===================================================== */
-
-async function loadFeedback() {
-
-    try {
-
-        const response = await fetch(
-            "/faculty/feedback",
-            {
-                credentials: "include",
-                cache: "no-store"
+            if (!Number.isNaN(number)) {
+                return number;
             }
-        );
-
-
-        if (response.status === 401) {
-
-            window.location.replace(
-                "/auth/faculty.html"
-            );
-
-            return;
-
         }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Failed to load feedback: " +
-                response.status
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (!data.success) {
-
-            showNoFeedback();
-
-            return;
-
-        }
-
-
-        const feedback =
-            Array.isArray(data.feedback)
-                ? data.feedback
-                : [];
-
-
-        const total =
-            Number(data.total) ||
-            feedback.length ||
-            0;
-
-
-        const teaching =
-            Number(data.teaching) || 0;
-
-
-        const communication =
-            Number(data.communication) || 0;
-
-
-        const behaviour =
-            Number(data.behaviour) || 0;
-
-
-        const teachAverage =
-            Number(data.teachAverage) || 0;
-
-
-        const commAverage =
-            Number(data.commAverage) || 0;
-
-
-        const behaveAverage =
-            Number(data.behaveAverage) || 0;
-
-
-        const overall =
-            Number(data.overall) ||
-            calculateOverall(
-                teachAverage,
-                commAverage,
-                behaveAverage
-            );
-
-
-        /* =================================================
-           MAIN STATISTICS
-        ================================================= */
-
-        animateNumber(
-            "total-feedback",
-            total
-        );
-
-
-        animateNumber(
-            "teaching",
-            teaching
-        );
-
-
-        animateNumber(
-            "communication",
-            communication
-        );
-
-
-        animateNumber(
-            "behaviour",
-            behaviour
-        );
-
-
-        animateNumber(
-            "overall-rating",
-            Math.round(overall)
-        );
-
-
-        /* =================================================
-           PERFORMANCE ANALYSIS
-        ================================================= */
-
-        setProgress(
-            "teach-progress",
-            "teach-percent",
-            ratingToPercent(
-                teachAverage
-            )
-        );
-
-
-        setText(
-            "teach-score",
-            `${teachAverage.toFixed(1)} / 5`
-        );
-
-
-        setProgress(
-            "comm-progress",
-            "comm-percent",
-            ratingToPercent(
-                commAverage
-            )
-        );
-
-
-        setText(
-            "comm-score",
-            `${commAverage.toFixed(1)} / 5`
-        );
-
-
-        setProgress(
-            "behave-progress",
-            "behave-percent",
-            ratingToPercent(
-                behaveAverage
-            )
-        );
-
-
-        setText(
-            "behave-score",
-            `${behaveAverage.toFixed(1)} / 5`
-        );
-
-
-        /* =================================================
-           OVERALL SCORE
-        ================================================= */
-
-        setText(
-            "overall-analysis-score",
-            `${overall.toFixed(1)} / 5`
-        );
-
-
-        setText(
-            "overall-description",
-            getOverallDescription(
-                overall
-            )
-        );
-
-
-        /* =================================================
-           PERFORMANCE INSIGHT
-        ================================================= */
-
-        setText(
-            "performance-insight-text",
-            generatePerformanceInsight(
-                teachAverage,
-                commAverage,
-                behaveAverage,
-                overall
-            )
-        );
-
-
-        /* =================================================
-           REAL-TIME ANALYSIS
-        ================================================= */
-
-        updateRealTimeAnalysis(
-            data,
-            total
-        );
-
-
-        /* =================================================
-           CHARTS
-        ================================================= */
-
-        createCharts(
-            teachAverage,
-            commAverage,
-            behaveAverage
-        );
-
-
-        /* =================================================
-           FEEDBACK
-        ================================================= */
-
-        renderFeedbackList(
-            feedback
-        );
-
-
-        console.log(
-            "Feedback loaded:",
-            total
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Feedback Loading Error:",
-            error
-        );
-
-        showFeedbackError(
-            error.message
-        );
-
     }
 
+
+    return 0;
 }
 
 
-/* =====================================================
-   REAL-TIME ANALYSIS
-===================================================== */
+/* ==========================================================
+   RATING BREAKDOWN
+========================================================== */
 
-function updateRealTimeAnalysis(
-    data,
-    total
-) {
+function renderRatingBreakdown(ratings) {
 
-    const analytics =
-        document.getElementById(
-            "real-time-analysis"
-        );
+    const container =
+        getElement("rating-breakdown");
 
-
-    if (!analytics) {
+    if (!container) {
         return;
     }
 
 
-    const teachAverage =
-        Number(data.teachAverage) || 0;
+    const parameters =
+        FEEDBACK_PARAMETERS.map(
+            parameter => ({
 
+                label:
+                    parameter.label,
 
-    const commAverage =
-        Number(data.commAverage) || 0;
+                value:
+                    Number(
+                        ratings[
+                            parameter.key
+                        ]
+                    ) || 0
 
-
-    const behaveAverage =
-        Number(data.behaveAverage) || 0;
-
-
-    analytics.innerHTML = `
-
-        <div class="analytics-live-card">
-
-            <h3>
-                ${htmlEntity("graduation")}
-                Teaching
-            </h3>
-
-            <div class="average">
-                ${teachAverage.toFixed(1)}/5
-            </div>
-
-            <p class="responses">
-                ${htmlEntity("chart")}
-                ${total} Responses
-            </p>
-
-        </div>
-
-
-        <div class="analytics-live-card">
-
-            <h3>
-                ${htmlEntity("speech")}
-                Communication
-            </h3>
-
-            <div class="average">
-                ${commAverage.toFixed(1)}/5
-            </div>
-
-            <p class="responses">
-                ${htmlEntity("chart")}
-                ${total} Responses
-            </p>
-
-        </div>
-
-
-        <div class="analytics-live-card">
-
-            <h3>
-                ${htmlEntity("thumb")}
-                Behaviour
-            </h3>
-
-            <div class="average">
-                ${behaveAverage.toFixed(1)}/5
-            </div>
-
-            <p class="responses">
-                ${htmlEntity("chart")}
-                ${total} Responses
-            </p>
-
-        </div>
-
-    `;
-
-}
-
-
-/* =====================================================
-   CREATE CHARTS
-===================================================== */
-
-function createCharts(
-    teaching,
-    communication,
-    behaviour
-) {
-
-    const ratingCanvas =
-        document.getElementById(
-            "ratingChart"
+            })
         );
 
 
-    const barCanvas =
-        document.getElementById(
-            "barChart"
+    const hasData =
+        parameters.some(
+            item =>
+                item.value > 0
+        );
+
+
+    if (!hasData) {
+
+        container.innerHTML = `
+            <div class="loading-card">
+                No rating data available yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    parameters.forEach(
+        parameter => {
+
+            const value =
+                Math.max(
+                    0,
+                    Math.min(
+                        5,
+                        parameter.value
+                    )
+                );
+
+
+            const percentage =
+                Math.round(
+                    (value / 5) * 100
+                );
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "breakdown-row";
+
+
+            row.innerHTML = `
+
+                <div class="breakdown-label">
+                    ${escapeHtml(
+                        parameter.label
+                    )}
+                </div>
+
+                <div class="breakdown-bar">
+
+                    <div
+                        class="breakdown-fill"
+                        style="width: ${percentage}%">
+                    </div>
+
+                </div>
+
+                <div class="breakdown-value">
+                    ${value.toFixed(1)}
+                </div>
+
+            `;
+
+
+            container.appendChild(row);
+        }
+    );
+}
+
+
+/* ==========================================================
+   CSS VARIABLE
+========================================================== */
+
+function getCssVariable(name) {
+
+    return getComputedStyle(
+        document.body
+    )
+        .getPropertyValue(name)
+        .trim();
+}
+
+
+/* ==========================================================
+   CHART THEME
+========================================================== */
+
+function updatePerformanceChartTheme() {
+
+    if (!performanceChart) {
+        return;
+    }
+
+
+    const textColor =
+        getCssVariable(
+            "--text-muted"
+        );
+
+    const borderColor =
+        getCssVariable(
+            "--border"
+        );
+
+    const accentColor =
+        getCssVariable(
+            "--accent"
+        );
+
+    const surfaceColor =
+        getCssVariable(
+            "--surface"
+        );
+
+    const textMainColor =
+        getCssVariable(
+            "--text"
+        );
+
+    const textSecondaryColor =
+        getCssVariable(
+            "--text-secondary"
         );
 
 
     if (
-        typeof Chart === "undefined"
+        performanceChart.options.scales?.x
+    ) {
+
+        performanceChart.options.scales.x
+            .ticks.color =
+            textColor;
+    }
+
+
+    if (
+        performanceChart.options.scales?.y
+    ) {
+
+        performanceChart.options.scales.y
+            .ticks.color =
+            textColor;
+
+        performanceChart.options.scales.y
+            .grid.color =
+            borderColor;
+    }
+
+
+    if (
+        performanceChart.data.datasets[0]
+    ) {
+
+        performanceChart.data.datasets[0]
+            .borderColor =
+            accentColor;
+
+        performanceChart.data.datasets[0]
+            .pointBackgroundColor =
+            accentColor;
+
+        performanceChart.data.datasets[0]
+            .pointBorderColor =
+            accentColor;
+    }
+
+
+    if (
+        performanceChart.options.plugins?.tooltip
+    ) {
+
+        performanceChart.options.plugins.tooltip
+            .backgroundColor =
+            surfaceColor;
+
+        performanceChart.options.plugins.tooltip
+            .titleColor =
+            textMainColor;
+
+        performanceChart.options.plugins.tooltip
+            .bodyColor =
+            textSecondaryColor;
+
+        performanceChart.options.plugins.tooltip
+            .borderColor =
+            borderColor;
+    }
+
+
+    performanceChart.update(
+        "none"
+    );
+}
+
+
+/* ==========================================================
+   PERFORMANCE TREND CHART
+========================================================== */
+
+function renderPerformanceChart(
+    cycles
+) {
+
+    const canvas =
+        getElement(
+            "perfTrendChart"
+        );
+
+    if (!canvas) {
+        return;
+    }
+
+
+    if (
+        typeof Chart ===
+        "undefined"
     ) {
 
         console.warn(
@@ -672,801 +1102,1427 @@ function createCharts(
         );
 
         return;
-
     }
 
 
-    /* =================================================
-       DESTROY OLD CHARTS
-    ================================================= */
-
-    if (ratingChartInstance) {
-
-        ratingChartInstance.destroy();
-
-        ratingChartInstance = null;
-
-    }
-
-
-    if (barChartInstance) {
-
-        barChartInstance.destroy();
-
-        barChartInstance = null;
-
-    }
-
-
-    /* =================================================
-       DOUGHNUT CHART
-    ================================================= */
-
-    if (ratingCanvas) {
-
-        ratingChartInstance =
-            new Chart(
-                ratingCanvas,
-                {
-
-                    type: "doughnut",
-
-                    data: {
-
-                        labels: [
-
-                            "Teaching",
-                            "Communication",
-                            "Behaviour"
-
-                        ],
-
-                        datasets: [{
-
-                            data: [
-
-                                teaching,
-                                communication,
-                                behaviour
-
-                            ],
-
-                            backgroundColor: [
-
-                                "#2563eb",
-                                "#3b82f6",
-                                "#60a5fa"
-
-                            ],
-
-                            borderWidth: 0,
-
-                            hoverOffset: 8
-
-                        }]
-
-                    },
-
-                    options: {
-
-                        responsive: true,
-
-                        maintainAspectRatio: false,
-
-                        cutout: "70%",
-
-                        plugins: {
-
-                            legend: {
-
-                                position: "bottom",
-
-                                labels: {
-
-                                    color: "#cbd5e1"
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-            );
-
-    }
-
-
-    /* =================================================
-       BAR CHART
-    ================================================= */
-
-    if (barCanvas) {
-
-        barChartInstance =
-            new Chart(
-                barCanvas,
-                {
-
-                    type: "bar",
-
-                    data: {
-
-                        labels: [
-
-                            "Teaching",
-                            "Communication",
-                            "Behaviour"
-
-                        ],
-
-                        datasets: [{
-
-                            label:
-                                "Average Rating",
-
-                            data: [
-
-                                teaching,
-                                communication,
-                                behaviour
-
-                            ],
-
-                            backgroundColor: [
-
-                                "#2563eb",
-                                "#3b82f6",
-                                "#60a5fa"
-
-                            ],
-
-                            borderRadius: 12
-
-                        }]
-
-                    },
-
-                    options: {
-
-                        responsive: true,
-
-                        maintainAspectRatio: false,
-
-                        scales: {
-
-                            y: {
-
-                                beginAtZero: true,
-
-                                max: 5,
-
-                                ticks: {
-
-                                    color:
-                                        "#94a3b8",
-
-                                    stepSize: 1
-
-                                }
-
-                            },
-
-                            x: {
-
-                                ticks: {
-
-                                    color:
-                                        "#94a3b8"
-
-                                }
-
-                            }
-
-                        },
-
-                        plugins: {
-
-                            legend: {
-
-                                labels: {
-
-                                    color:
-                                        "#cbd5e1"
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-            );
-
-    }
-
-}
-
-
-/* =====================================================
-   RENDER RECENT ANONYMOUS FEEDBACK
-===================================================== */
-
-function renderFeedbackList(
-    feedback
-) {
-
-    const box =
-        document.getElementById(
-            "feedback-list"
+    /*
+       Only display actual cycle data.
+       No fake/current-cycle data is generated.
+    */
+
+    const labels =
+        cycles.map(
+            cycle =>
+                cycle.label ||
+                cycle.name ||
+                cycle.key ||
+                cycle.cycle_name ||
+                "Cycle"
         );
 
 
-    if (!box) {
+    const values =
+        cycles.map(
+            cycle => {
+
+                const direct =
+                    getNumber(
+                        cycle,
+                        [
+                            "overall",
+                            "overallRating",
+                            "overallAverage",
+                            "average"
+                        ]
+                    );
+
+
+                if (direct > 0) {
+                    return direct;
+                }
+
+
+                const cycleRatings =
+                    extractRatings(
+                        cycle
+                    );
+
+
+                return calculateAverage(
+                    Object.values(
+                        cycleRatings
+                    )
+                );
+            }
+        );
+
+
+    if (performanceChart) {
+
+        performanceChart.destroy();
+
+        performanceChart = null;
+    }
+
+
+    const textColor =
+        getCssVariable(
+            "--text-muted"
+        );
+
+    const borderColor =
+        getCssVariable(
+            "--border"
+        );
+
+    const accentColor =
+        getCssVariable(
+            "--accent"
+        );
+
+
+    performanceChart =
+        new Chart(
+            canvas,
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Overall Rating",
+
+                            data:
+                                values,
+
+                            borderColor:
+                                accentColor,
+
+                            backgroundColor:
+                                "rgba(79, 141, 247, 0.08)",
+
+                            borderWidth:
+                                2,
+
+                            pointRadius:
+                                4,
+
+                            pointHoverRadius:
+                                6,
+
+                            pointBackgroundColor:
+                                accentColor,
+
+                            pointBorderColor:
+                                accentColor,
+
+                            tension:
+                                0.25,
+
+                            fill:
+                                true
+
+                        }
+
+                    ]
+                },
+
+                options: {
+
+                    responsive:
+                        true,
+
+                    maintainAspectRatio:
+                        false,
+
+                    interaction: {
+
+                        intersect:
+                            false,
+
+                        mode:
+                            "index"
+                    },
+
+                    plugins: {
+
+                        legend: {
+
+                            display:
+                                false
+                        },
+
+                        tooltip: {
+
+                            backgroundColor:
+                                getCssVariable(
+                                    "--surface"
+                                ),
+
+                            titleColor:
+                                getCssVariable(
+                                    "--text"
+                                ),
+
+                            bodyColor:
+                                getCssVariable(
+                                    "--text-secondary"
+                                ),
+
+                            borderColor:
+                                borderColor,
+
+                            borderWidth:
+                                1,
+
+                            padding:
+                                10
+                        }
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero:
+                                true,
+
+                            min:
+                                0,
+
+                            max:
+                                5,
+
+                            ticks: {
+
+                                stepSize:
+                                    1,
+
+                                color:
+                                    textColor
+                            },
+
+                            grid: {
+
+                                color:
+                                    borderColor
+                            }
+                        },
+
+                        x: {
+
+                            ticks: {
+
+                                color:
+                                    textColor
+                            },
+
+                            grid: {
+
+                                display:
+                                    false
+                            }
+                        }
+                    }
+                }
+            }
+        );
+}
+
+
+/* ==========================================================
+   FEEDBACK HISTORY
+========================================================== */
+
+function populateFeedbackHistory(
+    cycles
+) {
+
+    const container =
+        getElement(
+            "monthly-table"
+        );
+
+    if (!container) {
         return;
     }
 
 
     if (
-        !Array.isArray(feedback) ||
-        feedback.length === 0
+        !Array.isArray(cycles) ||
+        cycles.length === 0
     ) {
 
-        showNoFeedback();
+        container.innerHTML = `
+            <div class="loading-card">
+                No feedback cycles available.
+            </div>
+        `;
 
         return;
-
     }
 
 
-    box.innerHTML = "";
+    let html = `
 
+        <table class="table">
 
-    /*
-       Show latest 3 feedback records.
-    */
+            <thead>
 
-    feedback
-        .slice(0, 4)
-        .forEach(item => {
+                <tr>
 
-            box.insertAdjacentHTML(
-                "beforeend",
-                createDetailedFeedbackCard(
-                    item
-                )
-            );
+                    <th>Cycle</th>
 
-        });
+                    <th>Status</th>
 
+                    <th>Responses</th>
 
-    /*
-       Show View All only when
-       there are more than 3.
-    */
+                    <th>Overall</th>
 
-    if (feedback.length > 3) {
+                    ${FEEDBACK_PARAMETERS.map(
+                        parameter =>
+                            `<th>
+                                ${escapeHtml(
+                                    parameter.label
+                                )}
+                            </th>`
+                    ).join("")}
 
-        box.insertAdjacentHTML(
-            "beforeend",
-            `
+                    <th>Trend</th>
 
-            <div class="view-all-box">
+                </tr>
 
-                <a href="/dashboard/all-feedback.html">
+            </thead>
 
-                    View All Feedback &rarr;
-
-                </a>
-
-            </div>
-
-            `
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   CREATE DETAILED FEEDBACK CARD
-===================================================== */
-
-function createDetailedFeedbackCard(
-    item
-) {
-
-    /*
-       IMPORTANT PRIVACY RULE
-
-       NEVER DISPLAY:
-
-       student_id
-       student name
-       student email
-
-       Faculty only sees anonymous
-       feedback information.
-    */
-
-
-    const subject =
-        escapeHTML(
-            item.subject ||
-            "Unknown Subject"
-        );
-
-
-    const department =
-        escapeHTML(
-            item.department ||
-            "Not Available"
-        );
-
-
-    const courseSatisfaction =
-        escapeHTML(
-            item.course_satisfaction ||
-            "Not answered"
-        );
-
-
-    const syllabusPace =
-        escapeHTML(
-            item.syllabus_pace ||
-            "Not answered"
-        );
-
-
-    const conceptClarity =
-        escapeHTML(
-            item.concept_clarity ||
-            "Not answered"
-        );
-
-
-    const practicalWork =
-        escapeHTML(
-            item.practical_work ||
-            "Not answered"
-        );
-
-
-    const studyMaterial =
-        escapeHTML(
-            item.study_material ||
-            "Not answered"
-        );
-
-
-    const examDifficulty =
-        escapeHTML(
-            item.exam_difficulty ||
-            "Not answered"
-        );
-
-
-    const facultySupport =
-        escapeHTML(
-            item.faculty_support ||
-            "Not answered"
-        );
-
-
-    const improvement =
-        escapeHTML(
-            item.improvement ||
-            "Not answered"
-        );
-
-
-    const comments =
-        escapeHTML(
-            item.comments ||
-            "No additional comments"
-        );
-
-
-    const date =
-        formatDateTime(
-            item.submitted_at
-        );
-
-
-    const teaching =
-        clampRating(
-            item.teaching
-        );
-
-
-    const communication =
-        clampRating(
-            item.communication
-        );
-
-
-    const behaviour =
-        clampRating(
-            item.behaviour
-        );
-
-
-    const overall =
-        calculateOverall(
-            teaching,
-            communication,
-            behaviour
-        );
-
-
-    return `
-
-        <article class="feedback-card detailed-feedback-card">
-
-
-            <!-- =========================================
-                 HEADER
-            ========================================== -->
-
-            <div class="feedback-card-header">
-
-                <div>
-
-                    <span class="feedback-anonymous-badge">
-
-                        ${htmlEntity("lock")}
-                        Anonymous Feedback
-
-                    </span>
-
-
-                    <h3>
-
-                        ${htmlEntity("book")}
-                        ${subject}
-
-                    </h3>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================================
-                 META
-            ========================================== -->
-
-            <div class="feedback-meta">
-
-                <div>
-
-                    <span>
-                        Department
-                    </span>
-
-                    <b>
-                        ${department}
-                    </b>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        Submitted
-                    </span>
-
-                    <b>
-                        ${date}
-                    </b>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================================
-                 FACULTY RATING SUMMARY
-            ========================================== -->
-
-            <div class="feedback-category">
-
-                <h4>
-
-                    ${htmlEntity("star")}
-                    Faculty Rating Summary
-
-                </h4>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Teaching
-                    </span>
-
-                    <b>
-                        ${teaching} / 5
-                    </b>
-
-                </div>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Communication
-                    </span>
-
-                    <b>
-                        ${communication} / 5
-                    </b>
-
-                </div>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Behaviour
-                    </span>
-
-                    <b>
-                        ${behaviour} / 5
-                    </b>
-
-                </div>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Overall
-                    </span>
-
-                    <b>
-                        ${overall.toFixed(1)} / 5
-                    </b>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================================
-                 COURSE EXPERIENCE
-            ========================================== -->
-
-            <div class="feedback-category">
-
-                <h4>
-
-                    ${htmlEntity("book")}
-                    Course Experience
-
-                </h4>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Course Satisfaction
-                    </span>
-
-                    <b>
-                        ${courseSatisfaction}
-                    </b>
-
-                </div>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Syllabus Pace
-                    </span>
-
-                    <b>
-                        ${syllabusPace}
-                    </b>
-
-                </div>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Concept Clarity
-                    </span>
-
-                    <b>
-                        ${conceptClarity}
-                    </b>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================================
-                 PRACTICAL LEARNING
-            ========================================== -->
-
-            <div class="feedback-category">
-
-                <h4>
-
-                    ${htmlEntity("tools")}
-                    Practical Learning
-
-                </h4>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Practical Work
-                    </span>
-
-                    <b>
-                        ${practicalWork}
-                    </b>
-
-                </div>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Study Material
-                    </span>
-
-                    <b>
-                        ${studyMaterial}
-                    </b>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================================
-                 ASSESSMENT
-            ========================================== -->
-
-            <div class="feedback-category">
-
-                <h4>
-
-                    ${htmlEntity("memo")}
-                    Assessment
-
-                </h4>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Exam Difficulty
-                    </span>
-
-                    <b>
-                        ${examDifficulty}
-                    </b>
-
-                </div>
-
-
-                <div class="answer-row">
-
-                    <span>
-                        Faculty Support
-                    </span>
-
-                    <b>
-                        ${facultySupport}
-                    </b>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================================
-                 IMPROVEMENT
-            ========================================== -->
-
-            <div class="feedback-category">
-
-                <h4>
-
-                    ${htmlEntity("bulb")}
-                    Future Improvement
-
-                </h4>
-
-
-                <div class="answer-row improvement-answer">
-
-                    <b>
-                        ${improvement}
-                    </b>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================================
-                 COMMENTS
-            ========================================== -->
-
-            <div class="anonymous-comment">
-
-                <h4>
-
-                    ${htmlEntity("speech")}
-                    Additional Suggestions
-
-                </h4>
-
-
-                <p>
-
-                    "${comments}"
-
-                </p>
-
-            </div>
-
-
-        </article>
+            <tbody>
 
     `;
 
+
+    cycles.forEach(
+        (cycle, index) => {
+
+            const label =
+                cycle.label ||
+                cycle.name ||
+                cycle.key ||
+                cycle.cycle_name ||
+                "—";
+
+
+            const status =
+                String(
+                    cycle.status ||
+                    ""
+                ).toLowerCase();
+
+
+            const statusLabel =
+                status === "active"
+                    ? "Active"
+                    : status
+                        ? capitalize(status)
+                        : "—";
+
+
+            const responses =
+                getNumber(
+                    cycle,
+                    [
+                        "count",
+                        "responses",
+                        "feedbackCount",
+                        "total",
+                        "totalResponses"
+                    ]
+                );
+
+
+            const cycleRatings =
+                extractRatings(
+                    cycle
+                );
+
+
+            const overall =
+                getNumber(
+                    cycle,
+                    [
+                        "overall",
+                        "overallRating",
+                        "overallAverage",
+                        "average"
+                    ]
+                ) ||
+                calculateAverage(
+                    Object.values(
+                        cycleRatings
+                    )
+                );
+
+
+            const trend =
+                calculateTrend(
+                    cycles,
+                    index
+                );
+
+
+            html += `
+
+                <tr>
+
+                    <td>
+                        ${escapeHtml(
+                            label
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            statusLabel
+                        )}
+                    </td>
+
+                    <td>
+                        ${responses}
+                    </td>
+
+                    <td>
+                        ${formatRating(
+                            overall
+                        )}
+                    </td>
+
+                    ${FEEDBACK_PARAMETERS.map(
+                        parameter => `
+
+                            <td>
+                                ${formatRating(
+                                    cycleRatings[
+                                        parameter.key
+                                    ]
+                                )}
+                            </td>
+
+                        `
+                    ).join("")}
+
+                    <td>
+                        ${escapeHtml(
+                            trend
+                        )}
+                    </td>
+
+                </tr>
+
+            `;
+        }
+    );
+
+
+    html += `
+
+            </tbody>
+
+        </table>
+
+    `;
+
+
+    container.innerHTML =
+        html;
 }
 
 
-/* =====================================================
-   SHOW NO FEEDBACK
-===================================================== */
+/* ==========================================================
+   TREND
+========================================================== */
 
-function showNoFeedback() {
+function calculateTrend(
+    cycles,
+    index
+) {
 
-    const box =
-        document.getElementById(
-            "feedback-list"
+    if (
+        !Array.isArray(cycles) ||
+        index >= cycles.length - 1
+    ) {
+
+        return "—";
+    }
+
+
+    const current =
+        getCycleOverall(
+            cycles[index]
         );
 
 
-    if (!box) {
+    const previous =
+        getCycleOverall(
+            cycles[index + 1]
+        );
+
+
+    if (
+        current === 0 ||
+        previous === 0
+    ) {
+
+        return "—";
+    }
+
+
+    const difference =
+        current - previous;
+
+
+    if (
+        Math.abs(
+            difference
+        ) < 0.05
+    ) {
+
+        return "—";
+    }
+
+
+    if (
+        difference > 0
+    ) {
+
+        return `▲ ${difference.toFixed(1)}`;
+    }
+
+
+    return `▼ ${Math.abs(
+        difference
+    ).toFixed(1)}`;
+}
+
+
+function getCycleOverall(cycle) {
+
+    const direct =
+        getNumber(
+            cycle,
+            [
+                "overall",
+                "overallRating",
+                "overallAverage",
+                "average"
+            ]
+        );
+
+
+    if (direct > 0) {
+        return direct;
+    }
+
+
+    const ratings =
+        extractRatings(
+            cycle
+        );
+
+
+    return calculateAverage(
+        Object.values(
+            ratings
+        )
+    );
+}
+
+
+/* ==========================================================
+   FEEDBACK FILTERS
+========================================================== */
+
+function initializeFilters() {
+
+    const buttons =
+        document.querySelectorAll(
+            ".filter"
+        );
+
+
+    buttons.forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    buttons.forEach(
+                        item =>
+                            item.classList.remove(
+                                "active"
+                            )
+                    );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    const period =
+                        button.dataset.period;
+
+
+                    const cycles =
+                        getCycles(
+                            lastFetchedData ||
+                            {}
+                        );
+
+
+                    if (
+                        period === "current"
+                    ) {
+
+                        const activeCycle =
+                            getActiveCycle(
+                                lastFetchedData || {},
+                                cycles
+                            );
+
+
+                        if (activeCycle) {
+
+                            populateFeedbackHistory(
+                                [activeCycle]
+                            );
+
+                        } else {
+
+                            populateFeedbackHistory(
+                                []
+                            );
+                        }
+
+
+                    } else if (
+                        period === "previous"
+                    ) {
+
+                        const activeCycle =
+                            getActiveCycle(
+                                lastFetchedData || {},
+                                cycles
+                            );
+
+
+                        const activeId =
+                            getCycleId(
+                                activeCycle
+                            );
+
+
+                        const previousCycles =
+                            cycles.filter(
+                                cycle =>
+                                    getCycleId(
+                                        cycle
+                                    ) !== activeId
+                            );
+
+
+                        populateFeedbackHistory(
+                            previousCycles.slice(
+                                0,
+                                1
+                            )
+                        );
+
+
+                    } else {
+
+                        populateFeedbackHistory(
+                            cycles
+                        );
+                    }
+
+                }
+            );
+        }
+    );
+}
+
+
+/* ==========================================================
+   CYCLE ID HELPER
+========================================================== */
+
+function getCycleId(cycle) {
+
+    if (!cycle) {
+        return null;
+    }
+
+
+    return (
+        cycle.id ??
+        cycle.cycle_id ??
+        cycle.cycleId ??
+        null
+    );
+}
+
+
+/* ==========================================================
+   PARTICIPATION
+========================================================== */
+
+function renderParticipation(
+    data,
+    currentCycle
+) {
+
+    const container =
+        getElement(
+            "participation"
+        );
+
+    if (!container) {
         return;
     }
 
 
-    box.innerHTML = `
+    /*
+       If there is no active cycle, participation must not
+       display old-cycle numbers as if they were current.
+    */
 
-        <div class="empty-card">
+    if (!currentCycle) {
 
-            ${htmlEntity("inbox")}
+        container.innerHTML = `
+            <div class="loading-card">
+                No active feedback cycle.
+            </div>
+        `;
 
-            No feedback available yet.
+        return;
+    }
+
+
+    const participation =
+        data.participation ||
+        {};
+
+
+    const totalStudents =
+        getNumber(
+            participation,
+            [
+                "totalStudents",
+                "total",
+                "studentCount"
+            ]
+        );
+
+
+    const submitted =
+        getNumber(
+            participation,
+            [
+                "submittedCurrent",
+                "submitted",
+                "currentResponses",
+                "responses"
+            ]
+        );
+
+
+    const cycleResponses =
+        getNumber(
+            currentCycle,
+            [
+                "count",
+                "responses",
+                "feedbackCount",
+                "total",
+                "totalResponses"
+            ]
+        );
+
+
+    const finalSubmitted =
+        submitted ||
+        cycleResponses;
+
+
+    const rate =
+        totalStudents > 0
+            ? Math.min(
+                100,
+                Math.round(
+                    (
+                        finalSubmitted /
+                        totalStudents
+                    ) * 100
+                )
+            )
+            : 0;
+
+
+    if (
+        totalStudents === 0 &&
+        finalSubmitted === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="loading-card">
+                Participation data is not available yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML = `
+
+        <div>
+
+            <strong>
+                ${finalSubmitted} /
+                ${totalStudents}
+                students
+            </strong>
+
+        </div>
+
+        <div class="muted">
+            Participation Rate
+        </div>
+
+        <div class="progress">
+
+            <div
+                class="fill"
+                style="width: ${rate}%">
+            </div>
+
+        </div>
+
+        <div class="muted">
+            ${rate}% participation
+        </div>
+
+    `;
+}
+// ===========================================================
+// SUBMISSION CHECKLIST
+// ===========================================================
+
+function initializeSubmissionChecklist() {
+    const button = getElement("view-submission-checklist-btn");
+
+    if (!button) {
+        console.warn(
+            "Submission Checklist button not found."
+        );
+        return;
+    }
+
+    button.addEventListener("click", () => {
+        openSubmissionChecklist();
+    });
+
+    console.log(
+        "✅ Submission Checklist button initialized."
+    );
+}
+
+
+// ===========================================================
+// OPEN SUBMISSION CHECKLIST
+// ===========================================================
+
+function openSubmissionChecklist() {
+
+    // Remove an existing checklist if already open
+    const existingModal =
+        getElement("submission-checklist-modal");
+
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // -------------------------------------------------------
+    // Get participation data from the latest API response
+    // -------------------------------------------------------
+
+    const participation =
+        lastFetchedData?.participation || {};
+
+    const students =
+        Array.isArray(participation.students)
+            ? participation.students
+            : [];
+
+    const totalStudents =
+        Number(participation.totalStudents) || students.length;
+
+    const submittedCount =
+        Number(participation.submittedCurrent) ||
+        students.filter(
+            student => student.status === "Submitted"
+        ).length;
+
+    const pendingCount =
+        Number(participation.pendingCurrent) ||
+        students.filter(
+            student => student.status === "Pending"
+        ).length;
+
+    const activeCycle =
+        lastFetchedData?.activeCycle || null;
+
+    // -------------------------------------------------------
+    // Create modal
+    // -------------------------------------------------------
+
+    const modal =
+        document.createElement("div");
+
+    modal.id =
+        "submission-checklist-modal";
+
+    modal.innerHTML = `
+        <div
+            class="submission-checklist-overlay"
+            id="submission-checklist-overlay"
+        >
+
+            <div class="submission-checklist-modal">
+
+                <div class="submission-checklist-header">
+
+                    <div>
+                        <h2>
+                            ✅ Submission Checklist
+                        </h2>
+
+                        <p>
+                            ${
+                                escapeHtml(
+                                    activeCycle?.name ||
+                                    "Current Feedback Cycle"
+                                )
+                            }
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="close-submission-checklist"
+                        class="submission-checklist-close"
+                        aria-label="Close"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+                <div class="submission-checklist-summary">
+
+                    <div class="checklist-stat">
+                        <strong>
+                            ${totalStudents}
+                        </strong>
+                        <span>
+                            Total Students
+                        </span>
+                    </div>
+
+                    <div class="checklist-stat">
+                        <strong>
+                            ${submittedCount}
+                        </strong>
+                        <span>
+                            Submitted
+                        </span>
+                    </div>
+
+                    <div class="checklist-stat">
+                        <strong>
+                            ${pendingCount}
+                        </strong>
+                        <span>
+                            Pending
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="submission-checklist-list">
+
+                    ${
+                        students.length === 0
+                            ? `
+                                <div class="checklist-empty">
+                                    No student participation
+                                    data is available.
+                                </div>
+                              `
+                            : students.map(
+                                (student, index) => {
+
+                                    const name =
+                                        student?.name ||
+                                        "Unnamed Student";
+
+                                    const status =
+                                        student?.status ===
+                                        "Submitted"
+                                            ? "Submitted"
+                                            : "Pending";
+
+                                    const statusClass =
+                                        status === "Submitted"
+                                            ? "submitted"
+                                            : "pending";
+
+                                    return `
+                                        <div
+                                            class="checklist-student"
+                                        >
+
+                                            <div
+                                                class="checklist-student-number"
+                                            >
+                                                ${index + 1}
+                                            </div>
+
+                                            <div
+                                                class="checklist-student-name"
+                                            >
+                                                ${escapeHtml(name)}
+                                            </div>
+
+                                            <div
+                                                class="
+                                                    checklist-student-status
+                                                    ${statusClass}
+                                                "
+                                            >
+                                                ${
+                                                    status ===
+                                                    "Submitted"
+                                                        ? "✓ Submitted"
+                                                        : "○ Pending"
+                                                }
+                                            </div>
+
+                                        </div>
+                                    `;
+                                }
+                            ).join("")
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // -------------------------------------------------------
+    // Close button
+    // -------------------------------------------------------
+
+    const closeButton =
+        getElement("close-submission-checklist");
+
+    if (closeButton) {
+        closeButton.addEventListener(
+            "click",
+            closeSubmissionChecklist
+        );
+    }
+
+    // -------------------------------------------------------
+    // Close when clicking outside modal
+    // -------------------------------------------------------
+
+    const overlay =
+        getElement("submission-checklist-overlay");
+
+    if (overlay) {
+        overlay.addEventListener("click", event => {
+
+            if (
+                event.target === overlay
+            ) {
+                closeSubmissionChecklist();
+            }
+
+        });
+    }
+
+    // -------------------------------------------------------
+    // Close with Escape
+    // -------------------------------------------------------
+
+    document.addEventListener(
+        "keydown",
+        handleChecklistEscape
+    );
+
+    console.log(
+        "✅ Submission Checklist opened:",
+        students.length,
+        "students"
+    );
+}
+
+
+// ===========================================================
+// CLOSE SUBMISSION CHECKLIST
+// ===========================================================
+
+function closeSubmissionChecklist() {
+
+    const modal =
+        getElement("submission-checklist-modal");
+
+    if (modal) {
+        modal.remove();
+    }
+
+    document.removeEventListener(
+        "keydown",
+        handleChecklistEscape
+    );
+}
+
+
+// ===========================================================
+// ESCAPE KEY
+// ===========================================================
+
+function handleChecklistEscape(event) {
+
+    if (event.key === "Escape") {
+        closeSubmissionChecklist();
+    }
+}
+
+/* ==========================================================
+   INSIGHTS
+========================================================== */
+
+function renderInsights(
+    data,
+    ratings,
+    currentCycle
+) {
+
+    const container =
+        getElement(
+            "insights"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    if (!currentCycle) {
+
+        container.innerHTML = `
+            <div class="loading-card">
+                Insights will appear when an active feedback cycle is available.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const areas =
+        FEEDBACK_PARAMETERS
+            .map(
+                parameter => ({
+
+                    label:
+                        parameter.label,
+
+                    value:
+                        Number(
+                            ratings[
+                                parameter.key
+                            ]
+                        ) || 0
+
+                })
+            )
+            .filter(
+                area =>
+                    area.value > 0
+            );
+
+
+    if (
+        areas.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="loading-card">
+                Not enough feedback data for insights yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const sorted =
+        [...areas].sort(
+            (a, b) =>
+                b.value - a.value
+        );
+
+
+    const strongest =
+        sorted[0];
+
+
+    const weakest =
+        sorted[
+            sorted.length - 1
+        ];
+
+
+    const overall =
+        calculateAverage(
+            areas.map(
+                area =>
+                    area.value
+            )
+        );
+
+
+    let overallMessage =
+        "Feedback data is still developing.";
+
+
+    if (overall >= 4.5) {
+
+        overallMessage =
+            "Student feedback is very positive.";
+
+    } else if (
+        overall >= 4
+    ) {
+
+        overallMessage =
+            "Overall student feedback is positive.";
+
+    } else if (
+        overall >= 3
+    ) {
+
+        overallMessage =
+            "Feedback indicates some areas can be improved.";
+
+    } else {
+
+        overallMessage =
+            "Several areas may need attention.";
+    }
+
+
+    container.innerHTML = `
+
+        <div class="insight-card">
+
+            <strong>
+                ⭐ Strongest Area
+            </strong>
+
+            <div>
+                ${escapeHtml(
+                    strongest.label
+                )}
+
+                •
+
+                ${formatRating(
+                    strongest.value
+                )} / 5
+            </div>
+
+        </div>
+
+
+        <div class="insight-card">
+
+            <strong>
+                📈 Area for Attention
+            </strong>
+
+            <div>
+                ${escapeHtml(
+                    weakest.label
+                )}
+
+                •
+
+                ${formatRating(
+                    weakest.value
+                )} / 5
+            </div>
+
+        </div>
+
+
+        <div class="insight-card">
+
+            <strong>
+                💡 Overall Observation
+            </strong>
+
+            <div>
+                ${escapeHtml(
+                    overallMessage
+                )}
+            </div>
 
         </div>
 
     `;
+}
 
 
-    /*
-       Reset dashboard values
-       when there are no responses.
-    */
+/* ==========================================================
+   ANONYMOUS COMMENTS
+========================================================== */
+
+function renderComments(list) {
+
+    const container =
+        getElement(
+            "feedback-list"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    if (
+        !Array.isArray(list)
+    ) {
+
+        list = [];
+    }
+
+
+    const comments =
+        list.filter(
+            item => {
+
+                if (!item) {
+                    return false;
+                }
+
+
+                const comment =
+                    item.comments ||
+                    item.comment ||
+                    item.feedback ||
+                    "";
+
+
+                return String(
+                    comment
+                )
+                    .trim()
+                    .length > 0;
+            }
+        );
+
+
+    if (
+        comments.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="loading-card">
+                No anonymous comments have been submitted yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    comments
+        .slice(
+            0,
+            8
+        )
+        .forEach(
+            item => {
+
+                const comment =
+                    item.comments ||
+                    item.comment ||
+                    item.feedback ||
+                    "";
+
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "comment";
+
+
+                card.textContent =
+                    truncate(
+                        comment,
+                        400
+                    );
+
+
+                container.appendChild(
+                    card
+                );
+            }
+        );
+}
+
+
+/* ==========================================================
+   NO FEEDBACK STATE
+========================================================== */
+
+function showNoFeedbackState() {
+
+    setText(
+        "overall-rating",
+        "0.0"
+    );
 
     setText(
         "total-feedback",
@@ -1474,577 +2530,151 @@ function showNoFeedback() {
     );
 
     setText(
-        "teaching",
+        "cycle-responses",
         "0"
     );
 
     setText(
-        "communication",
-        "0"
+        "cycle-label",
+        "No Active Cycle"
     );
 
     setText(
-        "behaviour",
-        "0"
+        "cycle-label-small",
+        "No Active Cycle"
     );
 
-    setText(
-        "overall-rating",
-        "0"
+
+    renderRatingBreakdown(
+        createEmptyRatings()
     );
 
-}
 
-
-/* =====================================================
-   SHOW FEEDBACK ERROR
-===================================================== */
-
-function showFeedbackError(
-    message
-) {
-
-    const box =
-        document.getElementById(
-            "feedback-list"
-        );
-
-
-    if (!box) {
-        return;
-    }
-
-
-    box.innerHTML = `
-
-        <div class="empty-card">
-
-            ${htmlEntity("warning")}
-
-            Unable to load feedback.
-
-            <br><br>
-
-            <small>
-
-                ${escapeHTML(
-                    message ||
-                    "Server error"
-                )}
-
-            </small>
-
-        </div>
-
-    `;
-
-}
-
-
-/* =====================================================
-   OVERALL PERFORMANCE DESCRIPTION
-===================================================== */
-
-function getOverallDescription(
-    rating
-) {
-
-    rating =
-        Number(rating) || 0;
-
-
-    if (rating >= 4.5) {
-
-        return (
-            "Excellent overall performance based " +
-            "on student feedback."
-        );
-
-    }
-
-
-    if (rating >= 4) {
-
-        return (
-            "Strong overall performance with " +
-            "consistently positive feedback."
-        );
-
-    }
-
-
-    if (rating >= 3) {
-
-        return (
-            "Good overall performance with some " +
-            "opportunities for improvement."
-        );
-
-    }
-
-
-    if (rating >= 2) {
-
-        return (
-            "Performance needs improvement in " +
-            "several areas."
-        );
-
-    }
-
-
-    return (
-        "More student feedback is needed to " +
-        "evaluate overall performance."
+    populateFeedbackHistory(
+        []
     );
 
-}
 
-
-/* =====================================================
-   PERFORMANCE INSIGHT
-===================================================== */
-
-function generatePerformanceInsight(
-    teaching,
-    communication,
-    behaviour,
-    overall
-) {
-
-    const ratings = {
-
-        Teaching:
-            Number(teaching) || 0,
-
-        Communication:
-            Number(communication) || 0,
-
-        Behaviour:
-            Number(behaviour) || 0
-
-    };
-
-
-    const entries =
-        Object.entries(
-            ratings
-        );
-
-
-    if (
-        overall <= 0
-    ) {
-
-        return (
-            "There is not enough feedback yet " +
-            "to generate a performance insight."
-        );
-
-    }
-
-
-    const highest =
-        entries.reduce(
-            (a, b) =>
-                a[1] >= b[1]
-                    ? a
-                    : b
-        );
-
-
-    const lowest =
-        entries.reduce(
-            (a, b) =>
-                a[1] <= b[1]
-                    ? a
-                    : b
-        );
-
-
-    if (
-        highest[0] === lowest[0]
-    ) {
-
-        return (
-            `Your ${highest[0].toLowerCase()} rating is currently ` +
-            `${highest[1].toFixed(1)}/5. ` +
-            `Continue collecting feedback to identify ` +
-            `clear strengths and improvement areas.`
-        );
-
-    }
-
-
-    return (
-        `Your strongest area is ` +
-        `${highest[0].toLowerCase()} at ` +
-        `${highest[1].toFixed(1)}/5. ` +
-        `${lowest[0]} currently has the most room ` +
-        `for improvement at ` +
-        `${lowest[1].toFixed(1)}/5.`
+    renderParticipation(
+        {},
+        null
     );
 
-}
 
-
-/* =====================================================
-   NUMBER ANIMATION
-===================================================== */
-
-function animateNumber(
-    id,
-    target
-) {
-
-    const element =
-        document.getElementById(
-            id
-        );
-
-
-    if (!element) {
-        return;
-    }
-
-
-    target =
-        Math.max(
-            0,
-            Math.round(
-                Number(target) || 0
-            )
-        );
-
-
-    if (target === 0) {
-
-        element.textContent =
-            "0";
-
-        return;
-
-    }
-
-
-    /*
-       Prevent duplicate animation
-       from stacking.
-    */
-
-    if (
-        element._animationTimer
-    ) {
-
-        clearInterval(
-            element._animationTimer
-        );
-
-    }
-
-
-    let current = 0;
-
-
-    const timer =
-        setInterval(
-            () => {
-
-                current++;
-
-                element.textContent =
-                    current;
-
-
-                if (
-                    current >= target
-                ) {
-
-                    clearInterval(
-                        timer
-                    );
-
-                    element._animationTimer =
-                        null;
-
-                }
-
-            },
-            30
-        );
-
-
-    element._animationTimer =
-        timer;
-
-}
-
-
-/* =====================================================
-   RATING SCORE DISPLAY
-===================================================== */
-
-function setRatingScore(
-    id,
-    rating
-) {
-
-    const element =
-        document.getElementById(
-            id
-        );
-
-
-    if (!element) {
-        return;
-    }
-
-
-    rating =
-        clampRating(
-            rating
-        );
-
-
-    element.textContent =
-        rating.toFixed(1) +
-        " / 5";
-
-}
-
-
-/* =====================================================
-   CLAMP RATING
-===================================================== */
-
-function clampRating(
-    rating
-) {
-
-    rating =
-        Number(rating);
-
-
-    if (
-        !Number.isFinite(rating)
-    ) {
-
-        return 0;
-
-    }
-
-
-    return Math.max(
-        0,
-        Math.min(
-            5,
-            rating
-        )
+    renderInsights(
+        {},
+        createEmptyRatings(),
+        null
     );
 
-}
 
-
-/* =====================================================
-   PROGRESS BAR
-===================================================== */
-
-function setProgress(
-    barId,
-    textId,
-    value
-) {
-
-    const progress =
-        document.getElementById(
-            barId
-        );
-
-
-    const percent =
-        document.getElementById(
-            textId
-        );
-
-
-    value =
-        Number(value) || 0;
-
-
-    value =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                value
-            )
-        );
-
-
-    if (progress) {
-
-        progress.style.width =
-            value + "%";
-
-    }
-
-
-    if (percent) {
-
-        percent.textContent =
-            Math.round(value) +
-            "%";
-
-    }
-
-}
-
-
-/* =====================================================
-   RATING TO PERCENT
-===================================================== */
-
-function ratingToPercent(
-    rating
-) {
-
-    rating =
-        clampRating(
-            rating
-        );
-
-
-    return Math.round(
-        (rating / 5) * 100
+    renderComments(
+        []
     );
-
 }
 
 
-/* =====================================================
-   CALCULATE OVERALL
-===================================================== */
+/* ==========================================================
+   EMPTY RATINGS
+========================================================== */
 
-function calculateOverall(
-    teaching,
-    communication,
-    behaviour
-) {
+function createEmptyRatings() {
 
-    const values = [
-
-        Number(teaching) || 0,
-
-        Number(communication) || 0,
-
-        Number(behaviour) || 0
-
-    ];
+    const ratings = {};
 
 
-    if (
-        values.every(
-            value => value === 0
-        )
-    ) {
+    FEEDBACK_PARAMETERS.forEach(
+        parameter => {
 
-        return 0;
+            ratings[
+                parameter.key
+            ] = 0;
 
-    }
-
-
-    return Number(
-
-        (
-            (
-                values[0] +
-                values[1] +
-                values[2]
-            ) / 3
-
-        ).toFixed(1)
-
-    );
-
-}
-
-
-/* =====================================================
-   FORMAT DATE + TIME
-===================================================== */
-
-function formatDateTime(
-    dateValue
-) {
-
-    if (!dateValue) {
-
-        return "Unknown date";
-
-    }
-
-
-    const date =
-        new Date(
-            dateValue
-        );
-
-
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return "Unknown date";
-
-    }
-
-
-    return date.toLocaleString(
-        [],
-        {
-            dateStyle: "medium",
-            timeStyle: "short"
         }
     );
 
+
+    return ratings;
 }
 
 
-/* =====================================================
-   SAFE TEXT SETTER
-===================================================== */
+/* ==========================================================
+   FEEDBACK ERROR STATE
+========================================================== */
 
-function setText(
-    id,
-    value
-) {
+function showFeedbackError() {
 
-    const element =
-        document.getElementById(
-            id
+    const history =
+        getElement(
+            "monthly-table"
         );
 
 
-    if (!element) {
-        return;
+    if (history) {
+
+        history.innerHTML = `
+            <div class="loading-card">
+                Unable to load feedback history.
+                Please refresh the page.
+            </div>
+        `;
     }
 
 
-    element.textContent =
-        value;
+    const rating =
+        getElement(
+            "rating-breakdown"
+        );
 
+
+    if (rating) {
+
+        rating.innerHTML = `
+            <div class="loading-card">
+                Unable to load rating data.
+            </div>
+        `;
+    }
+
+
+    const participation =
+        getElement(
+            "participation"
+        );
+
+
+    if (participation) {
+
+        participation.innerHTML = `
+            <div class="loading-card">
+                Unable to load participation data.
+            </div>
+        `;
+    }
+
+
+    const insights =
+        getElement(
+            "insights"
+        );
+
+
+    if (insights) {
+
+        insights.innerHTML = `
+            <div class="loading-card">
+                Unable to generate insights.
+            </div>
+        `;
+    }
 }
 
 
-/* =====================================================
-   ESCAPE HTML
-===================================================== */
+/* ==========================================================
+   HTML ESCAPE
+========================================================== */
 
-function escapeHTML(
-    value
-) {
+function escapeHtml(value) {
 
     if (
         value === null ||
@@ -2052,131 +2682,227 @@ function escapeHTML(
     ) {
 
         return "";
-
     }
 
 
     return String(value)
-
         .replace(
             /&/g,
             "&amp;"
         )
-
         .replace(
             /</g,
             "&lt;"
         )
-
         .replace(
             />/g,
             "&gt;"
         )
-
         .replace(
             /"/g,
             "&quot;"
         )
-
         .replace(
             /'/g,
             "&#039;"
         );
-
 }
 
 
-/* =====================================================
-   HTML ENTITY HELPER
-===================================================== */
+/* ==========================================================
+   TEXT TRUNCATION
+========================================================== */
 
-function htmlEntity(
-    name
+function truncate(
+    value,
+    maxLength
 ) {
 
-    const entities = {
-
-        wave:
-            "👋",
-
-        graduation:
-            "🎓",
-
-        speech:
-            "💬",
-
-        thumb:
-            "👍",
-
-        chart:
-            "📊",
-
-        lock:
-            "🔒",
-
-        book:
-            "📚",
-
-        star:
-            "⭐",
-
-        tools:
-            "🛠️",
-
-        memo:
-            "📝",
-
-        bulb:
-            "💡",
-
-        inbox:
-            "📨",
-
-        warning:
-            "⚠️"
-
-    };
+    if (!value) {
+        return "";
+    }
 
 
-    return entities[name] || "";
+    const text =
+        String(value);
 
+
+    if (
+        text.length <= maxLength
+    ) {
+
+        return text;
+    }
+
+
+    return (
+        text.substring(
+            0,
+            maxLength - 1
+        ) +
+        "…"
+    );
 }
-/* =====================================================
-   PAGE RESTORE
-===================================================== */
 
-window.addEventListener(
-    "pageshow",
-    event => {
 
-        if (
-            event.persisted
-        ) {
+/* ==========================================================
+   CAPITALIZE
+========================================================== */
 
-            loadDashboard();
+function capitalize(value) {
 
+    if (!value) {
+        return "";
+    }
+
+
+    const text =
+        String(value);
+
+
+    return (
+        text.charAt(0).toUpperCase() +
+        text.slice(1)
+    );
+}
+
+
+/* ==========================================================
+   REAL-TIME DASHBOARD REFRESH
+========================================================== */
+
+async function refreshFacultyDashboard() {
+
+    if (isRealtimeRefreshing) {
+        return;
+    }
+
+
+    if (document.hidden) {
+        return;
+    }
+
+
+    isRealtimeRefreshing = true;
+
+
+    try {
+
+        console.log(
+            "[REALTIME] Checking for new feedback..."
+        );
+
+
+        await loadFeedback();
+
+
+        console.log(
+            "[REALTIME] Dashboard updated."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "[REALTIME] Dashboard refresh failed:",
+            error
+        );
+
+    } finally {
+
+        isRealtimeRefreshing = false;
+    }
+}
+
+
+/* ==========================================================
+   START REAL-TIME REFRESH
+========================================================== */
+
+function startRealtimeRefresh() {
+
+    if (realtimeRefreshTimer) {
+
+        clearInterval(
+            realtimeRefreshTimer
+        );
+    }
+
+
+    realtimeRefreshTimer =
+        setInterval(
+            refreshFacultyDashboard,
+            REALTIME_REFRESH_INTERVAL
+        );
+
+
+    console.log(
+        "[REALTIME] Auto-refresh enabled: every 10 seconds"
+    );
+}
+
+
+/* ==========================================================
+   STOP REAL-TIME REFRESH
+========================================================== */
+
+function stopRealtimeRefresh() {
+
+    if (realtimeRefreshTimer) {
+
+        clearInterval(
+            realtimeRefreshTimer
+        );
+
+        realtimeRefreshTimer = null;
+
+
+        console.log(
+            "[REALTIME] Auto-refresh stopped."
+        );
+    }
+}
+
+
+/* ==========================================================
+   HANDLE TAB VISIBILITY
+========================================================== */
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        if (document.hidden) {
+
+            stopRealtimeRefresh();
+
+        } else {
+
+            /*
+               Immediately fetch the latest dashboard data
+               when the user returns to the tab.
+            */
+
+            refreshFacultyDashboard();
+
+            startRealtimeRefresh();
         }
 
     }
 );
+/* ==========================================================
+   CLEANUP
+========================================================== */
+window.addEventListener(
+    "beforeunload",
+    () => {
 
+        stopRealtimeRefresh();
 
-/* =====================================================
-   GLOBAL FUNCTIONS
-===================================================== */
+        if (performanceChart) {
 
-window.loadFaculty =
-    loadFaculty;
+            performanceChart.destroy();
 
-
-window.loadFeedback =
-    loadFeedback;
-
-
-window.loadDashboard =
-    loadDashboard;
-
-
-console.log(
-    "faculty-dashboard.js upgraded successfully"
+            performanceChart = null;
+        }
+    }
 );
