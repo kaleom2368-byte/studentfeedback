@@ -3,10 +3,8 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
-const MySQLStore = require("express-mysql-session")(session);
 const helmet = require("helmet");
 const cors = require("cors");
-
 
 // =====================================================
 // ROUTES
@@ -20,14 +18,11 @@ const feedbackRoute = require("./routes/feedback");
 const dashboardRoute = require("./routes/dashboard");
 const facultyDirectoryRoute = require("./routes/faculty-directory");
 
-
 // =====================================================
 // DATABASE
 // =====================================================
 
 const dbPool = require("./db");
-const sessionStore = new MySQLStore({}, dbPool);
-
 
 // =====================================================
 // APP
@@ -35,18 +30,14 @@ const sessionStore = new MySQLStore({}, dbPool);
 
 const app = express();
 
-
 // =====================================================
 // SECURITY
 // =====================================================
 
 app.use(
     helmet({
-
         contentSecurityPolicy: {
-
             directives: {
-
                 defaultSrc: ["'self'"],
 
                 scriptSrc: [
@@ -83,14 +74,10 @@ app.use(
                     "'self'",
                     "https://cdn.jsdelivr.net"
                 ]
-
             }
-
         }
-
     })
 );
-
 
 // =====================================================
 // CORS
@@ -98,14 +85,10 @@ app.use(
 
 app.use(
     cors({
-
         origin: true,
-
         credentials: true
-
     })
 );
-
 
 // =====================================================
 // BODY PARSER
@@ -120,7 +103,6 @@ app.use(
 app.use(
     express.json()
 );
-
 
 // =====================================================
 // DISABLE CACHE
@@ -144,12 +126,26 @@ app.use((req, res, next) => {
     );
 
     next();
-
 });
-
 
 // =====================================================
 // SESSION
+// =====================================================
+//
+// LOCAL DEVELOPMENT SESSION
+//
+// Neon PostgreSQL is still used for all application
+// database data.
+//
+// We are NOT using:
+// - express-mysql-session
+// - connect-pg-simple
+//
+// Express will keep sessions in server memory.
+//
+// This is suitable for local development.
+// A persistent session store can be added later
+// when the application is deployed.
 // =====================================================
 
 app.use(
@@ -159,25 +155,23 @@ app.use(
             process.env.SESSION_SECRET ||
             "StudentFeedback2026",
 
-        store: sessionStore,
-
         resave: false,
 
         saveUninitialized: false,
 
         cookie: {
 
-            secure: process.env.NODE_ENV === "production",
+            secure:
+                process.env.NODE_ENV === "production",
 
             httpOnly: true,
 
-            maxAge: 1000 * 60 * 60 * 24
-
+            maxAge:
+                1000 * 60 * 60 * 24
         }
 
     })
 );
-
 
 // =====================================================
 // STATIC FILES
@@ -189,7 +183,6 @@ app.use(
     )
 );
 
-
 // =====================================================
 // ROUTES
 // =====================================================
@@ -200,13 +193,11 @@ app.use(
     studentRoute
 );
 
-
 // Faculty routes
 app.use(
     "/faculty",
     facultyRoute
 );
-
 
 // HOD routes
 app.use(
@@ -214,13 +205,11 @@ app.use(
     hodRoute
 );
 
-
 // Admin routes
 app.use(
     "/admin",
     adminRoute
 );
-
 
 // Feedback routes
 app.use(
@@ -228,20 +217,17 @@ app.use(
     feedbackRoute
 );
 
-
 // Dashboard routes
 app.use(
     "/dashboard",
     dashboardRoute
 );
 
-
 // Faculty directory
 app.use(
     "/faculty-directory",
     facultyDirectoryRoute
 );
-
 
 // =====================================================
 // HEALTH CHECK
@@ -263,7 +249,6 @@ app.get("/health", (req, res) => {
 
 });
 
-
 // =====================================================
 // HOME PAGE
 // =====================================================
@@ -280,19 +265,19 @@ app.get("/", (req, res) => {
 
 });
 
-
 // =====================================================
 // 404
 // =====================================================
 
 app.use((req, res) => {
 
-    res.status(404).send(
-        "404 Page Not Found"
-    );
+    res
+        .status(404)
+        .send(
+            "404 Page Not Found"
+        );
 
 });
-
 
 // =====================================================
 // SERVER
@@ -301,7 +286,6 @@ app.use((req, res) => {
 const PORT =
     process.env.PORT ||
     3000;
-
 
 app.listen(
     PORT,
@@ -337,6 +321,10 @@ app.listen(
 
         console.log(
             " Faculty Directory: /faculty-directory"
+        );
+
+        console.log(
+            " Session Store: Express Memory (Development)"
         );
 
         console.log(

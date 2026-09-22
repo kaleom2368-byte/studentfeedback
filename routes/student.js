@@ -7,14 +7,16 @@ const db = require("../db");
 // STUDENT LOGIN
 // =====================================================
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
 
     console.log("========== LOGIN ROUTE HIT ==========");
     console.log("Request Body:", req.body);
 
-    const student_id = req.body.student_id;
-    const password = req.body.password;
-    const department = req.body.department;
+    const {
+        student_id,
+        password,
+        department
+    } = req.body || {};
 
     // -------------------------------------------------
     // CHECK REQUIRED FIELDS
@@ -24,39 +26,40 @@ router.post("/login", (req, res) => {
 
         return res.redirect(
             "/auth/student.html?error=" +
-            encodeURIComponent("Please enter all login details")
+            encodeURIComponent(
+                "Please enter all login details"
+            )
         );
 
     }
 
-    // -------------------------------------------------
-    // FIND STUDENT
-    // -------------------------------------------------
+    try {
 
-    const sql = `
-        SELECT *
-        FROM students
-        WHERE student_id = ?
-        AND password = ?
-    `;
+        // -------------------------------------------------
+        // FIND STUDENT
+        // -------------------------------------------------
 
-    db.query(sql, [student_id, password], (err, result) => {
+        const sql = `
+            SELECT *
+            FROM students
+            WHERE student_id = $1
+            AND password = $2
+        `;
 
-        if (err) {
-
-            console.error("❌ Database Error:", err);
-
-            return res.status(500).send("Database Error");
-
-        }
+        const result = await db.query(
+            sql,
+            [student_id, password]
+        );
 
         // -------------------------------------------------
         // INVALID LOGIN
         // -------------------------------------------------
 
-        if (result.length === 0) {
+        if (result.rows.length === 0) {
 
-            console.log("❌ Invalid Roll Number or Password");
+            console.log(
+                "❌ Invalid Roll Number or Password"
+            );
 
             return res.redirect(
                 "/auth/student.html?error=" +
@@ -67,7 +70,7 @@ router.post("/login", (req, res) => {
 
         }
 
-        const student = result[0];
+        const student = result.rows[0];
 
         // -------------------------------------------------
         // DEPARTMENT CHECK
@@ -84,11 +87,17 @@ router.post("/login", (req, res) => {
         );
 
         if (
-            student.department.trim().toLowerCase() !==
-            department.trim().toLowerCase()
+            String(student.department || "")
+                .trim()
+                .toLowerCase() !==
+            String(department || "")
+                .trim()
+                .toLowerCase()
         ) {
 
-            console.log("❌ Wrong Department Selected");
+            console.log(
+                "❌ Wrong Department Selected"
+            );
 
             return res.redirect(
                 "/auth/student.html?error=" +
@@ -151,16 +160,26 @@ router.post("/login", (req, res) => {
             // GO TO DASHBOARD
             // -------------------------------------------------
 
-            res.redirect(
+            return res.redirect(
                 "/dashboard/student-dashboard.html"
             );
 
         });
 
-    });
+    } catch (err) {
+
+        console.error(
+            "❌ Student Login Database Error:",
+            err
+        );
+
+        return res.status(500).send(
+            "Database Error"
+        );
+
+    }
 
 });
-
 
 // =====================================================
 // STUDENT INFORMATION
@@ -188,14 +207,15 @@ router.get("/student-info", (req, res) => {
 
 });
 
-
 // =====================================================
 // STUDENT LOGOUT
 // =====================================================
 
 router.get("/logout", (req, res) => {
 
-    console.log("========== STUDENT LOGOUT ==========");
+    console.log(
+        "========== STUDENT LOGOUT =========="
+    );
 
     req.session.destroy((err) => {
 
@@ -230,11 +250,12 @@ router.get("/logout", (req, res) => {
         // REDIRECT TO LOGIN
         // -------------------------------------------------
 
-        res.redirect("/auth/student.html");
+        res.redirect(
+            "/auth/student.html"
+        );
 
     });
 
 });
-
 
 module.exports = router;

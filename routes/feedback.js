@@ -1,1228 +1,615 @@
 const express = require("express");
 const router = express.Router();
-
 const db = require("../db");
 
-
 // =====================================================
-// GET FACULTY + SUBJECT LIST
-// =====================================================
-//
-// The frontend uses this endpoint to populate:
-//   Faculty dropdown
-//   Subject dropdown
-//
-// Faculty and Subject are linked so selecting one can
-// automatically select the other.
-//
-// NOTE:
-// This currently assumes `subject` exists in the
-// `faculty` table.
-//
-// If your database has a separate subjects/courses table,
-// we will change this query after checking the schema.
+// GET ACTIVE FEEDBACK CYCLE
 // =====================================================
 
-router.get("/faculty", (req, res) => {
-
-    const sql = `
+async function getActiveCycle() {
+    const result = await db.query(`
         SELECT
-            faculty_id,
+            id,
             name,
-            department,
-            subject
-        FROM faculty
-        ORDER BY name ASC
-    `;
+            start_date,
+            end_date,
+            status
+        FROM feedback_cycles
+        WHERE status = 'active'
+        ORDER BY id DESC
+    `);
 
-    db.query(sql, (err, result) => {
+    // Exactly ONE active cycle must exist.
+    if (result.rows.length !== 1) {
+        return null;
+    }
 
-        if (err) {
+    return result.rows[0];
+}
 
-            console.error(
-                "❌ Faculty Fetch Error:",
-                err
-            );
+// =====================================================
+// GET FACULTY
+// =====================================================
+//
+// Used by the student feedback page.
+//
+// Returns faculty_id, name, department and subject.
+// =====================================================
 
-            return res.status(500).json({
-
-                success: false,
-
-                message:
-                    "Failed to load faculty"
-
-            });
-
-        }
-
+router.get("/faculty", async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT
+                faculty_id,
+                name,
+                department,
+                subject
+            FROM faculty
+            ORDER BY name ASC
+        `);
 
         return res.json({
-
             success: true,
-
-            faculty: result
-
+            faculty: result.rows,
         });
+    } catch (err) {
+        console.error("❌ Failed to load faculty:", err);
 
-    });
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load faculty",
+        });
+    }
 });
 
-
 // =====================================================
-// SUBMIT FEEDBACK
+// GET FEEDBACK STATUS
+// =====================================================
+//
+// IMPORTANT:
+//
+// The new feedback table is anonymous and does NOT contain
+// student_id.
+//
+// Therefore participation/status is read from:
+// feedback_submissions
+//
+// This tells the student what they have submitted without
+// connecting their identity to the actual feedback response.
 // =====================================================
 
-router.post("/submit", (req, res) => {
-
-    console.log(
-        "========== FEEDBACK SUBMISSION =========="
-    );
-
-
-    // =================================================
-    // CHECK STUDENT SESSION
-    // =================================================
-
-    if (
-        !req.session ||
-        !req.session.student
-    ) {
-
-        console.log(
-            "❌ Student session missing"
-        );
-
-        return res.status(401).json({
-
+router.get("/status", async (req, res) => {
+    if (!req.session || !req.session.student) {
+        return res.status(200).json({
             success: false,
-
-            message:
-                "Student login required"
-
+            message: "Not Logged In",
         });
-
     }
 
+    const studentId = req.session.student.student_id;
 
-    const studentId =
-        req.session.student.student_id;
-
-
-    const {
-        faculty_id,
-        department,
-        subject,
-        course_satisfaction,
-        syllabus_pace,
-        concept_clarity,
-        practical_work,
-        study_material,
-        exam_difficulty,
-        faculty_support,
-        improvement,
-        comments
-    } = req.body;
-
-
-    console.log(
-        "Student ID:",
-        studentId
-    );
-
-    console.log(
-        "Faculty ID:",
-        faculty_id
-    );
-
-    console.log(
-        "Department:",
-        department
-    );
-
-    console.log(
-        "Subject:",
-        subject
-    );
-
-
-    // =================================================
-    // REQUIRED FIELD VALIDATION
-    // =================================================
-
-    const missingFields = [];
-
-
-    if (
-        !faculty_id ||
-        !String(faculty_id).trim()
-    ) {
-
-        missingFields.push(
-            "faculty_id"
+    try {
+        const result = await db.query(
+            `
+            SELECT
+                fs.id,
+                fs.faculty_id,
+                fs.subject,
+                fs.cycle_id,
+                fs.submitted_at,
+                f.name AS faculty_name
+            FROM feedback_submissions fs
+            LEFT JOIN faculty f
+                ON fs.faculty_id = f.faculty_id
+            WHERE fs.student_id = $1
+            ORDER BY fs.submitted_at DESC
+            `,
+            [studentId]
         );
-
-    }
-
-
-    if (
-        !department ||
-        !String(department).trim()
-    ) {
-
-        missingFields.push(
-            "department"
-        );
-
-    }
-
-
-    if (
-        !subject ||
-        !String(subject).trim()
-    ) {
-
-        missingFields.push(
-            "subject"
-        );
-
-    }
-
-
-    if (
-        !course_satisfaction ||
-        !String(course_satisfaction).trim()
-    ) {
-
-        missingFields.push(
-            "course_satisfaction"
-        );
-
-    }
-
-
-    if (
-        !syllabus_pace ||
-        !String(syllabus_pace).trim()
-    ) {
-
-        missingFields.push(
-            "syllabus_pace"
-        );
-
-    }
-
-
-    if (
-        !concept_clarity ||
-        !String(concept_clarity).trim()
-    ) {
-
-        missingFields.push(
-            "concept_clarity"
-        );
-
-    }
-
-
-    if (
-        !practical_work ||
-        !String(practical_work).trim()
-    ) {
-
-        missingFields.push(
-            "practical_work"
-        );
-
-    }
-
-
-    if (
-        !study_material ||
-        !String(study_material).trim()
-    ) {
-
-        missingFields.push(
-            "study_material"
-        );
-
-    }
-
-
-    if (
-        !exam_difficulty ||
-        !String(exam_difficulty).trim()
-    ) {
-
-        missingFields.push(
-            "exam_difficulty"
-        );
-
-    }
-
-
-    if (
-        !faculty_support ||
-        !String(faculty_support).trim()
-    ) {
-
-        missingFields.push(
-            "faculty_support"
-        );
-
-    }
-
-
-    if (
-        !improvement ||
-        !String(improvement).trim()
-    ) {
-
-        missingFields.push(
-            "improvement"
-        );
-
-    }
-
-
-    if (missingFields.length > 0) {
-
-        console.log(
-            "❌ Missing fields:",
-            missingFields
-        );
-
-        return res.status(400).json({
-
-            success: false,
-
-            message:
-                "Missing required fields: " +
-                missingFields.join(", "),
-
-            missingFields
-
-        });
-
-    }
-
-
-    // =================================================
-    // VERIFY FACULTY
-    // =================================================
-
-    const facultySql = `
-
-        SELECT
-            faculty_id,
-            name,
-            department,
-            subject
-
-        FROM faculty
-
-        WHERE faculty_id = ?
-
-        LIMIT 1
-
-    `;
-
-
-    db.query(
-        facultySql,
-        [faculty_id],
-        (facultyError, facultyRows) => {
-
-            if (facultyError) {
-
-                console.error(
-                    "❌ Faculty Verification Error:",
-                    facultyError
-                );
-
-                return res.status(500).json({
-
-                    success: false,
-
-                    message:
-                        "Unable to verify faculty"
-
-                });
-
-            }
-
-
-            if (
-                !facultyRows ||
-                facultyRows.length === 0
-            ) {
-
-                return res.status(404).json({
-
-                    success: false,
-
-                    message:
-                        "Selected faculty member was not found"
-
-                });
-
-            }
-
-
-            const faculty =
-                facultyRows[0];
-
-
-            // =================================================
-            // VERIFY DEPARTMENT
-            // =================================================
-
-            if (
-                String(faculty.department)
-                    .trim()
-                    .toLowerCase() !==
-                String(department)
-                    .trim()
-                    .toLowerCase()
-            ) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    message:
-                        "Faculty and department information do not match"
-
-                });
-
-            }
-
-
-            // =================================================
-            // VERIFY SUBJECT
-            // =================================================
-            //
-            // Prevent the frontend from submitting an arbitrary
-            // faculty + subject combination.
-            //
-            // If `faculty.subject` is NULL or your database
-            // uses another structure, this section should be
-            // updated after inspecting the schema.
-            // =================================================
-
-            if (
-                faculty.subject &&
-                String(faculty.subject)
-                    .trim()
-                    .toLowerCase() !==
-                String(subject)
-                    .trim()
-                    .toLowerCase()
-            ) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    message:
-                        "Faculty and subject information do not match"
-
-                });
-
-            }
-
-
-            // =================================================
-            // FIND ACTIVE FEEDBACK CYCLE
-            // =================================================
-
-            const activeCycleSql = `
-
-                SELECT
-                    id,
-                    name,
-                    start_date,
-                    end_date,
-                    status
-
-                FROM feedback_cycles
-
-                WHERE status = 'active'
-
-                ORDER BY id ASC
-
-            `;
-
-
-            db.query(
-                activeCycleSql,
-                (cycleError, activeCycles) => {
-
-                    if (cycleError) {
-
-                        console.error(
-                            "❌ Active Cycle Lookup Error:",
-                            cycleError
-                        );
-
-                        return res.status(500).json({
-
-                            success: false,
-
-                            message:
-                                "Unable to verify the feedback cycle"
-
-                        });
-
-                    }
-
-
-                    // =================================================
-                    // NO ACTIVE CYCLE
-                    // =================================================
-
-                    if (
-                        activeCycles.length === 0
-                    ) {
-
-                        return res.status(409).json({
-
-                            success: false,
-
-                            code:
-                                "NO_ACTIVE_CYCLE",
-
-                            message:
-                                "Feedback submission is currently unavailable because no feedback cycle is active."
-
-                        });
-
-                    }
-
-
-                    // =================================================
-                    // MULTIPLE ACTIVE CYCLES
-                    // =================================================
-
-                    if (
-                        activeCycles.length !== 1
-                    ) {
-
-                        console.error(
-                            "❌ INVALID CYCLE CONFIGURATION: Multiple active cycles found."
-                        );
-
-                        return res.status(409).json({
-
-                            success: false,
-
-                            code:
-                                "MULTIPLE_ACTIVE_CYCLES",
-
-                            message:
-                                "Feedback submission is currently unavailable because the feedback-cycle configuration is invalid."
-
-                        });
-
-                    }
-
-
-                    const activeCycle =
-                        activeCycles[0];
-
-                    const cycleId =
-                        activeCycle.id;
-
-
-                    console.log(
-                        "✅ Active Cycle:",
-                        activeCycle.name,
-                        "ID:",
-                        cycleId
-                    );
-
-
-                    // =================================================
-                    // BEGIN DATABASE TRANSACTION
-                    // =================================================
-
-                    db.getConnection(
-                        (connectionError, connection) => {
-
-                            if (connectionError) {
-
-                                console.error(
-                                    "❌ Database Connection Error:",
-                                    connectionError
-                                );
-
-                                return res.status(500).json({
-
-                                    success: false,
-
-                                    message:
-                                        "Failed to submit feedback"
-
-                                });
-
-                            }
-
-
-                            const rollback =
-                                (error) => {
-
-                                    connection.rollback(
-                                        () => {
-
-                                            connection.release();
-
-                                            console.error(
-                                                "❌ Feedback transaction rolled back:",
-                                                error
-                                            );
-
-                                            return res.status(500).json({
-
-                                                success: false,
-
-                                                message:
-                                                    "Failed to submit feedback"
-
-                                            });
-
-                                        }
-                                    );
-
-                                };
-
-
-                            connection.beginTransaction(
-                                (transactionError) => {
-
-                                    if (transactionError) {
-
-                                        connection.release();
-
-                                        console.error(
-                                            "❌ Transaction Start Error:",
-                                            transactionError
-                                        );
-
-                                        return res.status(500).json({
-
-                                            success: false,
-
-                                            message:
-                                                "Failed to submit feedback"
-
-                                        });
-
-                                    }
-
-
-                                    // =================================================
-                                    // CONVERT CURRENT RATINGS
-                                    // =================================================
-
-                                    const teaching =
-                                        course_satisfaction === "Excellent"
-                                            ? 5
-                                            : course_satisfaction === "Good"
-                                                ? 4
-                                                : course_satisfaction === "Average"
-                                                    ? 3
-                                                    : course_satisfaction === "Poor"
-                                                        ? 2
-                                                        : 3;
-
-
-                                    const communication =
-                                        concept_clarity === "Very Clear"
-                                            ? 5
-                                            : concept_clarity === "Mostly Clear"
-                                                ? 4
-                                                : concept_clarity === "Rarely Clear"
-                                                    ? 2
-                                                    : 3;
-
-
-                                    const behaviour =
-                                        faculty_support === "Always Available"
-                                            ? 5
-                                            : faculty_support === "Sometimes Available"
-                                                ? 4
-                                                : faculty_support === "Rarely Available"
-                                                    ? 3
-                                                    : 3;
-
-
-                                    // =================================================
-                                    // INSERT ANONYMOUS FEEDBACK
-                                    // =================================================
-
-                                    const feedbackSql = `
-
-                                        INSERT INTO feedback (
-
-                                            faculty_id,
-                                            department,
-                                            subject,
-
-                                            teaching,
-                                            communication,
-                                            behaviour,
-
-                                            course_satisfaction,
-                                            syllabus_pace,
-                                            concept_clarity,
-                                            practical_work,
-                                            study_material,
-                                            exam_difficulty,
-                                            faculty_support,
-                                            improvement,
-                                            comments,
-
-                                            cycle_id
-
-                                        )
-
-                                        VALUES (
-                                            ?, ?, ?, ?, ?, ?,
-                                            ?, ?, ?, ?, ?, ?,
-                                            ?, ?, ?, ?
-                                        )
-
-                                    `;
-
-
-                                    const feedbackValues = [
-
-                                        faculty_id,
-                                        department,
-                                        subject,
-
-                                        teaching,
-                                        communication,
-                                        behaviour,
-
-                                        course_satisfaction,
-                                        syllabus_pace,
-                                        concept_clarity,
-                                        practical_work,
-                                        study_material,
-                                        exam_difficulty,
-                                        faculty_support,
-                                        improvement,
-                                        comments || null,
-
-                                        cycleId
-
-                                    ];
-
-
-                                    connection.query(
-                                        feedbackSql,
-                                        feedbackValues,
-                                        (feedbackError) => {
-
-                                            if (feedbackError) {
-
-                                                return rollback(
-                                                    feedbackError
-                                                );
-
-                                            }
-
-
-                                            // =================================================
-                                            // INSERT PARTICIPATION TRACKING
-                                            // =================================================
-                                            //
-                                            // Student identity is stored ONLY in
-                                            // feedback_submissions for participation
-                                            // tracking.
-                                            //
-                                            // It is NOT stored in feedback.
-                                            // =================================================
-
-                                            const trackingSql = `
-
-                                                INSERT INTO feedback_submissions (
-
-                                                    student_id,
-                                                    faculty_id,
-                                                    subject,
-                                                    cycle_id
-
-                                                )
-
-                                                VALUES (?, ?, ?, ?)
-
-                                            `;
-
-
-                                            const trackingValues = [
-
-                                                studentId,
-                                                faculty_id,
-                                                subject,
-                                                cycleId
-
-                                            ];
-
-
-                                            connection.query(
-                                                trackingSql,
-                                                trackingValues,
-                                                (trackingError) => {
-
-                                                    if (trackingError) {
-
-                                                        // =================================================
-                                                        // DATABASE UNIQUE CONSTRAINT
-                                                        // =================================================
-
-                                                        if (
-                                                            trackingError.code ===
-                                                            "ER_DUP_ENTRY"
-                                                        ) {
-
-                                                            return connection.rollback(
-                                                                () => {
-
-                                                                    connection.release();
-
-                                                                    console.log(
-                                                                        "⚠️ Duplicate feedback prevented by database constraint."
-                                                                    );
-
-                                                                    return res.status(409).json({
-
-                                                                        success: false,
-
-                                                                        code:
-                                                                            "DUPLICATE_SUBMISSION",
-
-                                                                        message:
-                                                                            "You have already submitted feedback for this faculty member in the active cycle."
-
-                                                                    });
-
-                                                                }
-                                                            );
-
-                                                        }
-
-
-                                                        return rollback(
-                                                            trackingError
-                                                        );
-
-                                                    }
-
-
-                                                    // =================================================
-                                                    // COMMIT
-                                                    // =================================================
-
-                                                    connection.commit(
-                                                        (commitError) => {
-
-                                                            if (commitError) {
-
-                                                                return rollback(
-                                                                    commitError
-                                                                );
-
-                                                            }
-
-
-                                                            connection.release();
-
-
-                                                            console.log(
-                                                                "✅ Anonymous feedback saved successfully."
-                                                            );
-
-                                                            console.log(
-                                                                "✅ Participation tracking saved."
-                                                            );
-
-                                                            console.log(
-                                                                "Cycle ID:",
-                                                                cycleId
-                                                            );
-
-
-                                                            return res.json({
-
-                                                                success: true,
-
-                                                                message:
-                                                                    "Feedback submitted successfully",
-
-                                                                cycle: {
-
-                                                                    id:
-                                                                        activeCycle.id,
-
-                                                                    name:
-                                                                        activeCycle.name
-
-                                                                },
-
-                                                                redirect:
-                                                                    "/dashboard/student-dashboard.html?feedback=success"
-
-                                                            });
-
-                                                        }
-                                                    );
-
-                                                }
-                                            );
-
-                                        }
-                                    );
-
-                                }
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-        }
-    );
-
-});
-
-
-// =====================================================
-// FEEDBACK HISTORY
-// =====================================================
-
-router.get("/history", (req, res) => {
-
-    if (
-        !req.session ||
-        !req.session.student
-    ) {
-
-        return res.status(401).json({
-
-            success: false,
-
-            message:
-                "Student login required"
-
-        });
-
-    }
-
-
-    const studentId =
-        req.session.student.student_id;
-
-
-    const sql = `
-
-        SELECT
-
-            fs.id,
-
-            fs.faculty_id,
-
-            fs.subject,
-
-            fs.cycle_id,
-
-            fs.submitted_at,
-
-            fc.name AS cycle_name,
-
-            f.name AS faculty_name
-
-        FROM feedback_submissions fs
-
-        LEFT JOIN faculty f
-            ON fs.faculty_id = f.faculty_id
-
-        LEFT JOIN feedback_cycles fc
-            ON fs.cycle_id = fc.id
-
-        WHERE fs.student_id = ?
-
-        ORDER BY
-            fs.submitted_at DESC
-
-    `;
-
-
-    db.query(
-        sql,
-        [studentId],
-        (err, result) => {
-
-            if (err) {
-
-                console.error(
-                    "❌ Feedback History Error:",
-                    err
-                );
-
-                return res.status(500).json({
-
-                    success: false,
-
-                    message:
-                        "Failed to load feedback history"
-
-                });
-
-            }
-
-
-            return res.json({
-
-                success: true,
-
-                feedback: result
-
-            });
-
-        }
-    );
-
-});
-
-
-// =====================================================
-// FEEDBACK STATUS
-// =====================================================
-
-router.get("/status", (req, res) => {
-
-    if (
-        !req.session ||
-        !req.session.student
-    ) {
 
         return res.json({
-
-            success: false,
-
-            message:
-                "Not Logged In"
-
+            success: true,
+            count: result.rows.length,
+            history: result.rows,
         });
+    } catch (err) {
+        console.error(
+            "❌ Failed to load feedback status:",
+            err
+        );
 
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load feedback status",
+        });
+    }
+});
+
+// =====================================================
+// SUBJECT CODE HELPERS
+// =====================================================
+
+function getSubjectCodeFromFacultySubject(subject) {
+    const value = String(subject || "").trim();
+
+    if (!value) {
+        return "";
     }
 
+    // Example:
+    // Data Structures and Algorithms(DSA)
+    // -> DSA
 
-    const studentId =
-        req.session.student.student_id;
+    const match = value.match(/\(([^)]+)\)\s*$/);
 
+    if (match) {
+        return match[1]
+            .trim()
+            .toUpperCase();
+    }
+
+    // Subjects without (...) need explicit mapping.
+    const normalized = value
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const aliases = {
+        "web development": "WEB",
+
+        "basic of computer networking": "BCN",
+        "basics of computer networking": "BCN",
+
+        "digital electronics and logic design": "DELD",
+
+        "data structures and algorithms": "DSA",
+
+        "object-oriented programming": "OOP",
+        "object oriented programming": "OOP",
+    };
+
+    return aliases[normalized] || value.toUpperCase();
+}
+
+// =====================================================
+// SUBMIT ALL FEEDBACK
+// =====================================================
+//
+// One student submits once per active cycle.
+//
+// Feedback itself remains ANONYMOUS.
+//
+// student_id is stored ONLY in feedback_submissions.
+//
+// The backend decides:
+// - active cycle
+// - faculty
+// - subject
+// - form type
+//
+// Frontend cannot control cycle_id or form_type.
+// =====================================================
+
+router.post("/submit-all", async (req, res) => {
+    console.log("========== SUBMIT ALL FEEDBACK ==========");
+
+    // =================================================
+    // CHECK STUDENT LOGIN
+    // =================================================
+
+    if (!req.session || !req.session.student) {
+        return res.status(401).json({
+            success: false,
+            message: "Student login required",
+        });
+    }
+
+    const studentId = req.session.student.student_id;
+    const feedback = req.body?.feedback;
+
+    // =================================================
+    // CHECK FEEDBACK DATA
+    // =================================================
+
+    if (!feedback || typeof feedback !== "object") {
+        return res.status(400).json({
+            success: false,
+            message: "No feedback data received",
+        });
+    }
+
+    const subjects = Object.values(feedback);
+
+    if (subjects.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message:
+                "Please submit feedback for at least one subject",
+        });
+    }
 
     // =================================================
     // GET ACTIVE CYCLE
     // =================================================
 
-    const cycleSql = `
+    const activeCycle = await getActiveCycle();
 
-        SELECT
-            id,
-            name,
-            start_date,
-            end_date
+    if (!activeCycle) {
+        return res.status(409).json({
+            success: false,
+            code: "NO_ACTIVE_CYCLE",
+            message:
+                "No feedback cycle is currently active",
+        });
+    }
 
-        FROM feedback_cycles
+    // IMPORTANT:
+    // cycle_id comes ONLY from the backend.
+    const cycleId = activeCycle.id;
 
-        WHERE status = 'active'
+    // =================================================
+    // DATABASE TRANSACTION
+    // =================================================
 
-        ORDER BY id ASC
+    const client = await db.connect();
 
-    `;
+    try {
+        await client.query("BEGIN");
 
+        // =================================================
+        // CHECK IF STUDENT ALREADY SUBMITTED THIS CYCLE
+        // =================================================
 
-    db.query(
-        cycleSql,
-        (cycleError, cycles) => {
+        const existingSql = `
+            SELECT id
+            FROM feedback_submissions
+            WHERE student_id = $1
+              AND cycle_id = $2
+            LIMIT 1
+        `;
 
-            if (cycleError) {
+        const existingResult = await client.query(
+            existingSql,
+            [studentId, cycleId]
+        );
 
-                console.error(
-                    "❌ Status Cycle Error:",
-                    cycleError
+        if (existingResult.rows.length > 0) {
+            await client.query("ROLLBACK");
+
+            return res.status(409).json({
+                success: false,
+                code: "ALREADY_SUBMITTED",
+                message:
+                    "You have already submitted feedback for this cycle.",
+            });
+        }
+
+        // =================================================
+        // PROCESS EACH SUBJECT
+        // =================================================
+
+        for (const item of subjects) {
+            const subjectCode = String(
+                item.subject || ""
+            )
+                .trim()
+                .toUpperCase();
+
+            const facultyId = String(
+                item.faculty_id || ""
+            ).trim();
+
+            const answers =
+                item.answers &&
+                typeof item.answers === "object" &&
+                !Array.isArray(item.answers)
+                    ? item.answers
+                    : {};
+
+            // =============================================
+            // BASIC VALIDATION
+            // =============================================
+
+            if (!subjectCode || !facultyId) {
+                throw new Error(
+                    "Subject and faculty are required for every feedback form."
                 );
-
-                return res.status(500).json({
-
-                    success: false,
-
-                    message:
-                        "Failed to load feedback status"
-
-                });
-
             }
 
+            // =============================================
+            // VERIFY FACULTY
+            // =============================================
 
-            // =================================================
-            // NO ACTIVE CYCLE
-            // =================================================
-
-            if (
-                cycles.length === 0
-            ) {
-
-                return res.json({
-
-                    success: true,
-
-                    activeCycle: null,
-
-                    count: 0,
-
-                    history: []
-
-                });
-
-            }
-
-
-            // =================================================
-            // INVALID CONFIGURATION
-            // =================================================
-
-            if (
-                cycles.length !== 1
-            ) {
-
-                console.error(
-                    "❌ Multiple active feedback cycles detected."
-                );
-
-                return res.status(409).json({
-
-                    success: false,
-
-                    code:
-                        "MULTIPLE_ACTIVE_CYCLES",
-
-                    message:
-                        "Feedback-cycle configuration is invalid."
-
-                });
-
-            }
-
-
-            const activeCycle =
-                cycles[0];
-
-
-            // =================================================
-            // GET STUDENT'S SUBMISSIONS
-            // IN ACTIVE CYCLE
-            // =================================================
-
-            const statusSql = `
-
+            const facultySql = `
                 SELECT
-
-                    fs.id,
-
-                    fs.faculty_id,
-
-                    fs.subject,
-
-                    fs.cycle_id,
-
-                    fs.submitted_at,
-
-                    f.name AS faculty_name
-
-                FROM feedback_submissions fs
-
-                LEFT JOIN faculty f
-                    ON fs.faculty_id = f.faculty_id
-
-                WHERE fs.student_id = ?
-
-                AND fs.cycle_id = ?
-
-                ORDER BY
-                    fs.submitted_at DESC
-
+                    faculty_id,
+                    name,
+                    department,
+                    subject
+                FROM faculty
+                WHERE faculty_id = $1
+                LIMIT 1
             `;
 
-
-            db.query(
-                statusSql,
-                [
-                    studentId,
-                    activeCycle.id
-                ],
-                (err, result) => {
-
-                    if (err) {
-
-                        console.error(
-                            "❌ Status Query Error:",
-                            err
-                        );
-
-                        return res.status(500).json({
-
-                            success: false,
-
-                            message:
-                                "Failed to load feedback status"
-
-                        });
-
-                    }
-
-
-                    return res.json({
-
-                        success: true,
-
-                        activeCycle: {
-
-                            id:
-                                activeCycle.id,
-
-                            name:
-                                activeCycle.name,
-
-                            start_date:
-                                activeCycle.start_date,
-
-                            end_date:
-                                activeCycle.end_date
-
-                        },
-
-                        count:
-                            result.length,
-
-                        history:
-                            result
-
-                    });
-
-                }
+            const facultyResult = await client.query(
+                facultySql,
+                [facultyId]
             );
 
+            if (facultyResult.rows.length === 0) {
+                throw new Error(
+                    `Faculty not found for ${subjectCode}`
+                );
+            }
+
+            const faculty = facultyResult.rows[0];
+
+            // =============================================
+            // VERIFY FACULTY + SUBJECT
+            // =============================================
+
+            const facultySubject = String(
+                faculty.subject || ""
+            ).trim();
+
+            const facultySubjectCode =
+                getSubjectCodeFromFacultySubject(
+                    facultySubject
+                );
+
+            const subjectMatches =
+                facultySubjectCode === subjectCode ||
+                facultySubject.toUpperCase() === subjectCode;
+
+            if (!subjectMatches) {
+                throw new Error(
+                    `Faculty and subject do not match for ${subjectCode}`
+                );
+            }
+
+            // =============================================
+            // GET SUBJECT REQUIREMENT
+            // =============================================
+
+            const requirementSql = `
+                SELECT
+                    requirement
+                FROM subject_requirements
+                WHERE LOWER(TRIM(subject)) =
+                      LOWER(TRIM($1))
+                LIMIT 1
+            `;
+
+            const requirementResult =
+                await client.query(
+                    requirementSql,
+                    [facultySubject]
+                );
+
+            if (requirementResult.rows.length === 0) {
+                throw new Error(
+                    `No feedback requirement configured for ${facultySubject}`
+                );
+            }
+
+            const requirement =
+                requirementResult.rows[0].requirement;
+
+            // =============================================
+            // DETERMINE FORM TYPE
+            // =============================================
+
+            let formType;
+
+            if (requirement === "theory") {
+                formType = "theory";
+            } else if (requirement === "combined") {
+                formType = "combined";
+            } else if (requirement === "other") {
+                throw new Error(
+                    `Subject "${facultySubject}" uses requirement "other", but the feedback table does not support this form type yet.`
+                );
+            } else {
+                throw new Error(
+                    `Invalid feedback requirement for ${facultySubject}`
+                );
+            }
+
+            // =============================================
+            // VALIDATE ANSWERS
+            // =============================================
+
+            if (
+                !answers ||
+                typeof answers !== "object" ||
+                Array.isArray(answers) ||
+                Object.keys(answers).length === 0
+            ) {
+                throw new Error(
+                    `${subjectCode}: No answers received`
+                );
+            }
+
+            // =============================================
+            // CLEAN ANSWERS
+            // =============================================
+
+            const cleanedAnswers = {};
+
+            for (const [key, value] of Object.entries(
+                answers
+            )) {
+                if (
+                    value === null ||
+                    value === undefined
+                ) {
+                    continue;
+                }
+
+                if (typeof value === "string") {
+                    const trimmedValue =
+                        value.trim();
+
+                    if (trimmedValue !== "") {
+                        cleanedAnswers[key] =
+                            trimmedValue;
+                    }
+                } else {
+                    cleanedAnswers[key] = value;
+                }
+            }
+
+            if (
+                Object.keys(cleanedAnswers).length === 0
+            ) {
+                throw new Error(
+                    `${subjectCode}: No valid answers received`
+                );
+            }
+
+            // =============================================
+            // INSERT ANONYMOUS FEEDBACK
+            // =============================================
+
+            /*
+             * IMPORTANT:
+             *
+             * student_id is NEVER stored in feedback.
+             *
+             * responses contains the complete answers.
+             */
+
+            const feedbackSql = `
+                INSERT INTO feedback (
+                    faculty_id,
+                    department,
+                    subject,
+                    form_type,
+                    responses,
+                    cycle_id
+                )
+                VALUES (
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5::jsonb,
+                    $6
+                )
+            `;
+
+            await client.query(
+                feedbackSql,
+                [
+                    facultyId,
+                    faculty.department,
+                    subjectCode,
+                    formType,
+                    JSON.stringify(
+                        cleanedAnswers
+                    ),
+                    cycleId,
+                ]
+            );
+
+            // =============================================
+            // PARTICIPATION TRACKING
+            // =============================================
+
+            /*
+             * Student identity exists ONLY here.
+             *
+             * This allows the system to know that the
+             * student has participated without connecting
+             * the student to the anonymous feedback response.
+             */
+
+            const trackingSql = `
+                INSERT INTO feedback_submissions (
+                    student_id,
+                    faculty_id,
+                    subject,
+                    cycle_id
+                )
+                VALUES ($1, $2, $3, $4)
+            `;
+
+            await client.query(
+                trackingSql,
+                [
+                    studentId,
+                    facultyId,
+                    subjectCode,
+                    cycleId,
+                ]
+            );
         }
-    );
 
+        // =================================================
+        // COMMIT
+        // =================================================
+
+        await client.query("COMMIT");
+
+        console.log(
+            "✅ All feedback submitted successfully."
+        );
+
+        console.log("Student:", studentId);
+        console.log("Cycle:", cycleId);
+        console.log(
+            "Subjects:",
+            subjects.length
+        );
+
+        return res.json({
+            success: true,
+            message:
+                "All feedback submitted successfully",
+            cycle: {
+                id: activeCycle.id,
+                name: activeCycle.name,
+            },
+            redirect:
+                "/dashboard/student-dashboard.html?feedback=success",
+        });
+
+    } catch (err) {
+        await client.query("ROLLBACK");
+
+        console.error(
+            "❌ Submit All Feedback Error:",
+            err
+        );
+
+        // =================================================
+        // DUPLICATE SUBMISSION
+        // =================================================
+
+        if (err.code === "23505") {
+            return res.status(409).json({
+                success: false,
+                code: "DUPLICATE_SUBMISSION",
+                message:
+                    "Feedback has already been submitted for this cycle.",
+            });
+        }
+
+        // =================================================
+        // DATABASE ERROR
+        // =================================================
+
+        return res.status(500).json({
+            success: false,
+            message:
+                err.message ||
+                "Failed to submit feedback",
+        });
+
+    } finally {
+        client.release();
+    }
 });
-
 
 // =====================================================
 // EXPORT ROUTER
