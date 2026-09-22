@@ -6,10 +6,6 @@ const session = require("express-session");
 const helmet = require("helmet");
 const cors = require("cors");
 
-// =====================================================
-// ROUTES
-// =====================================================
-
 const studentRoute = require("./routes/student");
 const facultyRoute = require("./routes/faculty");
 const hodRoute = require("./routes/hod");
@@ -18,17 +14,12 @@ const feedbackRoute = require("./routes/feedback");
 const dashboardRoute = require("./routes/dashboard");
 const facultyDirectoryRoute = require("./routes/faculty-directory");
 
-// =====================================================
-// DATABASE
-// =====================================================
-
-const dbPool = require("./db");
-
-// =====================================================
-// APP
-// =====================================================
+require("./db");
 
 const app = express();
+
+// Render runs behind HTTPS proxy.
+app.set("trust proxy", 1);
 
 // =====================================================
 // SECURITY
@@ -39,37 +30,31 @@ app.use(
         contentSecurityPolicy: {
             directives: {
                 defaultSrc: ["'self'"],
-
                 scriptSrc: [
                     "'self'",
                     "'unsafe-inline'",
                     "https://cdn.jsdelivr.net"
                 ],
-
                 scriptSrcElem: [
                     "'self'",
                     "'unsafe-inline'",
                     "https://cdn.jsdelivr.net"
                 ],
-
                 styleSrc: [
                     "'self'",
                     "'unsafe-inline'",
                     "https://fonts.googleapis.com"
                 ],
-
                 fontSrc: [
                     "'self'",
                     "https://fonts.gstatic.com",
                     "data:"
                 ],
-
                 imgSrc: [
                     "'self'",
                     "data:",
                     "blob:"
                 ],
-
                 connectSrc: [
                     "'self'",
                     "https://cdn.jsdelivr.net"
@@ -94,82 +79,40 @@ app.use(
 // BODY PARSER
 // =====================================================
 
-app.use(
-    express.urlencoded({
-        extended: true
-    })
-);
-
-app.use(
-    express.json()
-);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // =====================================================
 // DISABLE CACHE
 // =====================================================
 
 app.use((req, res, next) => {
-
     res.setHeader(
         "Cache-Control",
         "no-store, no-cache, must-revalidate, private"
     );
-
-    res.setHeader(
-        "Pragma",
-        "no-cache"
-    );
-
-    res.setHeader(
-        "Expires",
-        "0"
-    );
-
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     next();
 });
 
 // =====================================================
 // SESSION
 // =====================================================
-//
-// LOCAL DEVELOPMENT SESSION
-//
-// Neon PostgreSQL is still used for all application
-// database data.
-//
-// We are NOT using:
-// - express-mysql-session
-// - connect-pg-simple
-//
-// Express will keep sessions in server memory.
-//
-// This is suitable for local development.
-// A persistent session store can be added later
-// when the application is deployed.
-// =====================================================
 
 app.use(
     session({
-
-        secret:
-            process.env.SESSION_SECRET ||
-            "StudentFeedback2026",
-
+        secret: process.env.SESSION_SECRET || "StudentFeedback2026",
         resave: false,
-
         saveUninitialized: false,
+        proxy: true,
 
         cookie: {
-
-            secure:
-                process.env.NODE_ENV === "production",
-
+            secure: process.env.NODE_ENV === "production",
             httpOnly: true,
-
-            maxAge:
-                1000 * 60 * 60 * 24
+            sameSite: "lax",
+            maxAge: 24 * 60 * 60 * 1000
         }
-
     })
 );
 
@@ -177,92 +120,40 @@ app.use(
 // STATIC FILES
 // =====================================================
 
-app.use(
-    express.static(
-        path.join(__dirname, "public")
-    )
-);
+app.use(express.static(path.join(__dirname, "public")));
 
 // =====================================================
 // ROUTES
 // =====================================================
 
-// Student routes
-app.use(
-    "/student",
-    studentRoute
-);
-
-// Faculty routes
-app.use(
-    "/faculty",
-    facultyRoute
-);
-
-// HOD routes
-app.use(
-    "/hod",
-    hodRoute
-);
-
-// Admin routes
-app.use(
-    "/admin",
-    adminRoute
-);
-
-// Feedback routes
-app.use(
-    "/feedback",
-    feedbackRoute
-);
-
-// Dashboard routes
-app.use(
-    "/dashboard",
-    dashboardRoute
-);
-
-// Faculty directory
-app.use(
-    "/faculty-directory",
-    facultyDirectoryRoute
-);
+app.use("/student", studentRoute);
+app.use("/faculty", facultyRoute);
+app.use("/hod", hodRoute);
+app.use("/admin", adminRoute);
+app.use("/feedback", feedbackRoute);
+app.use("/dashboard", dashboardRoute);
+app.use("/faculty-directory", facultyDirectoryRoute);
 
 // =====================================================
-// HEALTH CHECK
+// HEALTH
 // =====================================================
 
 app.get("/health", (req, res) => {
-
     res.json({
-
         status: "OK",
-
-        environment:
-            process.env.NODE_ENV ||
-            "development",
-
+        environment: process.env.NODE_ENV || "development",
         database: "Connected"
-
     });
-
 });
 
 // =====================================================
-// HOME PAGE
+// HOME
 // =====================================================
 
 app.get("/", (req, res) => {
-
     res.sendFile(
-        path.join(
-            __dirname,
-            "public",
-            "index.html"
-        )
+        path.join(__dirname, "public", "index.html")
     );
-
 });
 
 // =====================================================
@@ -270,66 +161,25 @@ app.get("/", (req, res) => {
 // =====================================================
 
 app.use((req, res) => {
-
-    res
-        .status(404)
-        .send(
-            "404 Page Not Found"
-        );
-
+    res.status(404).send("404 Page Not Found");
 });
 
 // =====================================================
 // SERVER
 // =====================================================
 
-const PORT =
-    process.env.PORT ||
-    3000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(
-    PORT,
-    "0.0.0.0",
-    () => {
-
-        console.log(
-            "======================================"
-        );
-
-        console.log(
-            " Anonymous Student Feedback System"
-        );
-
-        console.log(
-            ` Server running at http://localhost:${PORT}`
-        );
-
-        console.log(
-            ` NODE_ENV = ${
-                process.env.NODE_ENV ||
-                "development"
-            }`
-        );
-
-        console.log(
-            " Student routes: /student"
-        );
-
-        console.log(
-            " Dashboard routes: /dashboard"
-        );
-
-        console.log(
-            " Faculty Directory: /faculty-directory"
-        );
-
-        console.log(
-            " Session Store: Express Memory (Development)"
-        );
-
-        console.log(
-            "======================================"
-        );
-
-    }
-);
+app.listen(PORT, "0.0.0.0", () => {
+    console.log("======================================");
+    console.log(" Anonymous Student Feedback System");
+    console.log(` Server running at http://localhost:${PORT}`);
+    console.log(
+        ` NODE_ENV = ${process.env.NODE_ENV || "development"}`
+    );
+    console.log(" Student routes: /student");
+    console.log(" Dashboard routes: /dashboard");
+    console.log(" Faculty Directory: /faculty-directory");
+    console.log(" Session: Express Memory");
+    console.log("======================================");
+});
