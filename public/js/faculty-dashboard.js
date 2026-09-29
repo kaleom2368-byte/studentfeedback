@@ -1,699 +1,506 @@
 "use strict";
-/* ==========================================================
-   GLOBAL VARIABLES
-========================================================== */
-let performanceChart = null;
-let lastFetchedData = null;
-let realtimeRefreshTimer = null;
-let isRealtimeRefreshing = false;
-const REALTIME_REFRESH_INTERVAL = 10000;
-/* ==========================================================
-   CURRENT FEEDBACK PARAMETERS
-========================================================== */
-const FEEDBACK_PARAMETERS = [
-    {
-        key: "course_satisfaction",
-        label: "Course Satisfaction"
-    },
-    {
-        key: "syllabus_pace",
-        label: "Syllabus Pace"
-    },
-    {
-        key: "concept_clarity",
-        label: "Concept Clarity"
-    },
-    {
-        key: "practical_work",
-        label: "Practical Work"
-    },
-    {
-        key: "study_material",
-        label: "Study Material"
-    },
-    {
-        key: "exam_difficulty",
-        label: "Exam Difficulty"
-    },
-    {
-        key: "faculty_support",
-        label: "Faculty Support"
-    },
-    {
-        key: "improvement",
-        label: "Improvement"
-    }
+
+/*
+ * FACULTY DASHBOARD
+ * Simplified + compatible with current PostgreSQL backend
+ */
+
+let chart = null;
+let data = null;
+let refreshTimer = null;
+let refreshing = false;
+
+const REFRESH_MS = 10000;
+
+const PARAMETERS = [
+    ["course_satisfaction", "Course Satisfaction"],
+    ["syllabus_pace", "Syllabus Pace"],
+    ["concept_clarity", "Concept Clarity"],
+    ["practical_work", "Practical Work"],
+    ["study_material", "Study Material"],
+    ["exam_difficulty", "Exam Difficulty"],
+    ["faculty_support", "Faculty Support"],
+    ["improvement", "Improvement"]
 ];
-/* ==========================================================
-   PAGE INITIALIZATION
-========================================================== */
-document.addEventListener("DOMContentLoaded", () => {
 
-    initializeTheme();
+/* =========================================================
+   START
+========================================================= */
 
-    initializeFilters();
+document.addEventListener("DOMContentLoaded", async () => {
+    initTheme();
+    initFilters();
+    initChecklist();
 
-    initializeSubmissionChecklist();
+    await loadFaculty();
+    await loadFeedback();
 
-    loadFaculty();
-
-    loadFeedback();
-
-    startRealtimeRefresh();
-
+    startRefresh();
 });
-/* ==========================================================
-   SAFE DOM HELPERS
-========================================================== */
-function getElement(id) {
-    return document.getElementById(id);
-}
-function setText(id, value) {
 
-    const element = getElement(id);
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
 
-    if (!element) {
-        return;
-    }
+const $ = id => document.getElementById(id);
+
+function setText(id, value, fallback = "—") {
+    const element = $(id);
+
+    if (!element) return;
 
     element.textContent =
-        value === null ||
         value === undefined ||
+        value === null ||
         value === ""
-            ? "—"
+            ? fallback
             : String(value);
 }
-/* ==========================================================
-   THEME
-========================================================== */
-function initializeTheme() {
 
-    const button = getElement("dark-mode-btn");
+function num(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+}
 
-    if (!button) {
-        return;
+function rating(value) {
+    return num(value).toFixed(1);
+}
+
+function average(values) {
+    const valid = values
+        .map(num)
+        .filter(value => value > 0);
+
+    if (!valid.length) return 0;
+
+    return valid.reduce(
+        (sum, value) => sum + value,
+        0
+    ) / valid.length;
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function truncate(value, length = 400) {
+    const text = String(value ?? "").trim();
+
+    return text.length > length
+        ? text.slice(0, length - 1) + "…"
+        : text;
+}
+
+function css(variable) {
+    return getComputedStyle(document.body)
+        .getPropertyValue(variable)
+        .trim();
+}
+
+async function apiGet(url) {
+    const response = await fetch(url, {
+        credentials: "include",
+        cache: "no-store",
+        headers: {
+            Accept: "application/json"
+        }
+    });
+
+    if (response.status === 401) {
+        window.location.href = "/auth/faculty.html";
+        throw new Error("Faculty session expired");
     }
-    const isAlreadyLight =
-        document.body.classList.contains("light-mode") ||
-        document.documentElement.dataset.theme === "light" ||
-        document.documentElement.classList.contains("light");
-    applyTheme(
-        isAlreadyLight
-            ? "light"
-            : "dark"
-    );
+
+    if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+    }
+
+    return response.json();
+}
+
+/* =========================================================
+   THEME
+========================================================= */
+
+function initTheme() {
+    const button = $("dark-mode-btn");
+
+    if (!button) return;
+
+    const saved =
+        localStorage.getItem("facultyTheme") || "dark";
+
+    applyTheme(saved);
+
     button.addEventListener("click", () => {
-        const isLight =
-            document.body.classList.contains("light-mode") ||
-            document.documentElement.dataset.theme === "light" ||
-            document.documentElement.classList.contains("light");
+        const current =
+            document.documentElement.dataset.theme === "light"
+                ? "light"
+                : "dark";
+
         applyTheme(
-            isLight
+            current === "light"
                 ? "dark"
                 : "light"
         );
     });
 }
+
 function applyTheme(theme) {
-    const body = document.body;
+    const light = theme === "light";
     const html = document.documentElement;
-    const button = getElement("dark-mode-btn");
-    if (theme === "light") {
-        body.classList.add("light-mode");
-        body.classList.remove("dark-mode");
-        body.classList.remove("dark");
-        html.dataset.theme = "light";
-        html.classList.add("light");
-        html.classList.remove("dark");
-        if (button) {
-            button.textContent = "🌙";
-            button.setAttribute(
-                "aria-label",
-                "Switch to dark mode"
-            );
-            button.setAttribute(
-                "title",
-                "Switch to dark mode"
-            );
-        }
-    } else {
-        body.classList.remove("light-mode");
-        body.classList.add("dark-mode");
-        body.classList.remove("dark");
-        html.dataset.theme = "dark";
-        html.classList.add("dark");
-        html.classList.remove("light");
-        if (button) {
-            button.textContent = "☀️";
-            button.setAttribute(
-                "aria-label",
-                "Switch to light mode"
-            );
-            button.setAttribute(
-                "title",
-                "Switch to light mode"
-            );
-        }
+    const body = document.body;
+    const button = $("dark-mode-btn");
+
+    html.dataset.theme = light ? "light" : "dark";
+
+    html.classList.toggle("light", light);
+    html.classList.toggle("dark", !light);
+
+    body.classList.toggle("light-mode", light);
+    body.classList.toggle("dark-mode", !light);
+
+    localStorage.setItem(
+        "facultyTheme",
+        light ? "light" : "dark"
+    );
+
+    if (button) {
+        button.textContent = light ? "🌙" : "☀️";
+        button.title = light
+            ? "Switch to dark mode"
+            : "Switch to light mode";
     }
-    updatePerformanceChartTheme();
+
+    updateChartTheme();
 }
-/* ==========================================================
-   API HELPER
-========================================================== */
-async function apiGet(path) {
-    const response = await fetch(path, {
-        method: "GET",
-        credentials: "include",
-        cache: "no-store",
-        headers: {
-            "Accept": "application/json"
-        }
-    });
-    if (!response.ok) {
-        throw new Error(
-            `Request failed: ${response.status} ${response.statusText}`
-        );
-    }
-    return await response.json();
-}
-/* ==========================================================
-   FACULTY INFORMATION
-========================================================== */
+
+/* =========================================================
+   FACULTY
+========================================================= */
+
 async function loadFaculty() {
     try {
-        const data =
-            await apiGet("/faculty/info");
-        console.log(
-            "Faculty information:",
-            data
-        );
-        if (!data || data.success === false) {
-            console.warn(
-                "Faculty information unavailable."
-            );
-            return;
-        }
+        const result = await apiGet("/faculty/info");
+
+        if (!result || result.success === false) return;
+
         const faculty =
-            data.faculty ||
-            data.user ||
-            data.data ||
-            data;
-        const facultyId =
+            result.faculty ||
+            result.data ||
+            result;
+
+        const id =
             faculty.faculty_id ||
             faculty.facultyId ||
             faculty.id ||
             "—";
-        const facultyName =
+
+        const name =
             faculty.name ||
             faculty.faculty_name ||
-            faculty.facultyName ||
             "Faculty";
+
         const department =
             faculty.department ||
             faculty.dept ||
-            faculty.department_name ||
             "—";
+
         const email =
             faculty.email ||
             faculty.faculty_email ||
             "—";
-        let subject = "—";
-        if (Array.isArray(faculty.subjects)) {
-            subject =
-                faculty.subjects.join(", ");
-        } else {
-            subject =
+
+        const subject = Array.isArray(faculty.subjects)
+            ? faculty.subjects.join(", ")
+            : (
                 faculty.subject ||
                 faculty.subject_name ||
                 faculty.subjects ||
-                "—";
-        }
-        setText(
-            "faculty-id",
-            facultyId
-        );
-        setText(
-            "faculty-name",
-            facultyName
-        );
-        setText(
-            "faculty-department",
-            department
-        );
-        setText(
-            "faculty-email",
-            email
-        );
-        setText(
-            "faculty-subject",
-            subject
-        );
-        setText(
-            "faculty-name-header",
-            facultyName
-        );
-        setText(
-            "faculty-department-header",
-            department
-        );
+                "—"
+            );
+
+        setText("faculty-id", id);
+        setText("faculty-name", name);
+        setText("faculty-department", department);
+        setText("faculty-email", email);
+        setText("faculty-subject", subject);
+
+        setText("faculty-name-header", name);
+        setText("faculty-department-header", department);
+
         setText(
             "welcome-heading",
-            `Welcome back, ${facultyName} 👋`
+            `Welcome back, ${name} 👋`
         );
+
         setText(
             "welcome-sub",
             `${subject} • ${department}`
         );
+
     } catch (error) {
-        console.error(
-            "Failed to load faculty information:",
-            error
-        );
+        console.error("Faculty information error:", error);
     }
 }
-/* ==========================================================
-   FEEDBACK DATA
-========================================================== */
+
+/* =========================================================
+   FEEDBACK
+========================================================= */
+
 async function loadFeedback() {
     try {
-        const data =
+        const result =
             await apiGet("/faculty/feedback");
+
+        data = result;
+
         console.log(
-            "Faculty feedback:",
-            data
+            "Faculty dashboard:",
+            result
         );
-        if (!data || data.success === false) {
-            console.warn(
-                "Faculty feedback data unavailable."
-            );
-            showNoFeedbackState();
+
+        if (!result || result.success === false) {
+            showNoFeedback();
             return;
         }
-        lastFetchedData = data;
-        /* --------------------------------------------------
-           TOTAL FEEDBACK
-        -------------------------------------------------- */
-        const totalFeedback =
-            getNumberFromObjects(
-                [
-                    data,
-                    data.statistics,
-                    data.stats,
-                    data.summary,
-                    data.overview
-                ],
-                [
-                    "totalFeedback",
-                    "total",
-                    "count",
-                    "feedbackCount"
-                ]
-            );
-        /* --------------------------------------------------
-           RATINGS
-        -------------------------------------------------- */
-        const ratings =
-            extractRatings(data);
-        const overall =
-            getNumberFromObjects(
-                [
-                    data,
-                    data.statistics,
-                    data.stats,
-                    data.summary,
-                    data.averages
-                ],
-                [
-                    "overall",
-                    "overallRating",
-                    "overallAverage",
-                    "averageRating"
-                ]
+
+        const cycle = activeCycle();
+        const cycles = getCycles();
+
+        const ratings = getRatings(
+            result.averages ||
+            result.ratings ||
+            result.statistics ||
+            result.stats ||
+            {}
+        );
+
+        const total =
+            num(
+                result.totalFeedback
             ) ||
-            calculateAverage(
-                Object.values(ratings)
-            );
+            num(
+                result.feedbackCount
+            ) ||
+            num(
+                cycle?.count
+            ) ||
+            getFeedbackCount();
+
+        const responses =
+            num(
+                result.participation?.submitted
+            ) ||
+            num(
+                result.participation?.submittedCurrent
+            ) ||
+            total;
+
         setText(
             "overall-rating",
-            formatRating(overall)
+            rating(
+                result.overall ||
+                result.overallRating ||
+                average(Object.values(ratings))
+            )
         );
+
         setText(
             "total-feedback",
-            totalFeedback
+            total,
+            "0"
         );
-        /* --------------------------------------------------
-           ACTIVE / CURRENT CYCLE
-        -------------------------------------------------- */
-        const cycles =
-            getCycles(data);
-        const currentCycle =
-            getActiveCycle(data, cycles);
-        const cycleLabel =
-            getCycleLabel(
-                data,
-                currentCycle
-            );
-        setText(
-            "cycle-label",
-            cycleLabel
-        );
-        setText(
-            "cycle-label-small",
-            cycleLabel
-        );
-        /* --------------------------------------------------
-           CURRENT RESPONSES
-        -------------------------------------------------- */
-        const cycleResponses =
-            getCurrentCycleResponses(
-                data,
-                currentCycle
-            );
+
         setText(
             "cycle-responses",
-            cycleResponses
+            responses,
+            "0"
         );
-        /* --------------------------------------------------
-           RATING BREAKDOWN
-        -------------------------------------------------- */
-        renderRatingBreakdown(
-            ratings
+
+        const cycleName =
+            getCycleName(cycle);
+
+        setText(
+            "cycle-label",
+            cycleName
         );
-        /* --------------------------------------------------
-           PERFORMANCE CHART
-        -------------------------------------------------- */
-        renderPerformanceChart(
-            cycles
+
+        setText(
+            "cycle-label-small",
+            cycleName
         );
-        /* --------------------------------------------------
-           FEEDBACK HISTORY
-        -------------------------------------------------- */
-        populateFeedbackHistory(
-            cycles
-        );
-        /* --------------------------------------------------
-           PARTICIPATION
-        -------------------------------------------------- */
-        renderParticipation(
-            data,
-            currentCycle
-        );
-        /* --------------------------------------------------
-           INSIGHTS
-        -------------------------------------------------- */
-        renderInsights(
-            data,
-            ratings,
-            currentCycle
-        );
-        /* --------------------------------------------------
-           COMMENTS
-        -------------------------------------------------- */
+
+        renderRatings(ratings);
+        renderChart(cycles);
+        renderHistory(cycles);
+        renderParticipation(result.participation);
+        renderInsights(ratings, cycle);
         renderComments(
-            data.feedback ||
-            data.comments ||
-            data.recentFeedback ||
+            result.feedback ||
+            result.recentFeedback ||
             []
         );
+
     } catch (error) {
         console.error(
-            "Failed to load faculty feedback:",
+            "Faculty feedback error:",
             error
         );
+
         showFeedbackError();
     }
 }
-/* ==========================================================
-   GET ACTIVE CYCLE
-========================================================== */
-function getActiveCycle(data, cycles) {
-    /*
-       Preferred source:
 
-       data.activeCycle
+/* =========================================================
+   CYCLES
+========================================================= */
 
-       This allows the backend to explicitly tell the
-       dashboard which cycle is active.
+function activeCycle() {
+    if (!data) return null;
 
-       Example:
-
-       {
-           activeCycle: {
-               id: 2,
-               name: "August 2026",
-               status: "active"
-           }
-       }
-    */
-    const backendActiveCycle =
-        data?.activeCycle ||
-        data?.currentCycle ||
-        data?.active_cycle ||
-        null;
     if (
-        backendActiveCycle &&
-        typeof backendActiveCycle === "object"
+        data.activeCycle &&
+        typeof data.activeCycle === "object"
     ) {
-        return backendActiveCycle;
-    }
-    /*
-       If the backend returns cycles containing status,
-       search specifically for status = active.
-
-       We DO NOT assume cycles[0] is active.
-    */
-    if (Array.isArray(cycles)) {
-
-        const activeCycle =
-            cycles.find(
-                cycle =>
-                    String(
-                        cycle?.status || ""
-                    ).toLowerCase() === "active"
-            );
-
-        if (activeCycle) {
-            return activeCycle;
-        }
+        return data.activeCycle;
     }
 
+    if (
+        data.currentCycle &&
+        typeof data.currentCycle === "object"
+    ) {
+        return data.currentCycle;
+    }
 
-    /*
-       No active cycle.
-
-       This is intentional.
-
-       The dashboard should not silently treat an old
-       cycle as the current cycle.
-    */
-
-    return null;
+    return getCycles().find(
+        cycle =>
+            String(cycle.status || "")
+                .toLowerCase() === "active"
+    ) || null;
 }
 
+function getCycles() {
+    if (!data) return [];
 
-/* ==========================================================
-   CYCLE LABEL
-========================================================== */
+    const cycles =
+        data.cycles ||
+        data.history ||
+        data.months ||
+        data.monthlyTrend ||
+        [];
 
-function getCycleLabel(
-    data,
-    currentCycle
-) {
+    return Array.isArray(cycles)
+        ? cycles
+        : [];
+}
 
-    if (!currentCycle) {
-
-        return "No Active Cycle";
-    }
-
+function getCycleName(cycle) {
     return (
-        currentCycle.label ||
-        currentCycle.name ||
-        currentCycle.key ||
-        currentCycle.cycle_name ||
-        "Active Cycle"
+        cycle?.name ||
+        cycle?.label ||
+        cycle?.cycle_name ||
+        "No Active Cycle"
     );
 }
 
-
-/* ==========================================================
-   EXTRACT ALL 8 RATINGS
-========================================================== */
-
-function extractRatings(data) {
-
-    const sourceObjects = [
-
-        data?.ratings,
-        data?.averages,
-        data?.statistics,
-        data?.stats,
-        data?.summary,
-        data
-
-    ].filter(Boolean);
-
-
-    const ratings = {};
-
-
-    FEEDBACK_PARAMETERS.forEach(
-        parameter => {
-
-            ratings[parameter.key] =
-                getNumberFromObjects(
-                    sourceObjects,
-                    getParameterAliases(
-                        parameter.key
-                    )
-                );
-
-        }
+function getCycleId(cycle) {
+    return (
+        cycle?.id ??
+        cycle?.cycle_id ??
+        cycle?.cycleId ??
+        null
     );
-
-
-    return ratings;
 }
 
+function getFeedbackCount() {
+    if (!data) return 0;
 
-/* ==========================================================
-   PARAMETER ALIASES
-========================================================== */
+    const list =
+        data.feedback ||
+        data.recentFeedback ||
+        [];
 
-function getParameterAliases(key) {
+    return Array.isArray(list)
+        ? list.length
+        : 0;
+}
+
+/* =========================================================
+   RATINGS
+========================================================= */
+
+function getRatings(source) {
+    const result = {};
+
+    for (const [key] of PARAMETERS) {
+        result[key] = findRating(
+            source,
+            key
+        );
+    }
+
+    return result;
+}
+
+function findRating(source, key) {
+    if (!source) return 0;
 
     const aliases = {
-
         course_satisfaction: [
             "course_satisfaction",
             "courseSatisfaction",
-            "course_satisfaction_avg",
-            "courseSatisfactionAvg",
-            "course_satisfaction_average",
-            "courseSatisfactionAverage",
             "course"
         ],
 
         syllabus_pace: [
             "syllabus_pace",
             "syllabusPace",
-            "syllabus_pace_avg",
-            "syllabusPaceAvg",
-            "syllabus_pace_average",
-            "syllabusPaceAverage",
             "pace"
         ],
 
         concept_clarity: [
             "concept_clarity",
             "conceptClarity",
-            "concept_clarity_avg",
-            "conceptClarityAvg",
-            "concept_clarity_average",
-            "conceptClarityAverage",
             "clarity"
         ],
 
         practical_work: [
             "practical_work",
             "practicalWork",
-            "practical_work_avg",
-            "practicalWorkAvg",
-            "practical_work_average",
-            "practicalWorkAverage",
             "practical"
         ],
 
         study_material: [
             "study_material",
             "studyMaterial",
-            "study_material_avg",
-            "studyMaterialAvg",
-            "study_material_average",
-            "studyMaterialAverage",
             "material"
         ],
 
         exam_difficulty: [
             "exam_difficulty",
             "examDifficulty",
-            "exam_difficulty_avg",
-            "examDifficultyAvg",
-            "exam_difficulty_average",
-            "examDifficultyAverage",
             "exam"
         ],
 
         faculty_support: [
             "faculty_support",
             "facultySupport",
-            "faculty_support_avg",
-            "facultySupportAvg",
-            "faculty_support_average",
-            "facultySupportAverage",
             "support"
         ],
 
         improvement: [
-            "improvement",
-            "improvement_avg",
-            "improvementAvg",
-            "improvement_average",
-            "improvementAverage"
+            "improvement"
         ]
     };
 
-
-    return aliases[key] || [key];
-}
-
-
-/* ==========================================================
-   NUMBER HELPERS
-========================================================== */
-
-function getNumber(object, keys) {
-
-    if (!object) {
-        return 0;
-    }
-
-    for (const key of keys) {
-
-        if (
-            object[key] !== undefined &&
-            object[key] !== null &&
-            object[key] !== ""
-        ) {
-
-            const value =
-                Number(object[key]);
-
-            if (!Number.isNaN(value)) {
-                return value;
-            }
-        }
-    }
-
-    return 0;
-}
-
-
-function getNumberFromObjects(
-    objects,
-    keys
-) {
-
-    for (const object of objects) {
-
-        if (!object) {
-            continue;
-        }
-
-        const value =
-            getNumber(
-                object,
-                keys
-            );
+    for (const name of aliases[key] || [key]) {
+        const value = num(source[name]);
 
         if (value > 0) {
             return value;
@@ -703,1294 +510,551 @@ function getNumberFromObjects(
     return 0;
 }
 
-
-/* ==========================================================
-   AVERAGE
-========================================================== */
-
-function calculateAverage(values) {
-
-    const validValues =
-        values.filter(
-            value =>
-                typeof value === "number" &&
-                !Number.isNaN(value) &&
-                value > 0
-        );
-
-
-    if (validValues.length === 0) {
-        return 0;
-    }
-
-
-    return (
-        validValues.reduce(
-            (sum, value) =>
-                sum + value,
-            0
-        ) /
-        validValues.length
-    );
-}
-
-
-/* ==========================================================
-   FORMAT RATING
-========================================================== */
-
-function formatRating(value) {
-
-    const number =
-        Number(value) || 0;
-
-    return number.toFixed(1);
-}
-
-
-/* ==========================================================
-   GET CYCLES
-========================================================== */
-
-function getCycles(data) {
-
-    const cycles =
-        data?.cycles ||
-        data?.history ||
-        data?.months ||
-        data?.monthlyTrend ||
-        [];
-
-
-    if (!Array.isArray(cycles)) {
-        return [];
-    }
-
-
-    return cycles;
-}
-
-
-/* ==========================================================
-   CURRENT CYCLE RESPONSES
-========================================================== */
-
-function getCurrentCycleResponses(
-    data,
-    currentCycle
-) {
-
-    if (!currentCycle) {
-        return 0;
-    }
-
-
-    const participation =
-        data?.participation ||
-        {};
-
-
-    const possibleValues = [
-
-        participation.submittedCurrent,
-
-        participation.currentResponses,
-
-        currentCycle.count,
-
-        currentCycle.responses,
-
-        currentCycle.feedbackCount,
-
-        currentCycle.totalResponses,
-
-        data.currentCycle?.responses,
-
-        data.currentCycle?.count,
-
-        data.currentCycle?.feedbackCount
-
-    ];
-
-
-    for (const value of possibleValues) {
-
-        if (
-            value !== undefined &&
-            value !== null &&
-            value !== ""
-        ) {
-
-            const number =
-                Number(value);
-
-            if (!Number.isNaN(number)) {
-                return number;
-            }
-        }
-    }
-
-
-    return 0;
-}
-
-
-/* ==========================================================
+/* =========================================================
    RATING BREAKDOWN
-========================================================== */
+========================================================= */
 
-function renderRatingBreakdown(ratings) {
-
+function renderRatings(ratings) {
     const container =
-        getElement("rating-breakdown");
+        $("rating-breakdown");
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
+    const rows = PARAMETERS.map(
+        ([key, label]) => ({
+            label,
+            value: num(ratings[key])
+        })
+    );
 
-    const parameters =
-        FEEDBACK_PARAMETERS.map(
-            parameter => ({
-
-                label:
-                    parameter.label,
-
-                value:
-                    Number(
-                        ratings[
-                            parameter.key
-                        ]
-                    ) || 0
-
-            })
-        );
-
-
-    const hasData =
-        parameters.some(
-            item =>
-                item.value > 0
-        );
-
-
-    if (!hasData) {
-
+    if (!rows.some(row => row.value > 0)) {
         container.innerHTML = `
             <div class="loading-card">
                 No rating data available yet.
             </div>
         `;
-
         return;
     }
 
+    container.innerHTML = rows.map(row => {
+        const value = Math.min(
+            5,
+            Math.max(0, row.value)
+        );
 
-    container.innerHTML = "";
+        const percent =
+            Math.round((value / 5) * 100);
 
-
-    parameters.forEach(
-        parameter => {
-
-            const value =
-                Math.max(
-                    0,
-                    Math.min(
-                        5,
-                        parameter.value
-                    )
-                );
-
-
-            const percentage =
-                Math.round(
-                    (value / 5) * 100
-                );
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "breakdown-row";
-
-
-            row.innerHTML = `
-
+        return `
+            <div class="breakdown-row">
                 <div class="breakdown-label">
-                    ${escapeHtml(
-                        parameter.label
-                    )}
+                    ${escapeHtml(row.label)}
                 </div>
 
                 <div class="breakdown-bar">
-
                     <div
                         class="breakdown-fill"
-                        style="width: ${percentage}%">
+                        style="width:${percent}%">
                     </div>
-
                 </div>
 
                 <div class="breakdown-value">
                     ${value.toFixed(1)}
                 </div>
-
-            `;
-
-
-            container.appendChild(row);
-        }
-    );
+            </div>
+        `;
+    }).join("");
 }
 
+/* =========================================================
+   CHART
+========================================================= */
 
-/* ==========================================================
-   CSS VARIABLE
-========================================================== */
-
-function getCssVariable(name) {
-
-    return getComputedStyle(
-        document.body
-    )
-        .getPropertyValue(name)
-        .trim();
-}
-
-
-/* ==========================================================
-   CHART THEME
-========================================================== */
-
-function updatePerformanceChartTheme() {
-
-    if (!performanceChart) {
-        return;
-    }
-
-
-    const textColor =
-        getCssVariable(
-            "--text-muted"
-        );
-
-    const borderColor =
-        getCssVariable(
-            "--border"
-        );
-
-    const accentColor =
-        getCssVariable(
-            "--accent"
-        );
-
-    const surfaceColor =
-        getCssVariable(
-            "--surface"
-        );
-
-    const textMainColor =
-        getCssVariable(
-            "--text"
-        );
-
-    const textSecondaryColor =
-        getCssVariable(
-            "--text-secondary"
-        );
-
-
-    if (
-        performanceChart.options.scales?.x
-    ) {
-
-        performanceChart.options.scales.x
-            .ticks.color =
-            textColor;
-    }
-
-
-    if (
-        performanceChart.options.scales?.y
-    ) {
-
-        performanceChart.options.scales.y
-            .ticks.color =
-            textColor;
-
-        performanceChart.options.scales.y
-            .grid.color =
-            borderColor;
-    }
-
-
-    if (
-        performanceChart.data.datasets[0]
-    ) {
-
-        performanceChart.data.datasets[0]
-            .borderColor =
-            accentColor;
-
-        performanceChart.data.datasets[0]
-            .pointBackgroundColor =
-            accentColor;
-
-        performanceChart.data.datasets[0]
-            .pointBorderColor =
-            accentColor;
-    }
-
-
-    if (
-        performanceChart.options.plugins?.tooltip
-    ) {
-
-        performanceChart.options.plugins.tooltip
-            .backgroundColor =
-            surfaceColor;
-
-        performanceChart.options.plugins.tooltip
-            .titleColor =
-            textMainColor;
-
-        performanceChart.options.plugins.tooltip
-            .bodyColor =
-            textSecondaryColor;
-
-        performanceChart.options.plugins.tooltip
-            .borderColor =
-            borderColor;
-    }
-
-
-    performanceChart.update(
-        "none"
-    );
-}
-
-
-/* ==========================================================
-   PERFORMANCE TREND CHART
-========================================================== */
-
-function renderPerformanceChart(
-    cycles
-) {
-
+function renderChart(cycles) {
     const canvas =
-        getElement(
-            "perfTrendChart"
-        );
+        $("perfTrendChart");
 
-    if (!canvas) {
+    if (!canvas ||
+        typeof Chart === "undefined") {
         return;
     }
 
-
-    if (
-        typeof Chart ===
-        "undefined"
-    ) {
-
-        console.warn(
-            "Chart.js is not loaded."
-        );
-
-        return;
+    if (chart) {
+        chart.destroy();
     }
 
+    const labels = cycles.map(
+        getCycleName
+    );
 
-    /*
-       Only display actual cycle data.
-       No fake/current-cycle data is generated.
-    */
+    const values = cycles.map(
+        getCycleOverall
+    );
 
-    const labels =
-        cycles.map(
-            cycle =>
-                cycle.label ||
-                cycle.name ||
-                cycle.key ||
-                cycle.cycle_name ||
-                "Cycle"
-        );
+    chart = new Chart(canvas, {
+        type: "line",
 
+        data: {
+            labels,
 
-    const values =
-        cycles.map(
-            cycle => {
+            datasets: [{
+                label: "Overall Rating",
+                data: values,
 
-                const direct =
-                    getNumber(
-                        cycle,
-                        [
-                            "overall",
-                            "overallRating",
-                            "overallAverage",
-                            "average"
-                        ]
-                    );
+                borderColor:
+                    css("--accent"),
 
+                backgroundColor:
+                    "rgba(79,141,247,0.08)",
 
-                if (direct > 0) {
-                    return direct;
-                }
+                borderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
 
+                pointBackgroundColor:
+                    css("--accent"),
 
-                const cycleRatings =
-                    extractRatings(
-                        cycle
-                    );
+                tension: 0.25,
+                fill: true
+            }]
+        },
 
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
 
-                return calculateAverage(
-                    Object.values(
-                        cycleRatings
-                    )
-                );
-            }
-        );
+            interaction: {
+                intersect: false,
+                mode: "index"
+            },
 
-
-    if (performanceChart) {
-
-        performanceChart.destroy();
-
-        performanceChart = null;
-    }
-
-
-    const textColor =
-        getCssVariable(
-            "--text-muted"
-        );
-
-    const borderColor =
-        getCssVariable(
-            "--border"
-        );
-
-    const accentColor =
-        getCssVariable(
-            "--accent"
-        );
-
-
-    performanceChart =
-        new Chart(
-            canvas,
-            {
-
-                type: "line",
-
-                data: {
-
-                    labels,
-
-                    datasets: [
-
-                        {
-
-                            label:
-                                "Overall Rating",
-
-                            data:
-                                values,
-
-                            borderColor:
-                                accentColor,
-
-                            backgroundColor:
-                                "rgba(79, 141, 247, 0.08)",
-
-                            borderWidth:
-                                2,
-
-                            pointRadius:
-                                4,
-
-                            pointHoverRadius:
-                                6,
-
-                            pointBackgroundColor:
-                                accentColor,
-
-                            pointBorderColor:
-                                accentColor,
-
-                            tension:
-                                0.25,
-
-                            fill:
-                                true
-
-                        }
-
-                    ]
+            plugins: {
+                legend: {
+                    display: false
                 },
 
-                options: {
+                tooltip: {
+                    backgroundColor:
+                        css("--surface"),
 
-                    responsive:
-                        true,
+                    titleColor:
+                        css("--text"),
 
-                    maintainAspectRatio:
-                        false,
+                    bodyColor:
+                        css("--text-secondary"),
 
-                    interaction: {
+                    borderColor:
+                        css("--border"),
 
-                        intersect:
-                            false,
+                    borderWidth: 1
+                }
+            },
 
-                        mode:
-                            "index"
+            scales: {
+                y: {
+                    min: 0,
+                    max: 5,
+
+                    ticks: {
+                        stepSize: 1,
+                        color:
+                            css("--text-muted")
                     },
 
-                    plugins: {
+                    grid: {
+                        color:
+                            css("--border")
+                    }
+                },
 
-                        legend: {
-
-                            display:
-                                false
-                        },
-
-                        tooltip: {
-
-                            backgroundColor:
-                                getCssVariable(
-                                    "--surface"
-                                ),
-
-                            titleColor:
-                                getCssVariable(
-                                    "--text"
-                                ),
-
-                            bodyColor:
-                                getCssVariable(
-                                    "--text-secondary"
-                                ),
-
-                            borderColor:
-                                borderColor,
-
-                            borderWidth:
-                                1,
-
-                            padding:
-                                10
-                        }
+                x: {
+                    ticks: {
+                        color:
+                            css("--text-muted")
                     },
 
-                    scales: {
-
-                        y: {
-
-                            beginAtZero:
-                                true,
-
-                            min:
-                                0,
-
-                            max:
-                                5,
-
-                            ticks: {
-
-                                stepSize:
-                                    1,
-
-                                color:
-                                    textColor
-                            },
-
-                            grid: {
-
-                                color:
-                                    borderColor
-                            }
-                        },
-
-                        x: {
-
-                            ticks: {
-
-                                color:
-                                    textColor
-                            },
-
-                            grid: {
-
-                                display:
-                                    false
-                            }
-                        }
+                    grid: {
+                        display: false
                     }
                 }
             }
-        );
-}
-
-
-/* ==========================================================
-   FEEDBACK HISTORY
-========================================================== */
-
-function populateFeedbackHistory(
-    cycles
-) {
-
-    const container =
-        getElement(
-            "monthly-table"
-        );
-
-    if (!container) {
-        return;
-    }
-
-
-    if (
-        !Array.isArray(cycles) ||
-        cycles.length === 0
-    ) {
-
-        container.innerHTML = `
-            <div class="loading-card">
-                No feedback cycles available.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    let html = `
-
-        <table class="table">
-
-            <thead>
-
-                <tr>
-
-                    <th>Cycle</th>
-
-                    <th>Status</th>
-
-                    <th>Responses</th>
-
-                    <th>Overall</th>
-
-                    ${FEEDBACK_PARAMETERS.map(
-                        parameter =>
-                            `<th>
-                                ${escapeHtml(
-                                    parameter.label
-                                )}
-                            </th>`
-                    ).join("")}
-
-                    <th>Trend</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-    `;
-
-
-    cycles.forEach(
-        (cycle, index) => {
-
-            const label =
-                cycle.label ||
-                cycle.name ||
-                cycle.key ||
-                cycle.cycle_name ||
-                "—";
-
-
-            const status =
-                String(
-                    cycle.status ||
-                    ""
-                ).toLowerCase();
-
-
-            const statusLabel =
-                status === "active"
-                    ? "Active"
-                    : status
-                        ? capitalize(status)
-                        : "—";
-
-
-            const responses =
-                getNumber(
-                    cycle,
-                    [
-                        "count",
-                        "responses",
-                        "feedbackCount",
-                        "total",
-                        "totalResponses"
-                    ]
-                );
-
-
-            const cycleRatings =
-                extractRatings(
-                    cycle
-                );
-
-
-            const overall =
-                getNumber(
-                    cycle,
-                    [
-                        "overall",
-                        "overallRating",
-                        "overallAverage",
-                        "average"
-                    ]
-                ) ||
-                calculateAverage(
-                    Object.values(
-                        cycleRatings
-                    )
-                );
-
-
-            const trend =
-                calculateTrend(
-                    cycles,
-                    index
-                );
-
-
-            html += `
-
-                <tr>
-
-                    <td>
-                        ${escapeHtml(
-                            label
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            statusLabel
-                        )}
-                    </td>
-
-                    <td>
-                        ${responses}
-                    </td>
-
-                    <td>
-                        ${formatRating(
-                            overall
-                        )}
-                    </td>
-
-                    ${FEEDBACK_PARAMETERS.map(
-                        parameter => `
-
-                            <td>
-                                ${formatRating(
-                                    cycleRatings[
-                                        parameter.key
-                                    ]
-                                )}
-                            </td>
-
-                        `
-                    ).join("")}
-
-                    <td>
-                        ${escapeHtml(
-                            trend
-                        )}
-                    </td>
-
-                </tr>
-
-            `;
         }
-    );
-
-
-    html += `
-
-            </tbody>
-
-        </table>
-
-    `;
-
-
-    container.innerHTML =
-        html;
+    });
 }
-
-
-/* ==========================================================
-   TREND
-========================================================== */
-
-function calculateTrend(
-    cycles,
-    index
-) {
-
-    if (
-        !Array.isArray(cycles) ||
-        index >= cycles.length - 1
-    ) {
-
-        return "—";
-    }
-
-
-    const current =
-        getCycleOverall(
-            cycles[index]
-        );
-
-
-    const previous =
-        getCycleOverall(
-            cycles[index + 1]
-        );
-
-
-    if (
-        current === 0 ||
-        previous === 0
-    ) {
-
-        return "—";
-    }
-
-
-    const difference =
-        current - previous;
-
-
-    if (
-        Math.abs(
-            difference
-        ) < 0.05
-    ) {
-
-        return "—";
-    }
-
-
-    if (
-        difference > 0
-    ) {
-
-        return `▲ ${difference.toFixed(1)}`;
-    }
-
-
-    return `▼ ${Math.abs(
-        difference
-    ).toFixed(1)}`;
-}
-
 
 function getCycleOverall(cycle) {
-
     const direct =
-        getNumber(
-            cycle,
-            [
-                "overall",
-                "overallRating",
-                "overallAverage",
-                "average"
-            ]
-        );
-
+        num(cycle?.overall) ||
+        num(cycle?.overallRating) ||
+        num(cycle?.overallAverage) ||
+        num(cycle?.average);
 
     if (direct > 0) {
         return direct;
     }
 
-
-    const ratings =
-        extractRatings(
-            cycle
-        );
-
-
-    return calculateAverage(
+    return average(
         Object.values(
-            ratings
+            getRatings(cycle)
         )
     );
 }
 
+function updateChartTheme() {
+    if (!chart) return;
 
-/* ==========================================================
-   FEEDBACK FILTERS
-========================================================== */
+    chart.options.scales.x.ticks.color =
+        css("--text-muted");
 
-function initializeFilters() {
+    chart.options.scales.y.ticks.color =
+        css("--text-muted");
 
-    const buttons =
-        document.querySelectorAll(
-            ".filter"
-        );
+    chart.options.scales.y.grid.color =
+        css("--border");
 
+    chart.data.datasets[0].borderColor =
+        css("--accent");
 
-    buttons.forEach(
-        button => {
+    chart.data.datasets[0].pointBackgroundColor =
+        css("--accent");
 
+    chart.options.plugins.tooltip.backgroundColor =
+        css("--surface");
+
+    chart.options.plugins.tooltip.titleColor =
+        css("--text");
+
+    chart.options.plugins.tooltip.bodyColor =
+        css("--text-secondary");
+
+    chart.options.plugins.tooltip.borderColor =
+        css("--border");
+
+    chart.update("none");
+}
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function renderHistory(cycles) {
+    const container =
+        $("monthly-table");
+
+    if (!container) return;
+
+    if (!cycles.length) {
+        container.innerHTML = `
+            <div class="loading-card">
+                No feedback cycles available.
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cycle</th>
+                    <th>Status</th>
+                    <th>Responses</th>
+                    <th>Overall</th>
+
+                    ${PARAMETERS.map(
+                        ([, label]) =>
+                            `<th>${escapeHtml(label)}</th>`
+                    ).join("")}
+
+                    <th>Trend</th>
+                </tr>
+            </thead>
+
+            <tbody>
+    `;
+
+    cycles.forEach((cycle, index) => {
+        const ratings =
+            getRatings(cycle);
+
+        const overall =
+            getCycleOverall(cycle);
+
+        const responses =
+            num(cycle.count) ||
+            num(cycle.responses) ||
+            num(cycle.feedbackCount) ||
+            num(cycle.totalResponses) ||
+            0;
+
+        const status =
+            cycle.status
+                ? capitalize(cycle.status)
+                : "—";
+
+        html += `
+            <tr>
+                <td>
+                    ${escapeHtml(
+                        getCycleName(cycle)
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(status)}
+                </td>
+
+                <td>${responses}</td>
+
+                <td>${rating(overall)}</td>
+
+                ${PARAMETERS.map(
+                    ([key]) =>
+                        `<td>${rating(
+                            ratings[key]
+                        )}</td>`
+                ).join("")}
+
+                <td>
+                    ${escapeHtml(
+                        trend(cycles, index)
+                    )}
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    container.innerHTML = html;
+}
+
+function trend(cycles, index) {
+    if (index >= cycles.length - 1) {
+        return "—";
+    }
+
+    const current =
+        getCycleOverall(cycles[index]);
+
+    const previous =
+        getCycleOverall(cycles[index + 1]);
+
+    if (!current || !previous) {
+        return "—";
+    }
+
+    const difference =
+        current - previous;
+
+    if (Math.abs(difference) < 0.05) {
+        return "—";
+    }
+
+    return difference > 0
+        ? `▲ ${difference.toFixed(1)}`
+        : `▼ ${Math.abs(difference).toFixed(1)}`;
+}
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+function initFilters() {
+    document
+        .querySelectorAll(".filter")
+        .forEach(button => {
             button.addEventListener(
                 "click",
                 () => {
-
-                    buttons.forEach(
-                        item =>
+                    document
+                        .querySelectorAll(".filter")
+                        .forEach(item =>
                             item.classList.remove(
                                 "active"
                             )
-                    );
+                        );
 
+                    button.classList.add("active");
 
-                    button.classList.add(
-                        "active"
-                    );
-
+                    const cycles =
+                        getCycles();
 
                     const period =
                         button.dataset.period;
 
+                    if (period === "current") {
+                        const cycle =
+                            activeCycle();
 
-                    const cycles =
-                        getCycles(
-                            lastFetchedData ||
-                            {}
+                        renderHistory(
+                            cycle ? [cycle] : []
                         );
 
-
-                    if (
-                        period === "current"
-                    ) {
-
-                        const activeCycle =
-                            getActiveCycle(
-                                lastFetchedData || {},
-                                cycles
-                            );
-
-
-                        if (activeCycle) {
-
-                            populateFeedbackHistory(
-                                [activeCycle]
-                            );
-
-                        } else {
-
-                            populateFeedbackHistory(
-                                []
-                            );
-                        }
-
-
-                    } else if (
-                        period === "previous"
-                    ) {
-
-                        const activeCycle =
-                            getActiveCycle(
-                                lastFetchedData || {},
-                                cycles
-                            );
-
-
-                        const activeId =
-                            getCycleId(
-                                activeCycle
-                            );
-
-
-                        const previousCycles =
-                            cycles.filter(
-                                cycle =>
-                                    getCycleId(
-                                        cycle
-                                    ) !== activeId
-                            );
-
-
-                        populateFeedbackHistory(
-                            previousCycles.slice(
-                                0,
-                                1
-                            )
-                        );
-
-
-                    } else {
-
-                        populateFeedbackHistory(
-                            cycles
-                        );
+                        return;
                     }
 
+                    if (period === "previous") {
+                        const active =
+                            activeCycle();
+
+                        const activeId =
+                            getCycleId(active);
+
+                        renderHistory(
+                            cycles
+                                .filter(
+                                    cycle =>
+                                        getCycleId(cycle) !==
+                                        activeId
+                                )
+                                .slice(0, 1)
+                        );
+
+                        return;
+                    }
+
+                    renderHistory(cycles);
                 }
             );
-        }
-    );
+        });
 }
 
-
-/* ==========================================================
-   CYCLE ID HELPER
-========================================================== */
-
-function getCycleId(cycle) {
-
-    if (!cycle) {
-        return null;
-    }
-
-
-    return (
-        cycle.id ??
-        cycle.cycle_id ??
-        cycle.cycleId ??
-        null
-    );
-}
-
-
-/* ==========================================================
+/* =========================================================
    PARTICIPATION
-========================================================== */
+========================================================= */
 
-function renderParticipation(
-    data,
-    currentCycle
-) {
-
+function renderParticipation(participation = {}) {
     const container =
-        getElement(
-            "participation"
-        );
+        $("participation");
 
-    if (!container) {
-        return;
-    }
-
-
-    /*
-       If there is no active cycle, participation must not
-       display old-cycle numbers as if they were current.
-    */
-
-    if (!currentCycle) {
-
-        container.innerHTML = `
-            <div class="loading-card">
-                No active feedback cycle.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    const participation =
-        data.participation ||
-        {};
-
-
-    const totalStudents =
-        getNumber(
-            participation,
-            [
-                "totalStudents",
-                "total",
-                "studentCount"
-            ]
-        );
-
-
-    const submitted =
-        getNumber(
-            participation,
-            [
-                "submittedCurrent",
-                "submitted",
-                "currentResponses",
-                "responses"
-            ]
-        );
-
-
-    const cycleResponses =
-        getNumber(
-            currentCycle,
-            [
-                "count",
-                "responses",
-                "feedbackCount",
-                "total",
-                "totalResponses"
-            ]
-        );
-
-
-    const finalSubmitted =
-        submitted ||
-        cycleResponses;
-
-
-    const rate =
-        totalStudents > 0
-            ? Math.min(
-                100,
-                Math.round(
-                    (
-                        finalSubmitted /
-                        totalStudents
-                    ) * 100
-                )
-            )
-            : 0;
-
-
-    if (
-        totalStudents === 0 &&
-        finalSubmitted === 0
-    ) {
-
-        container.innerHTML = `
-            <div class="loading-card">
-                Participation data is not available yet.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    container.innerHTML = `
-
-        <div>
-
-            <strong>
-                ${finalSubmitted} /
-                ${totalStudents}
-                students
-            </strong>
-
-        </div>
-
-        <div class="muted">
-            Participation Rate
-        </div>
-
-        <div class="progress">
-
-            <div
-                class="fill"
-                style="width: ${rate}%">
-            </div>
-
-        </div>
-
-        <div class="muted">
-            ${rate}% participation
-        </div>
-
-    `;
-}
-// ===========================================================
-// SUBMISSION CHECKLIST
-// ===========================================================
-
-function initializeSubmissionChecklist() {
-    const button = getElement("view-submission-checklist-btn");
-
-    if (!button) {
-        console.warn(
-            "Submission Checklist button not found."
-        );
-        return;
-    }
-
-    button.addEventListener("click", () => {
-        openSubmissionChecklist();
-    });
-
-    console.log(
-        "✅ Submission Checklist button initialized."
-    );
-}
-
-
-// ===========================================================
-// OPEN SUBMISSION CHECKLIST
-// ===========================================================
-
-function openSubmissionChecklist() {
-
-    // Remove an existing checklist if already open
-    const existingModal =
-        getElement("submission-checklist-modal");
-
-    if (existingModal) {
-        existingModal.remove();
-    }
-
-    // -------------------------------------------------------
-    // Get participation data from the latest API response
-    // -------------------------------------------------------
-
-    const participation =
-        lastFetchedData?.participation || {};
+    if (!container) return;
 
     const students =
         Array.isArray(participation.students)
             ? participation.students
             : [];
 
-    const totalStudents =
-        Number(participation.totalStudents) || students.length;
+    const total =
+        num(participation.eligible) ||
+        num(participation.totalStudents) ||
+        num(participation.total) ||
+        students.length;
 
-    const submittedCount =
-        Number(participation.submittedCurrent) ||
+    const submitted =
+        num(participation.submitted) ||
+        num(participation.submittedCurrent) ||
         students.filter(
-            student => student.status === "Submitted"
+            student =>
+                String(student.status || "")
+                    .toLowerCase() ===
+                "submitted"
         ).length;
 
-    const pendingCount =
-        Number(participation.pendingCurrent) ||
+    const pending =
+        num(participation.pending) ||
+        num(participation.pendingCurrent) ||
+        Math.max(
+            0,
+            total - submitted
+        );
+
+    const rate =
+        total > 0
+            ? Math.round(
+                (submitted / total) * 100
+            )
+            : 0;
+
+    if (!total && !submitted) {
+        container.innerHTML = `
+            <div class="loading-card">
+                No student participation
+                data is available yet.
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div>
+            <strong>
+                ${submitted} / ${total} students
+            </strong>
+        </div>
+
+        <div class="muted">
+            Submitted: ${submitted}
+            &nbsp; • &nbsp;
+            Pending: ${pending}
+        </div>
+
+        <div class="progress">
+            <div
+                class="fill"
+                style="width:${Math.min(100, rate)}%">
+            </div>
+        </div>
+
+        <div class="muted">
+            ${rate}% participation
+        </div>
+    `;
+}
+
+/* =========================================================
+   SUBMISSION CHECKLIST
+========================================================= */
+
+function initChecklist() {
+    const button =
+        $("view-submission-checklist-btn");
+
+    if (!button) return;
+
+    button.addEventListener(
+        "click",
+        openChecklist
+    );
+}
+
+function openChecklist() {
+    closeChecklist();
+
+    const participation =
+        data?.participation || {};
+
+    const students =
+        Array.isArray(participation.students)
+            ? participation.students
+            : [];
+
+    const total =
+        num(participation.eligible) ||
+        num(participation.totalStudents) ||
+        students.length;
+
+    const submitted =
+        num(participation.submitted) ||
+        num(participation.submittedCurrent) ||
         students.filter(
-            student => student.status === "Pending"
+            student =>
+                String(student.status || "")
+                    .toLowerCase() ===
+                "submitted"
         ).length;
 
-    const activeCycle =
-        lastFetchedData?.activeCycle || null;
+    const pending =
+        Math.max(
+            0,
+            total - submitted
+        );
 
-    // -------------------------------------------------------
-    // Create modal
-    // -------------------------------------------------------
+    const cycle =
+        activeCycle();
 
     const modal =
         document.createElement("div");
@@ -2001,8 +1065,7 @@ function openSubmissionChecklist() {
     modal.innerHTML = `
         <div
             class="submission-checklist-overlay"
-            id="submission-checklist-overlay"
-        >
+            id="submission-checklist-overlay">
 
             <div class="submission-checklist-modal">
 
@@ -2014,21 +1077,16 @@ function openSubmissionChecklist() {
                         </h2>
 
                         <p>
-                            ${
-                                escapeHtml(
-                                    activeCycle?.name ||
-                                    "Current Feedback Cycle"
-                                )
-                            }
+                            ${escapeHtml(
+                                getCycleName(cycle)
+                            )}
                         </p>
                     </div>
 
                     <button
                         type="button"
                         id="close-submission-checklist"
-                        class="submission-checklist-close"
-                        aria-label="Close"
-                    >
+                        class="submission-checklist-close">
                         ×
                     </button>
 
@@ -2037,30 +1095,18 @@ function openSubmissionChecklist() {
                 <div class="submission-checklist-summary">
 
                     <div class="checklist-stat">
-                        <strong>
-                            ${totalStudents}
-                        </strong>
-                        <span>
-                            Total Students
-                        </span>
+                        <strong>${total}</strong>
+                        <span>Total Students</span>
                     </div>
 
                     <div class="checklist-stat">
-                        <strong>
-                            ${submittedCount}
-                        </strong>
-                        <span>
-                            Submitted
-                        </span>
+                        <strong>${submitted}</strong>
+                        <span>Submitted</span>
                     </div>
 
                     <div class="checklist-stat">
-                        <strong>
-                            ${pendingCount}
-                        </strong>
-                        <span>
-                            Pending
-                        </span>
+                        <strong>${pending}</strong>
+                        <span>Pending</span>
                     </div>
 
                 </div>
@@ -2068,471 +1114,271 @@ function openSubmissionChecklist() {
                 <div class="submission-checklist-list">
 
                     ${
-                        students.length === 0
-                            ? `
-                                <div class="checklist-empty">
-                                    No student participation
-                                    data is available.
-                                </div>
-                              `
-                            : students.map(
+                        students.length
+                            ? students.map(
                                 (student, index) => {
-
-                                    const name =
-                                        student?.name ||
-                                        "Unnamed Student";
-
-                                    const status =
-                                        student?.status ===
-                                        "Submitted"
-                                            ? "Submitted"
-                                            : "Pending";
-
-                                    const statusClass =
-                                        status === "Submitted"
-                                            ? "submitted"
-                                            : "pending";
+                                    const submitted =
+                                        String(
+                                            student.status || ""
+                                        ).toLowerCase() ===
+                                        "submitted";
 
                                     return `
                                         <div
-                                            class="checklist-student"
-                                        >
+                                            class="checklist-student">
 
                                             <div
-                                                class="checklist-student-number"
-                                            >
+                                                class="checklist-student-number">
                                                 ${index + 1}
                                             </div>
 
                                             <div
-                                                class="checklist-student-name"
-                                            >
-                                                ${escapeHtml(name)}
+                                                class="checklist-student-name">
+                                                ${escapeHtml(
+                                                    student.name ||
+                                                    "Student"
+                                                )}
                                             </div>
 
                                             <div
                                                 class="
                                                     checklist-student-status
-                                                    ${statusClass}
-                                                "
-                                            >
+                                                    ${submitted
+                                                        ? "submitted"
+                                                        : "pending"}
+                                                ">
+
                                                 ${
-                                                    status ===
-                                                    "Submitted"
+                                                    submitted
                                                         ? "✓ Submitted"
                                                         : "○ Pending"
                                                 }
+
                                             </div>
 
                                         </div>
                                     `;
                                 }
                             ).join("")
+                            : `
+                                <div class="checklist-empty">
+                                    Student checklist data
+                                    is not available.
+                                </div>
+                            `
                     }
 
                 </div>
-
             </div>
-
         </div>
     `;
 
     document.body.appendChild(modal);
 
-    // -------------------------------------------------------
-    // Close button
-    // -------------------------------------------------------
-
-    const closeButton =
-        getElement("close-submission-checklist");
-
-    if (closeButton) {
-        closeButton.addEventListener(
+    $("close-submission-checklist")
+        ?.addEventListener(
             "click",
-            closeSubmissionChecklist
+            closeChecklist
         );
-    }
 
-    // -------------------------------------------------------
-    // Close when clicking outside modal
-    // -------------------------------------------------------
-
-    const overlay =
-        getElement("submission-checklist-overlay");
-
-    if (overlay) {
-        overlay.addEventListener("click", event => {
-
-            if (
-                event.target === overlay
-            ) {
-                closeSubmissionChecklist();
+    $("submission-checklist-overlay")
+        ?.addEventListener(
+            "click",
+            event => {
+                if (
+                    event.target.id ===
+                    "submission-checklist-overlay"
+                ) {
+                    closeChecklist();
+                }
             }
-
-        });
-    }
-
-    // -------------------------------------------------------
-    // Close with Escape
-    // -------------------------------------------------------
+        );
 
     document.addEventListener(
         "keydown",
-        handleChecklistEscape
-    );
-
-    console.log(
-        "✅ Submission Checklist opened:",
-        students.length,
-        "students"
+        checklistEscape
     );
 }
 
-
-// ===========================================================
-// CLOSE SUBMISSION CHECKLIST
-// ===========================================================
-
-function closeSubmissionChecklist() {
-
-    const modal =
-        getElement("submission-checklist-modal");
-
-    if (modal) {
-        modal.remove();
-    }
+function closeChecklist() {
+    $("submission-checklist-modal")?.remove();
 
     document.removeEventListener(
         "keydown",
-        handleChecklistEscape
+        checklistEscape
     );
 }
 
-
-// ===========================================================
-// ESCAPE KEY
-// ===========================================================
-
-function handleChecklistEscape(event) {
-
+function checklistEscape(event) {
     if (event.key === "Escape") {
-        closeSubmissionChecklist();
+        closeChecklist();
     }
 }
 
-/* ==========================================================
+/* =========================================================
    INSIGHTS
-========================================================== */
+========================================================= */
 
-function renderInsights(
-    data,
-    ratings,
-    currentCycle
-) {
-
+function renderInsights(ratings, cycle) {
     const container =
-        getElement(
-            "insights"
-        );
+        $("insights");
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
-
-    if (!currentCycle) {
-
+    if (!cycle) {
         container.innerHTML = `
             <div class="loading-card">
-                Insights will appear when an active feedback cycle is available.
+                No active feedback cycle.
             </div>
         `;
-
         return;
     }
-
 
     const areas =
-        FEEDBACK_PARAMETERS
-            .map(
-                parameter => ({
-
-                    label:
-                        parameter.label,
-
-                    value:
-                        Number(
-                            ratings[
-                                parameter.key
-                            ]
-                        ) || 0
-
-                })
-            )
+        PARAMETERS
+            .map(([key, label]) => ({
+                label,
+                value: num(ratings[key])
+            }))
             .filter(
-                area =>
-                    area.value > 0
+                item => item.value > 0
             );
 
-
-    if (
-        areas.length === 0
-    ) {
-
+    if (!areas.length) {
         container.innerHTML = `
             <div class="loading-card">
-                Not enough feedback data for insights yet.
+                Not enough feedback data
+                for insights yet.
             </div>
         `;
-
         return;
     }
 
-
-    const sorted =
+    const highest =
         [...areas].sort(
-            (a, b) =>
-                b.value - a.value
-        );
+            (a, b) => b.value - a.value
+        )[0];
 
-
-    const strongest =
-        sorted[0];
-
-
-    const weakest =
-        sorted[
-            sorted.length - 1
-        ];
-
+    const lowest =
+        [...areas].sort(
+            (a, b) => a.value - b.value
+        )[0];
 
     const overall =
-        calculateAverage(
-            areas.map(
-                area =>
-                    area.value
-            )
+        average(
+            areas.map(item => item.value)
         );
 
-
-    let overallMessage =
-        "Feedback data is still developing.";
-
-
-    if (overall >= 4.5) {
-
-        overallMessage =
-            "Student feedback is very positive.";
-
-    } else if (
-        overall >= 4
-    ) {
-
-        overallMessage =
-            "Overall student feedback is positive.";
-
-    } else if (
-        overall >= 3
-    ) {
-
-        overallMessage =
-            "Feedback indicates some areas can be improved.";
-
-    } else {
-
-        overallMessage =
-            "Several areas may need attention.";
-    }
-
+    const message =
+        overall >= 4.5
+            ? "Student feedback is very positive."
+            : overall >= 4
+                ? "Overall student feedback is positive."
+                : overall >= 3
+                    ? "Some areas can be improved."
+                    : "Several areas may need attention.";
 
     container.innerHTML = `
-
         <div class="insight-card">
-
-            <strong>
-                ⭐ Strongest Area
-            </strong>
+            <strong>⭐ Highest Rated</strong>
 
             <div>
-                ${escapeHtml(
-                    strongest.label
-                )}
-
-                •
-
-                ${formatRating(
-                    strongest.value
-                )} / 5
+                ${escapeHtml(highest.label)}
+                —
+                ${rating(highest.value)}/5
             </div>
-
         </div>
-
 
         <div class="insight-card">
-
-            <strong>
-                📈 Area for Attention
-            </strong>
+            <strong>📌 Needs Attention</strong>
 
             <div>
-                ${escapeHtml(
-                    weakest.label
-                )}
-
-                •
-
-                ${formatRating(
-                    weakest.value
-                )} / 5
+                ${escapeHtml(lowest.label)}
+                —
+                ${rating(lowest.value)}/5
             </div>
-
         </div>
-
 
         <div class="insight-card">
-
-            <strong>
-                💡 Overall Observation
-            </strong>
+            <strong>💡 Overall Observation</strong>
 
             <div>
-                ${escapeHtml(
-                    overallMessage
-                )}
+                ${message}
             </div>
-
         </div>
-
     `;
 }
 
-
-/* ==========================================================
-   ANONYMOUS COMMENTS
-========================================================== */
+/* =========================================================
+   COMMENTS
+========================================================= */
 
 function renderComments(list) {
-
     const container =
-        getElement(
-            "feedback-list"
-        );
+        $("feedback-list");
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
-
-    if (
-        !Array.isArray(list)
-    ) {
-
+    if (!Array.isArray(list)) {
         list = [];
     }
 
+    const comments = list
+        .map(item => {
+            let responses =
+                item?.responses;
 
-    const comments =
-        list.filter(
-            item => {
-
-                if (!item) {
-                    return false;
+            if (typeof responses === "string") {
+                try {
+                    responses =
+                        JSON.parse(responses);
+                } catch {
+                    responses = {};
                 }
-
-
-                const comment =
-                    item.comments ||
-                    item.comment ||
-                    item.feedback ||
-                    "";
-
-
-                return String(
-                    comment
-                )
-                    .trim()
-                    .length > 0;
             }
-        );
 
+            return (
+                item?.comments ||
+                item?.comment ||
+                responses?.comments ||
+                ""
+            );
+        })
+        .map(comment =>
+            String(comment).trim()
+        )
+        .filter(Boolean);
 
-    if (
-        comments.length === 0
-    ) {
-
+    if (!comments.length) {
         container.innerHTML = `
             <div class="loading-card">
-                No anonymous comments have been submitted yet.
+                No anonymous comments have
+                been submitted yet.
             </div>
         `;
-
         return;
     }
 
-
-    container.innerHTML = "";
-
-
-    comments
-        .slice(
-            0,
-            8
-        )
-        .forEach(
-            item => {
-
-                const comment =
-                    item.comments ||
-                    item.comment ||
-                    item.feedback ||
-                    "";
-
-
-                const card =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                card.className =
-                    "comment";
-
-
-                card.textContent =
-                    truncate(
-                        comment,
-                        400
-                    );
-
-
-                container.appendChild(
-                    card
-                );
-            }
-        );
+    container.innerHTML = comments
+        .slice(0, 8)
+        .map(comment => `
+            <div class="comment">
+                ${escapeHtml(
+                    truncate(comment)
+                )}
+            </div>
+        `)
+        .join("");
 }
 
+/* =========================================================
+   NO DATA / ERROR
+========================================================= */
 
-/* ==========================================================
-   NO FEEDBACK STATE
-========================================================== */
-
-function showNoFeedbackState() {
-
-    setText(
-        "overall-rating",
-        "0.0"
-    );
-
-    setText(
-        "total-feedback",
-        "0"
-    );
-
-    setText(
-        "cycle-responses",
-        "0"
-    );
+function showNoFeedback() {
+    setText("overall-rating", "0.0");
+    setText("total-feedback", "0");
+    setText("cycle-responses", "0");
 
     setText(
         "cycle-label",
@@ -2544,365 +1390,134 @@ function showNoFeedbackState() {
         "No Active Cycle"
     );
 
-
-    renderRatingBreakdown(
-        createEmptyRatings()
-    );
-
-
-    populateFeedbackHistory(
-        []
-    );
-
-
-    renderParticipation(
-        {},
-        null
-    );
-
-
-    renderInsights(
-        {},
-        createEmptyRatings(),
-        null
-    );
-
-
-    renderComments(
-        []
-    );
+    renderRatings({});
+    renderHistory([]);
+    renderParticipation({});
+    renderInsights({}, null);
+    renderComments([]);
 }
-
-
-/* ==========================================================
-   EMPTY RATINGS
-========================================================== */
-
-function createEmptyRatings() {
-
-    const ratings = {};
-
-
-    FEEDBACK_PARAMETERS.forEach(
-        parameter => {
-
-            ratings[
-                parameter.key
-            ] = 0;
-
-        }
-    );
-
-
-    return ratings;
-}
-
-
-/* ==========================================================
-   FEEDBACK ERROR STATE
-========================================================== */
 
 function showFeedbackError() {
+    const sections = [
+        [
+            "monthly-table",
+            "Unable to load feedback history."
+        ],
+        [
+            "rating-breakdown",
+            "Unable to load rating data."
+        ],
+        [
+            "participation",
+            "Unable to load participation data."
+        ],
+        [
+            "insights",
+            "Unable to generate insights."
+        ],
+        [
+            "feedback-list",
+            "Unable to load anonymous feedback."
+        ]
+    ];
 
-    const history =
-        getElement(
-            "monthly-table"
-        );
+    sections.forEach(
+        ([id, message]) => {
+            const element = $(id);
 
+            if (!element) return;
 
-    if (history) {
-
-        history.innerHTML = `
-            <div class="loading-card">
-                Unable to load feedback history.
-                Please refresh the page.
-            </div>
-        `;
-    }
-
-
-    const rating =
-        getElement(
-            "rating-breakdown"
-        );
-
-
-    if (rating) {
-
-        rating.innerHTML = `
-            <div class="loading-card">
-                Unable to load rating data.
-            </div>
-        `;
-    }
-
-
-    const participation =
-        getElement(
-            "participation"
-        );
-
-
-    if (participation) {
-
-        participation.innerHTML = `
-            <div class="loading-card">
-                Unable to load participation data.
-            </div>
-        `;
-    }
-
-
-    const insights =
-        getElement(
-            "insights"
-        );
-
-
-    if (insights) {
-
-        insights.innerHTML = `
-            <div class="loading-card">
-                Unable to generate insights.
-            </div>
-        `;
-    }
-}
-
-
-/* ==========================================================
-   HTML ESCAPE
-========================================================== */
-
-function escapeHtml(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-    }
-
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-/* ==========================================================
-   TEXT TRUNCATION
-========================================================== */
-
-function truncate(
-    value,
-    maxLength
-) {
-
-    if (!value) {
-        return "";
-    }
-
-
-    const text =
-        String(value);
-
-
-    if (
-        text.length <= maxLength
-    ) {
-
-        return text;
-    }
-
-
-    return (
-        text.substring(
-            0,
-            maxLength - 1
-        ) +
-        "…"
+            element.innerHTML = `
+                <div class="loading-card">
+                    ${message}
+                    Please refresh the page.
+                </div>
+            `;
+        }
     );
 }
 
+/* =========================================================
+   AUTO REFRESH
+========================================================= */
 
-/* ==========================================================
-   CAPITALIZE
-========================================================== */
-
-function capitalize(value) {
-
-    if (!value) {
-        return "";
-    }
-
-
-    const text =
-        String(value);
-
-
-    return (
-        text.charAt(0).toUpperCase() +
-        text.slice(1)
-    );
-}
-
-
-/* ==========================================================
-   REAL-TIME DASHBOARD REFRESH
-========================================================== */
-
-async function refreshFacultyDashboard() {
-
-    if (isRealtimeRefreshing) {
+async function refreshDashboard() {
+    if (
+        refreshing ||
+        document.hidden
+    ) {
         return;
     }
 
-
-    if (document.hidden) {
-        return;
-    }
-
-
-    isRealtimeRefreshing = true;
-
+    refreshing = true;
 
     try {
-
-        console.log(
-            "[REALTIME] Checking for new feedback..."
-        );
-
-
         await loadFeedback();
-
-
-        console.log(
-            "[REALTIME] Dashboard updated."
-        );
-
     } catch (error) {
-
         console.error(
-            "[REALTIME] Dashboard refresh failed:",
+            "Dashboard refresh failed:",
             error
         );
-
     } finally {
-
-        isRealtimeRefreshing = false;
+        refreshing = false;
     }
 }
 
+function startRefresh() {
+    stopRefresh();
 
-/* ==========================================================
-   START REAL-TIME REFRESH
-========================================================== */
-
-function startRealtimeRefresh() {
-
-    if (realtimeRefreshTimer) {
-
-        clearInterval(
-            realtimeRefreshTimer
-        );
-    }
-
-
-    realtimeRefreshTimer =
+    refreshTimer =
         setInterval(
-            refreshFacultyDashboard,
-            REALTIME_REFRESH_INTERVAL
+            refreshDashboard,
+            REFRESH_MS
         );
-
 
     console.log(
-        "[REALTIME] Auto-refresh enabled: every 10 seconds"
+        "✅ Faculty dashboard auto-refresh: 10 seconds"
     );
 }
 
+function stopRefresh() {
+    if (!refreshTimer) return;
 
-/* ==========================================================
-   STOP REAL-TIME REFRESH
-========================================================== */
-
-function stopRealtimeRefresh() {
-
-    if (realtimeRefreshTimer) {
-
-        clearInterval(
-            realtimeRefreshTimer
-        );
-
-        realtimeRefreshTimer = null;
-
-
-        console.log(
-            "[REALTIME] Auto-refresh stopped."
-        );
-    }
+    clearInterval(refreshTimer);
+    refreshTimer = null;
 }
-
-
-/* ==========================================================
-   HANDLE TAB VISIBILITY
-========================================================== */
 
 document.addEventListener(
     "visibilitychange",
     () => {
-
         if (document.hidden) {
-
-            stopRealtimeRefresh();
-
+            stopRefresh();
         } else {
-
-            /*
-               Immediately fetch the latest dashboard data
-               when the user returns to the tab.
-            */
-
-            refreshFacultyDashboard();
-
-            startRealtimeRefresh();
+            refreshDashboard();
+            startRefresh();
         }
-
     }
 );
-/* ==========================================================
-   CLEANUP
-========================================================== */
+
 window.addEventListener(
     "beforeunload",
     () => {
+        stopRefresh();
 
-        stopRealtimeRefresh();
-
-        if (performanceChart) {
-
-            performanceChart.destroy();
-
-            performanceChart = null;
+        if (chart) {
+            chart.destroy();
+            chart = null;
         }
     }
 );
+
+/* =========================================================
+   MISC
+========================================================= */
+
+function capitalize(value) {
+    const text =
+        String(value || "");
+
+    return text
+        ? text.charAt(0).toUpperCase() +
+          text.slice(1)
+        : "";
+}

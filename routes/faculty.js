@@ -1,12 +1,243 @@
+"use strict";
+
 const express = require("express");
 const router = express.Router();
-
 const db = require("../db");
 
-// =====================================================
-// FACULTY LOGIN
-// POST /faculty/login
-// =====================================================
+const PARAMETERS = [
+    "course_satisfaction",
+    "syllabus_pace",
+    "concept_clarity",
+    "practical_work",
+    "study_material",
+    "exam_difficulty",
+    "faculty_support",
+    "improvement"
+];
+
+const SCORE_MAPS = {
+    course_satisfaction: {
+        "Excellent": 5,
+        "Good": 4,
+        "Average": 3,
+        "Poor": 2,
+        "Very Poor": 1
+    },
+
+    syllabus_pace: {
+        "Just Right": 5,
+        "Too Slow": 2,
+        "Too Fast": 2
+    },
+
+    concept_clarity: {
+        "Very Clear": 5,
+        "Mostly Clear": 4,
+        "Somewhat Clear": 3,
+        "Not Clear": 2
+    },
+
+    practical_work: {
+        "Highly Effective": 5,
+        "Effective": 4,
+        "Somewhat Effective": 3,
+        "Not Effective": 2
+    },
+
+    study_material: {
+        "Very Helpful": 5,
+        "Helpful": 4,
+        "Somewhat Helpful": 3,
+        "Not Helpful": 2
+    },
+
+    exam_difficulty: {
+        "Challenging but Fair": 5,
+        "Moderate": 4,
+        "Too Easy": 2,
+        "Too Difficult": 2
+    },
+
+    faculty_support: {
+        "Always Available": 5,
+        "Usually Available": 4,
+        "Sometimes Available": 3,
+        "Rarely Available": 2,
+        "Never Available": 1
+    }
+};
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function facultyLoggedIn(req) {
+    return !!req.session?.faculty?.faculty_id;
+}
+
+function facultyId(req) {
+    return req.session.faculty.faculty_id;
+}
+
+function emptyAverages() {
+    return Object.fromEntries(
+        PARAMETERS.map(key => [key, 0])
+    );
+}
+
+function normalizeFeedback(rows) {
+    return rows.map(row => {
+        let responses = row.responses;
+
+        if (typeof responses === "string") {
+            try {
+                responses = JSON.parse(responses);
+            } catch {
+                responses = {};
+            }
+        }
+
+        if (!responses || typeof responses !== "object") {
+            responses = {};
+        }
+
+        return {
+            id: row.id,
+            faculty_id: row.faculty_id,
+            subject: row.subject,
+            department: row.department,
+            cycle_id: row.cycle_id,
+
+            course_satisfaction:
+                responses.course_satisfaction ?? null,
+
+            syllabus_pace:
+                responses.syllabus_pace ?? null,
+
+            concept_clarity:
+                responses.concept_clarity ?? null,
+
+            practical_work:
+                responses.practical_work ?? null,
+
+            study_material:
+                responses.study_material ?? null,
+
+            exam_difficulty:
+                responses.exam_difficulty ?? null,
+
+            faculty_support:
+                responses.faculty_support ?? null,
+
+            improvement:
+                responses.improvement ?? null,
+
+            comments:
+                responses.comments ??
+                responses.comment ??
+                null
+        };
+    });
+}
+
+function calculateAverages(feedback) {
+    const totals = {};
+    const counts = {};
+
+    PARAMETERS.forEach(key => {
+        totals[key] = 0;
+        counts[key] = 0;
+    });
+
+    for (const item of feedback) {
+        for (const key of PARAMETERS) {
+            if (key === "improvement") continue;
+
+            const raw = item[key];
+
+            if (raw === null || raw === undefined || raw === "") {
+                continue;
+            }
+
+            let score = SCORE_MAPS[key]?.[String(raw).trim()];
+
+            if (score === undefined) {
+                const numeric = Number(raw);
+
+                if (
+                    Number.isFinite(numeric) &&
+                    numeric >= 1 &&
+                    numeric <= 5
+                ) {
+                    score = numeric;
+                }
+            }
+
+            if (score >= 1 && score <= 5) {
+                totals[key] += score;
+                counts[key]++;
+            }
+        }
+    }
+
+    const averages = emptyAverages();
+
+    for (const key of PARAMETERS) {
+        if (counts[key]) {
+            averages[key] = Number(
+                (totals[key] / counts[key]).toFixed(1)
+            );
+        }
+    }
+
+    const ratings = PARAMETERS
+        .filter(key => key !== "improvement")
+        .map(key => averages[key])
+        .filter(value => value > 0);
+
+    const overall = ratings.length
+        ? Number(
+            (
+                ratings.reduce(
+                    (sum, value) => sum + value,
+                    0
+                ) / ratings.length
+            ).toFixed(1)
+        )
+        : 0;
+
+    return { averages, overall };
+}
+
+function cycleSummary(cycle, feedback) {
+    const { averages, overall } =
+        calculateAverages(feedback);
+
+    return {
+        id: cycle.id,
+        cycle_id: cycle.id,
+        name: cycle.name,
+        label: cycle.name,
+        start_date: cycle.start_date,
+        end_date: cycle.end_date,
+        status: cycle.status,
+
+        count: feedback.length,
+        responses: feedback.length,
+        feedbackCount: feedback.length,
+
+        overall,
+        overallRating: overall,
+        overallAverage: overall,
+        averageRating: overall,
+
+        ...averages
+    };
+}
+
+/* =========================================================
+   LOGIN
+========================================================= */
 
 router.post("/login", async (req, res) => {
     try {
@@ -15,10 +246,6 @@ router.post("/login", async (req, res) => {
             department,
             password
         } = req.body || {};
-
-        console.log("========== FACULTY LOGIN ==========");
-        console.log("Faculty ID:", faculty_id);
-        console.log("Department:", department);
 
         if (!faculty_id || !department || !password) {
             return res.redirect(
@@ -29,8 +256,8 @@ router.post("/login", async (req, res) => {
             );
         }
 
-        // PostgreSQL uses $1, $2, $3
-        const sql = `
+        const result = await db.query(
+            `
             SELECT
                 faculty_id,
                 name,
@@ -40,20 +267,15 @@ router.post("/login", async (req, res) => {
                 subject
             FROM faculty
             WHERE faculty_id = $1
-            AND LOWER(TRIM(department)) = LOWER(TRIM($2))
-            AND password = $3
+              AND LOWER(TRIM(department)) =
+                  LOWER(TRIM($2))
+              AND password = $3
             LIMIT 1
-        `;
+            `,
+            [faculty_id, department, password]
+        );
 
-        const result = await db.query(sql, [
-            faculty_id,
-            department,
-            password
-        ]);
-
-        if (!result.rows || result.rows.length === 0) {
-            console.log("❌ Invalid Faculty Login");
-
+        if (!result.rows.length) {
             return res.redirect(
                 "/auth/faculty.html?error=" +
                 encodeURIComponent(
@@ -72,69 +294,38 @@ router.post("/login", async (req, res) => {
             subject: faculty.subject || ""
         };
 
-        console.log("✅ Faculty Login Successful");
-        console.log("Faculty ID:", faculty.faculty_id);
-        console.log("Name:", faculty.name);
-        console.log("Department:", faculty.department);
-        console.log("Subject:", faculty.subject);
-
-        req.session.save((sessionError) => {
-            if (sessionError) {
-                console.error(
-                    "❌ Faculty Session Save Error:",
-                    sessionError
-                );
-
-                return res
-                    .status(500)
-                    .send("Session Error");
+        req.session.save(error => {
+            if (error) {
+                console.error("Faculty session error:", error);
+                return res.status(500).send("Session Error");
             }
 
-            console.log("✅ Faculty session saved");
-
-            return res.redirect(
+            res.redirect(
                 "/dashboard/faculty-dashboard.html"
             );
         });
 
-    } catch (err) {
-        console.error("❌ Faculty Login Database Error:");
-        console.error(err);
-
-        return res
-            .status(500)
-            .send("Database Error");
+    } catch (error) {
+        console.error("Faculty login error:", error);
+        res.status(500).send("Database Error");
     }
 });
 
-
-// =====================================================
-// FACULTY INFO
-// GET /faculty/info
-// =====================================================
+/* =========================================================
+   INFO
+========================================================= */
 
 router.get("/info", async (req, res) => {
+    if (!facultyLoggedIn(req)) {
+        return res.status(401).json({
+            success: false,
+            message: "Faculty not logged in"
+        });
+    }
+
     try {
-        console.log("========== FACULTY INFO ==========");
-
-        if (
-            !req.session ||
-            !req.session.faculty
-        ) {
-            console.log("❌ No faculty session found");
-
-            return res
-                .status(401)
-                .json({
-                    success: false,
-                    message: "Faculty not logged in"
-                });
-        }
-
-        const facultyId =
-            req.session.faculty.faculty_id;
-
-        const sql = `
+        const result = await db.query(
+            `
             SELECT
                 faculty_id,
                 name,
@@ -144,36 +335,18 @@ router.get("/info", async (req, res) => {
             FROM faculty
             WHERE faculty_id = $1
             LIMIT 1
-        `;
+            `,
+            [facultyId(req)]
+        );
 
-        const result = await db.query(sql, [
-            facultyId
-        ]);
-
-        if (
-            !result.rows ||
-            result.rows.length === 0
-        ) {
-            return res
-                .status(404)
-                .json({
-                    success: false,
-                    message: "Faculty not found"
-                });
+        if (!result.rows.length) {
+            return res.status(404).json({
+                success: false,
+                message: "Faculty not found"
+            });
         }
 
         const faculty = result.rows[0];
-
-        const subjects = [];
-
-        if (
-            faculty.subject &&
-            String(faculty.subject).trim()
-        ) {
-            subjects.push(
-                String(faculty.subject).trim()
-            );
-        }
 
         req.session.faculty = {
             faculty_id: faculty.faculty_id,
@@ -183,99 +356,46 @@ router.get("/info", async (req, res) => {
             subject: faculty.subject || ""
         };
 
-        return res.json({
+        res.json({
             success: true,
-
             faculty: {
-                faculty_id: faculty.faculty_id,
-                name: faculty.name,
-                email: faculty.email,
-                department: faculty.department,
-                subjects: subjects
+                ...req.session.faculty,
+                subjects: faculty.subject
+                    ? [String(faculty.subject).trim()]
+                    : []
             }
         });
 
-    } catch (err) {
-        console.error(
-            "❌ Faculty Info Database Error:",
-            err
-        );
+    } catch (error) {
+        console.error("Faculty info error:", error);
 
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Database Error"
-            });
+        res.status(500).json({
+            success: false,
+            message: "Database Error"
+        });
     }
 });
 
-
-// =====================================================
-// FACULTY FEEDBACK
-// GET /faculty/feedback
-//
-// IMPORTANT PRIVACY RULES
-//
-// feedback:
-//     Anonymous feedback only.
-//
-// feedback_submissions:
-//     Participation tracking only.
-//
-// Student identity is NEVER connected to the
-// anonymous feedback returned to faculty.
-//
-// Checklist exposes ONLY:
-//     name
-//     status
-//
-// student_id and submitted_at are NEVER returned.
-// =====================================================
+/* =========================================================
+   FEEDBACK
+========================================================= */
 
 router.get("/feedback", async (req, res) => {
+    if (!facultyLoggedIn(req)) {
+        return res.status(401).json({
+            success: false,
+            message: "Faculty not logged in"
+        });
+    }
+
     try {
-        console.log("========== FACULTY FEEDBACK ==========");
+        const id = facultyId(req);
 
-        // =================================================
-        // CHECK SESSION
-        // =================================================
+        /* -------------------------------------------------
+           ACTIVE CYCLE
+        ------------------------------------------------- */
 
-        if (
-            !req.session ||
-            !req.session.faculty
-        ) {
-            console.log("❌ No faculty session found");
-
-            return res
-                .status(401)
-                .json({
-                    success: false,
-                    message: "Faculty not logged in"
-                });
-        }
-
-        const facultyId =
-            req.session.faculty.faculty_id;
-
-        const facultyDepartment =
-            req.session.faculty.department || "";
-
-        console.log(
-            "Loading feedback for:",
-            facultyId
-        );
-
-        // =================================================
-        // FIND ACTIVE CYCLE
-        //
-        // Backend decides the active cycle.
-        // Frontend NEVER supplies cycle_id.
-        //
-        // Exactly ONE active cycle is required.
-        // =================================================
-
-        const activeCycleSql = `
+        const activeResult = await db.query(`
             SELECT
                 id,
                 name,
@@ -285,78 +405,31 @@ router.get("/feedback", async (req, res) => {
             FROM feedback_cycles
             WHERE status = 'active'
             ORDER BY id DESC
-        `;
+        `);
 
-        const activeCycleResult =
-            await db.query(activeCycleSql);
-
-        const activeCycles =
-            activeCycleResult.rows || [];
-
-        // =================================================
-        // NO ACTIVE CYCLE
-        // =================================================
-
-        if (activeCycles.length === 0) {
-            console.log(
-                "ℹ️ No active feedback cycle"
-            );
-
+        if (activeResult.rows.length === 0) {
             return res.json({
                 success: true,
-
                 no_active_cycle: true,
-
-                message:
-                    "No feedback cycle is currently active.",
-
                 activeCycle: null,
-
+                currentCycle: null,
                 feedback: [],
-
                 total: 0,
-
                 feedbackCount: 0,
-
-                ratings: {
-                    course_satisfaction: 0,
-                    syllabus_pace: 0,
-                    concept_clarity: 0,
-                    practical_work: 0,
-                    study_material: 0,
-                    exam_difficulty: 0,
-                    faculty_support: 0,
-                    improvement: 0
-                },
-
-                averages: {
-                    course_satisfaction: 0,
-                    syllabus_pace: 0,
-                    concept_clarity: 0,
-                    practical_work: 0,
-                    study_material: 0,
-                    exam_difficulty: 0,
-                    faculty_support: 0,
-                    improvement: 0
-                },
-
-                statistics: {},
-                stats: {},
-                summary: {},
-
+                cycleResponses: 0,
+                ratings: emptyAverages(),
+                averages: emptyAverages(),
+                statistics: emptyAverages(),
+                stats: emptyAverages(),
+                summary: emptyAverages(),
                 overall: 0,
                 overallRating: 0,
                 overallAverage: 0,
                 averageRating: 0,
-
-                currentCycle: null,
-                cycleResponses: 0,
-
-                months: [],
-                monthlyTrend: [],
                 cycles: [],
                 history: [],
-
+                months: [],
+                monthlyTrend: [],
                 participation: {
                     totalStudents: 0,
                     submittedCurrent: 0,
@@ -368,335 +441,102 @@ router.get("/feedback", async (req, res) => {
             });
         }
 
-        // =================================================
-        // SAFETY:
-        // EXACTLY ONE ACTIVE CYCLE
-        // =================================================
-
-        if (activeCycles.length > 1) {
-            console.error(
-                "❌ Multiple active feedback cycles detected:",
-                activeCycles.map(cycle => cycle.id)
-            );
-
-            return res
-                .status(409)
-                .json({
-                    success: false,
-                    message:
-                        "Multiple active feedback cycles detected. Please keep exactly one cycle active."
-                });
+        if (activeResult.rows.length > 1) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "Multiple active feedback cycles detected."
+            });
         }
 
-        const activeCycle =
-            activeCycles[0];
+        const activeCycle = activeResult.rows[0];
 
-        console.log(
-            "Active Cycle:",
-            activeCycle.name,
-            "| ID:",
-            activeCycle.id
-        );
+        /* -------------------------------------------------
+           CURRENT ANONYMOUS FEEDBACK
+        ------------------------------------------------- */
 
-        // =================================================
-        // GET ANONYMOUS FEEDBACK
-        //
-        // IMPORTANT:
-        // student_id is NOT selected.
-        // student name is NOT selected.
-        //
-        // Therefore faculty cannot determine which
-        // student submitted which feedback.
-        // =================================================
-
-        const feedbackSql = `
+        const feedbackResult = await db.query(
+            `
             SELECT
                 id,
                 faculty_id,
                 subject,
                 department,
-
-                course_satisfaction,
-                syllabus_pace,
-                concept_clarity,
-                practical_work,
-                study_material,
-                exam_difficulty,
-                faculty_support,
-                improvement,
-
-                comments
-
+                responses,
+                cycle_id
             FROM feedback
-
             WHERE faculty_id = $1
-            AND cycle_id = $2
-
+              AND cycle_id = $2
             ORDER BY id DESC
-        `;
-
-        const feedbackResult =
-            await db.query(
-                feedbackSql,
-                [
-                    facultyId,
-                    activeCycle.id
-                ]
-            );
+            `,
+            [id, activeCycle.id]
+        );
 
         const feedback =
-            feedbackResult.rows || [];
+            normalizeFeedback(
+                feedbackResult.rows
+            );
 
-        // =================================================
-        // 8 FEEDBACK PARAMETERS
-        // =================================================
+        const {
+            averages,
+            overall
+        } = calculateAverages(feedback);
 
-        const parameters = [
-            "course_satisfaction",
-            "syllabus_pace",
-            "concept_clarity",
-            "practical_work",
-            "study_material",
-            "exam_difficulty",
-            "faculty_support",
-            "improvement"
-        ];
+        /* -------------------------------------------------
+           HISTORY
+        ------------------------------------------------- */
 
-        const totals = {};
-        const counts = {};
+        const cyclesResult = await db.query(`
+            SELECT
+                id,
+                name,
+                start_date,
+                end_date,
+                status
+            FROM feedback_cycles
+            ORDER BY id DESC
+        `);
 
-        parameters.forEach(parameter => {
-            totals[parameter] = 0;
-            counts[parameter] = 0;
-        });
+        const history = [];
 
-        // =================================================
-        // CONVERT CATEGORICAL ANSWERS
-        // TO NUMERIC SCORES
-        // =================================================
+        for (const cycle of cyclesResult.rows) {
+            const result = await db.query(
+                `
+                SELECT
+                    id,
+                    faculty_id,
+                    subject,
+                    department,
+                    responses,
+                    cycle_id
+                FROM feedback
+                WHERE faculty_id = $1
+                  AND cycle_id = $2
+                `,
+                [id, cycle.id]
+            );
 
-        const scoreMaps = {
-
-            course_satisfaction: {
-                "Excellent": 5,
-                "Good": 4,
-                "Average": 3,
-                "Poor": 2,
-                "Very Poor": 1
-            },
-
-            syllabus_pace: {
-                "Just Right": 5,
-                "Too Slow": 2,
-                "Too Fast": 2
-            },
-
-            concept_clarity: {
-                "Very Clear": 5,
-                "Mostly Clear": 4,
-                "Somewhat Clear": 3,
-                "Not Clear": 2
-            },
-
-            practical_work: {
-                "Highly Effective": 5,
-                "Effective": 4,
-                "Somewhat Effective": 3,
-                "Not Effective": 2
-            },
-
-            study_material: {
-                "Very Helpful": 5,
-                "Helpful": 4,
-                "Somewhat Helpful": 3,
-                "Not Helpful": 2
-            },
-
-            exam_difficulty: {
-                "Challenging but Fair": 5,
-                "Moderate": 4,
-                "Too Easy": 2,
-                "Too Difficult": 2
-            },
-
-            faculty_support: {
-                "Always Available": 5,
-                "Usually Available": 4,
-                "Sometimes Available": 3,
-                "Rarely Available": 2,
-                "Never Available": 1
-            }
-        };
-
-        // =================================================
-        // CALCULATE NUMERIC AVERAGES
-        // =================================================
-
-        feedback.forEach(item => {
-
-            parameters.forEach(parameter => {
-
-                // improvement is a suggestion field,
-                // not a rating field.
-                if (parameter === "improvement") {
-                    return;
-                }
-
-                const rawValue =
-                    item[parameter];
-
-                if (
-                    rawValue === null ||
-                    rawValue === undefined
-                ) {
-                    return;
-                }
-
-                const textValue =
-                    String(rawValue).trim();
-
-                // First try categorical mapping
-                let value =
-                    scoreMaps[parameter]?.[textValue];
-
-                // Fallback for numeric values
-                if (value === undefined) {
-                    const numericValue =
-                        Number(rawValue);
-
-                    if (
-                        Number.isFinite(numericValue) &&
-                        numericValue > 0
-                    ) {
-                        value = numericValue;
-                    }
-                }
-
-                if (
-                    Number.isFinite(value) &&
-                    value > 0 &&
-                    value <= 5
-                ) {
-                    totals[parameter] += value;
-                    counts[parameter]++;
-                }
-            });
-        });
-
-        // =================================================
-        // CREATE AVERAGES
-        // =================================================
-
-        const averages = {};
-
-        parameters.forEach(parameter => {
-
-            averages[parameter] =
-                counts[parameter] > 0
-                    ? Number(
-                        (
-                            totals[parameter] /
-                            counts[parameter]
-                        ).toFixed(1)
-                    )
-                    : 0;
-        });
-
-        // =================================================
-        // OVERALL AVERAGE
-        // =================================================
-
-        const validAverages =
-            Object.values(averages)
-                .filter(value => value > 0);
-
-        const overall =
-            validAverages.length > 0
-                ? Number(
-                    (
-                        validAverages.reduce(
-                            (sum, value) =>
-                                sum + value,
-                            0
-                        ) /
-                        validAverages.length
-                    ).toFixed(1)
+            history.push(
+                cycleSummary(
+                    cycle,
+                    normalizeFeedback(result.rows)
                 )
-                : 0;
+            );
+        }
 
-        // =================================================
-        // CURRENT CYCLE SUMMARY
-        // =================================================
+        /* -------------------------------------------------
+           PARTICIPATION
+           
+           IMPORTANT FIX:
+           Do NOT compare faculty.department with
+           student.department.
 
-        const currentCycleSummary = {
+           faculty_divisions already defines which
+           divisions belong to this faculty.
+        ------------------------------------------------- */
 
-            key:
-                String(activeCycle.id),
-
-            cycle_id:
-                activeCycle.id,
-
-            label:
-                activeCycle.name,
-
-            name:
-                activeCycle.name,
-
-            start_date:
-                activeCycle.start_date,
-
-            end_date:
-                activeCycle.end_date,
-
-            status:
-                "current",
-
-            count:
-                feedback.length,
-
-            responses:
-                feedback.length,
-
-            feedbackCount:
-                feedback.length,
-
-            overall:
-                overall,
-
-            overallRating:
-                overall,
-
-            overallAverage:
-                overall,
-
-            average:
-                overall
-        };
-
-        parameters.forEach(parameter => {
-            currentCycleSummary[parameter] =
-                averages[parameter];
-        });
-
-        // =================================================
-        // PARTICIPATION / SUBMISSION CHECKLIST
-        //
-        // faculty_id
-        //      ↓
-        // faculty_divisions
-        //      ↓
-        // assigned division(s)
-        //      ↓
-        // students
-        //
-        // Student ID is used internally ONLY.
-        //
-        // Student ID is NOT returned.
-        //
-        // submitted_at is NOT selected.
-        // =================================================
-
-        const participationSql = `
+        const participationResult = await db.query(
+            `
             SELECT
                 s.student_id,
                 s.name,
@@ -706,8 +546,8 @@ router.get("/feedback", async (req, res) => {
                         SELECT 1
                         FROM feedback_submissions fs
                         WHERE fs.student_id = s.student_id
-                        AND fs.faculty_id = $1
-                        AND fs.cycle_id = $2
+                          AND fs.faculty_id = $1
+                          AND fs.cycle_id = $2
                     )
                     THEN 'Submitted'
                     ELSE 'Pending'
@@ -715,345 +555,133 @@ router.get("/feedback", async (req, res) => {
 
             FROM students s
 
-            INNER JOIN faculty_divisions fd
-                ON LOWER(TRIM(fd.division)) =
-                   LOWER(TRIM(s.division))
-
-            WHERE LOWER(TRIM(s.department)) =
-                  LOWER(TRIM($3))
-
-            AND fd.faculty_id = $4
+            WHERE EXISTS (
+                SELECT 1
+                FROM faculty_divisions fd
+                WHERE fd.faculty_id = $1
+                  AND LOWER(TRIM(fd.division)) =
+                      LOWER(TRIM(s.division))
+            )
 
             ORDER BY s.name ASC
-        `;
+            `,
+            [id, activeCycle.id]
+        );
 
-        const participationResult =
-            await db.query(
-                participationSql,
-                [
-                    facultyId,
-                    activeCycle.id,
-                    facultyDepartment,
-                    facultyId
-                ]
-            );
-
-        const rows =
-            participationResult.rows || [];
-
-        // =================================================
-        // PRIVACY BOUNDARY
-        //
-        // We create NEW objects.
-        //
-        // student_id is deliberately NOT copied.
-        //
-        // submitted_at is NOT copied.
-        //
-        // Only:
-        //
-        // name
-        // status
-        //
-        // are exposed.
-        // =================================================
-
-        const participationStudents =
-            rows.map(student => ({
-                name:
-                    student.name ||
-                    "Unnamed Student",
-
+        const students =
+            participationResult.rows.map(student => ({
+                name: student.name || "Unnamed Student",
                 status:
-                    student.submission_status ===
-                    "Submitted"
+                    student.submission_status === "Submitted"
                         ? "Submitted"
                         : "Pending"
             }));
 
-        // =================================================
-        // PARTICIPATION COUNTS
-        // =================================================
-
         const totalStudents =
-            participationStudents.length;
+            students.length;
 
         const submittedCurrent =
-            participationStudents.filter(
+            students.filter(
                 student =>
-                    student.status ===
-                    "Submitted"
+                    student.status === "Submitted"
             ).length;
 
         const pendingCurrent =
-            participationStudents.filter(
-                student =>
-                    student.status ===
-                    "Pending"
-            ).length;
+            totalStudents - submittedCurrent;
 
-        const participation = {
+        /* -------------------------------------------------
+           RESPONSE
+        ------------------------------------------------- */
 
-            totalStudents:
-                totalStudents,
-
-            submittedCurrent:
-                submittedCurrent,
-
-            pendingCurrent:
-                pendingCurrent,
-
-            submitted:
-                submittedCurrent,
-
-            currentResponses:
-                submittedCurrent,
-
-            // ONLY NAME + STATUS
-            //
-            // No student_id.
-            // No submitted_at.
-            // No feedback.
-
-            students:
-                participationStudents
+        const currentCycle = {
+            id: activeCycle.id,
+            cycle_id: activeCycle.id,
+            name: activeCycle.name,
+            label: activeCycle.name,
+            start_date: activeCycle.start_date,
+            end_date: activeCycle.end_date,
+            status: activeCycle.status,
+            count: feedback.length,
+            responses: feedback.length,
+            feedbackCount: feedback.length,
+            overall,
+            overallRating: overall,
+            overallAverage: overall,
+            averageRating: overall,
+            ...averages
         };
 
-        // =================================================
-        // CYCLE DATA
-        // =================================================
-
-        const months = [
-            currentCycleSummary
-        ];
-
-        // =================================================
-        // LOGGING
-        // =================================================
-
-        console.log(
-            "✅ Feedback loaded:",
-            feedback.length
-        );
-
-        console.log(
-            "Overall:",
-            overall
-        );
-
-        console.log(
-            "8 Parameter Averages:",
-            averages
-        );
-
-        console.log(
-            "Participation:",
-            submittedCurrent,
-            "/",
-            totalStudents
-        );
-
-        console.log(
-            "Pending:",
-            pendingCurrent
-        );
-
-        console.log(
-            "=================================="
-        );
-
-        // =================================================
-        // FINAL RESPONSE
-        // =================================================
-
-        return res.json({
-
+        res.json({
             success: true,
+            no_active_cycle: false,
 
-            no_active_cycle:
-                false,
+            activeCycle,
+            currentCycle,
 
-            // -----------------------------------------
-            // ACTIVE CYCLE
-            // -----------------------------------------
+            feedback,
 
-            activeCycle:
-                activeCycle,
+            total: feedback.length,
+            feedbackCount: feedback.length,
+            cycleResponses: feedback.length,
 
-            // -----------------------------------------
-            // ANONYMOUS FEEDBACK
-            // -----------------------------------------
+            ratings: averages,
+            averages,
+            statistics: averages,
+            stats: averages,
+            summary: averages,
 
-            feedback:
-                feedback,
+            overall,
+            overallRating: overall,
+            overallAverage: overall,
+            averageRating: overall,
 
-            total:
-                feedback.length,
+            cycles: history,
+            history,
+            months: history,
+            monthlyTrend: history,
 
-            feedbackCount:
-                feedback.length,
-
-            // -----------------------------------------
-            // 8 PARAMETERS
-            // -----------------------------------------
-
-            ratings:
-                averages,
-
-            averages:
-                averages,
-
-            statistics:
-                averages,
-
-            stats:
-                averages,
-
-            summary:
-                averages,
-
-            // -----------------------------------------
-            // OVERALL
-            // -----------------------------------------
-
-            overall:
-                overall,
-
-            overallRating:
-                overall,
-
-            overallAverage:
-                overall,
-
-            averageRating:
-                overall,
-
-            // -----------------------------------------
-            // CURRENT CYCLE
-            // -----------------------------------------
-
-            currentCycle: {
-
-                id:
-                    activeCycle.id,
-
-                cycle_id:
-                    activeCycle.id,
-
-                name:
-                    activeCycle.name,
-
-                label:
-                    activeCycle.name,
-
-                responses:
-                    feedback.length,
-
-                count:
-                    feedback.length,
-
-                feedbackCount:
-                    feedback.length,
-
-                overall:
-                    overall
-            },
-
-            cycleResponses:
-                feedback.length,
-
-            // -----------------------------------------
-            // CYCLES / HISTORY
-            // -----------------------------------------
-
-            months:
-                months,
-
-            monthlyTrend:
-                months,
-
-            cycles:
-                months,
-
-            history:
-                months,
-
-            // -----------------------------------------
-            // PARTICIPATION
-            //
-            // NAME + STATUS ONLY
-            // -----------------------------------------
-
-            participation:
-                participation
+            participation: {
+                totalStudents,
+                submittedCurrent,
+                pendingCurrent,
+                submitted: submittedCurrent,
+                currentResponses: submittedCurrent,
+                students
+            }
         });
 
-    } catch (err) {
+    } catch (error) {
+        console.error("Faculty feedback error:");
+        console.error(error);
 
-        console.error(
-            "❌ Faculty Feedback Error:"
-        );
-
-        console.error(err);
-
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message:
-                    "Unable to load faculty feedback"
-            });
+        res.status(500).json({
+            success: false,
+            message: "Unable to load faculty feedback"
+        });
     }
 });
 
+/* =========================================================
+   LOGOUT
+========================================================= */
 
-// =====================================================
-// FACULTY LOGOUT
-// GET /faculty/logout
-// =====================================================
-
-router.get("/logout", (req, res) => {
-
-    console.log(
-        "========== FACULTY LOGOUT =========="
-    );
-
+function logout(req, res) {
     if (!req.session) {
-        return res.redirect(
-            "/auth/faculty.html"
-        );
+        return res.redirect("/auth/faculty.html");
     }
 
-    req.session.destroy((err) => {
-
-        if (err) {
-            console.error(
-                "Faculty logout error:",
-                err
-            );
-
-            return res
-                .status(500)
-                .send("Logout failed");
+    req.session.destroy(error => {
+        if (error) {
+            console.error("Faculty logout error:", error);
+            return res.status(500).send("Logout failed");
         }
 
-        res.clearCookie(
-            "connect.sid"
-        );
-
-        console.log(
-            "✅ Faculty logged out successfully"
-        );
-
-        return res.redirect(
-            "/auth/faculty.html"
-        );
+        res.clearCookie("connect.sid");
+        res.redirect("/auth/faculty.html");
     });
-});
+}
 
-
-// =====================================================
-// EXPORT ROUTER
-// =====================================================
+router.get("/logout", logout);
+router.post("/logout", logout);
 
 module.exports = router;
