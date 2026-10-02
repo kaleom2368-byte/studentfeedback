@@ -357,3 +357,24 @@ button {
         border-color 0.25s ease,
         box-shadow 0.25s ease;
 }
+
+/* FORCED DARK MODE FOR ALL CARDS AND SECTIONS */
+body.dark .dashboard-card,
+body.dark .portal-card,
+body.dark .recognition-grid > div,
+body.dark .performance-card,
+body.dark .report-card,
+body.dark .privacy-card,
+body.dark .glass-card {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+}
+
+body.dark header {
+    background: #0f172a !important;
+}
+
+body.dark section {
+    background: transparent;
+}

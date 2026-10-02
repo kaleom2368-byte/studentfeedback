@@ -16,55 +16,13 @@ const PARAMETERS = [
 ];
 
 const SCORE_MAPS = {
-    course_satisfaction: {
-        "Excellent": 5,
-        "Good": 4,
-        "Average": 3,
-        "Poor": 2,
-        "Very Poor": 1
-    },
-
-    syllabus_pace: {
-        "Just Right": 5,
-        "Too Slow": 2,
-        "Too Fast": 2
-    },
-
-    concept_clarity: {
-        "Very Clear": 5,
-        "Mostly Clear": 4,
-        "Somewhat Clear": 3,
-        "Not Clear": 2
-    },
-
-    practical_work: {
-        "Highly Effective": 5,
-        "Effective": 4,
-        "Somewhat Effective": 3,
-        "Not Effective": 2
-    },
-
-    study_material: {
-        "Very Helpful": 5,
-        "Helpful": 4,
-        "Somewhat Helpful": 3,
-        "Not Helpful": 2
-    },
-
-    exam_difficulty: {
-        "Challenging but Fair": 5,
-        "Moderate": 4,
-        "Too Easy": 2,
-        "Too Difficult": 2
-    },
-
-    faculty_support: {
-        "Always Available": 5,
-        "Usually Available": 4,
-        "Sometimes Available": 3,
-        "Rarely Available": 2,
-        "Never Available": 1
-    }
+    course_satisfaction: { "Very Satisfied": 5, "Satisfied": 4, "Neutral": 3, "Dissatisfied": 2, "Very Dissatisfied": 1 },
+    syllabus_pace: { "Very Appropriate": 5, "Appropriate": 4, "Neutral": 3, "Too Fast": 2, "Too Slow": 1 },
+    concept_clarity: { "Very Clear": 5, "Clear": 4, "Neutral": 3, "Not Clear": 2 },
+    practical_work: { "Very Helpful": 5, "Helpful": 4, "Neutral": 3, "Not Helpful": 2 },
+    study_material: { "Very Helpful": 5, "Helpful": 4, "Neutral": 3, "Not Helpful": 2 },
+    exam_difficulty: { "Very Appropriate": 5, "Appropriate": 4, "Neutral": 3, "Difficult": 2, "Very Difficult": 1 },
+    faculty_support: { "Excellent": 5, "Good": 4, "Average": 3, "Needs Improvement": 2 }
 };
 
 /* =========================================================
@@ -555,17 +513,11 @@ router.get("/feedback", async (req, res) => {
 
             FROM students s
 
-            WHERE EXISTS (
-                SELECT 1
-                FROM faculty_divisions fd
-                WHERE fd.faculty_id = $1
-                  AND LOWER(TRIM(fd.division)) =
-                      LOWER(TRIM(s.division))
-            )
+            WHERE LOWER(TRIM(s.department)) = LOWER(TRIM($3))
 
             ORDER BY s.name ASC
             `,
-            [id, activeCycle.id]
+            [id, activeCycle.id, req.session.faculty.department]
         );
 
         const students =
@@ -654,10 +606,7 @@ router.get("/feedback", async (req, res) => {
         console.error("Faculty feedback error:");
         console.error(error);
 
-        res.status(500).json({
-            success: false,
-            message: "Unable to load faculty feedback"
-        });
+        res.status(500).json({ success: false, message: "Unable to load faculty feedback", error: error.message, stack: error.stack });
     }
 });
 

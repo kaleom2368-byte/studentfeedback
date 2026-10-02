@@ -1,0 +1,20 @@
+const fs = require('fs');
+let f = fs.readFileSync('public/css/hod.css', 'utf8');
+f = f.replace(/body\.dark\s*\{[\s\S]*?--shadow-lg:[^\}]+\}/, `body.dark {
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-light: #1e293b;
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+    --border: #334155;
+    --border-light: #475569;
+    --text: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --muted: #94a3b8;
+    --header: #0f172a;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+    --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
+    --shadow-lg: 0 18px 45px rgba(0,0,0,0.6);
+}`);
+fs.writeFileSync('public/css/hod.css', f);

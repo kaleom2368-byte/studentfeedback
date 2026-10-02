@@ -113,72 +113,55 @@ router.post("/login", async (req, res) => {
         // -------------------------------------------------
 
         req.session.student = {
-
             student_id: student.student_id,
-
             name: student.name,
-
             email: student.email,
-
             department: student.department,
-
             year: student.year,
-
             division: student.division
-
         };
 
-        console.log(
-            "✅ Login Success:",
-            student.name
-        );
-
-        // -------------------------------------------------
-        // SAVE SESSION BEFORE REDIRECT
-        // -------------------------------------------------
+        req.session.mustChangePassword = !!student.must_change_password;
 
         req.session.save((sessionError) => {
-
             if (sessionError) {
-
-                console.error(
-                    "❌ Session Save Error:",
-                    sessionError
-                );
-
-                return res.status(500).send(
-                    "Session Error"
-                );
-
+                console.error("❌ Session Save Error:", sessionError);
+                return res.status(500).send("Session Error");
             }
-
-            console.log(
-                "✅ Student session saved"
-            );
-
-            // -------------------------------------------------
-            // GO TO DASHBOARD
-            // -------------------------------------------------
-
-            return res.redirect(
-                "/dashboard/student-dashboard.html"
-            );
-
+            if (student.must_change_password) {
+                return res.redirect('/change-password/student.html');
+            }
+            return res.redirect("/dashboard/student-dashboard.html");
         });
 
     } catch (err) {
-
-        console.error(
-            "❌ Student Login Database Error:",
-            err
-        );
-
-        return res.status(500).send(
-            "Database Error"
-        );
-
+        console.error("❌ Student Login Database Error:", err);
+        return res.status(500).send("Database Error");
     }
+});
 
+// =====================================================
+// CHANGE PASSWORD
+// =====================================================
+
+router.post("/change-password", async (req, res) => {
+    if (!req.session || !req.session.student) return res.redirect('/auth/student.html');
+    const { newPassword, confirmPassword } = req.body;
+    if (!newPassword || newPassword !== confirmPassword)
+        return res.redirect('/change-password/student.html?error=Passwords+do+not+match');
+    if (newPassword.length < 6)
+        return res.redirect('/change-password/student.html?error=Password+must+be+at+least+6+characters');
+    try {
+        await db.query(
+            'UPDATE students SET password=$1, must_change_password=FALSE WHERE student_id=$2',
+            [newPassword, req.session.student.student_id]
+        );
+        req.session.mustChangePassword = false;
+        return req.session.save(() => res.redirect('/dashboard/student-dashboard.html'));
+    } catch (err) {
+        console.error('Change password error:', err);
+        return res.redirect('/change-password/student.html?error=Failed+to+change+password');
+    }
 });
 
 // =====================================================

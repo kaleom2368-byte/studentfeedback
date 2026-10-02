@@ -3,25 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        HOD Dashboard | Anonymous Student Feedback System
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="../css/hod.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/darkmode.css"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOD Dashboard | Anonymous Student Feedback System</title>
+    <link rel="stylesheet" href="../css/hod.css">
+    <link rel="stylesheet" href="../css/darkmode.css">
+    <link rel="stylesheet" href="../css/hod-portal-extras.css">
 </head>
 
 <body>
@@ -36,48 +22,26 @@
 
             <div class="brand-section">
 
-                <div class="brand-mark">
-                    HOD
-                </div>
+                <div class="brand-mark">HOD</div>
 
                 <div class="brand-text">
-
-                    <h1>
-                        Anonymous Student Feedback System
-                    </h1>
-
-                    <p>
-                        Head of Department Portal
-                    </p>
-
+                    <h1>Anonymous Student Feedback System</h1>
+                    <p>Head of Department Portal</p>
                 </div>
 
             </div>
 
-
             <div class="header-actions">
 
-                <button
-                    id="dark-mode-btn"
-                    type="button"
-                >
-                    🌙 Dark Mode
-                </button>
+                <button id="dark-mode-btn" type="button">🌙 Dark Mode</button>
 
-                <button
-                    id="logout-btn"
-                    class="logout-btn"
-                    type="button"
-                >
-                    Logout
-                </button>
+                <button id="logout-btn" class="logout-btn" type="button">Logout</button>
 
             </div>
 
         </div>
 
     </header>
-
 
 
     <!-- =====================================================
@@ -97,46 +61,27 @@
 
                 <div class="welcome-text">
 
-                    <span class="welcome-tag">
-                        HOD DASHBOARD
-                    </span>
+                    <span class="welcome-tag">HOD DASHBOARD</span>
 
-                    <h2 id="hod-name">
-                        Loading...
-                    </h2>
+                    <h2 id="hod-name">Loading...</h2>
 
-                    <p
-                        id="hod-department"
-                        class="department-text"
-                    >
-                        Loading department...
-                    </p>
+                    <p id="hod-department" class="department-text">Loading department...</p>
 
                     <p class="welcome-description">
-                        Monitor department feedback, faculty
-                        performance and academic insights from
-                        one place.
+                        Monitor department feedback, faculty performance
+                        and academic insights — all from one place.
                     </p>
 
                 </div>
 
-
                 <div class="hod-id-box">
-
-                    <span>
-                        HOD ID
-                    </span>
-
-                    <strong id="hod-id">
-                        --
-                    </strong>
-
+                    <span>HOD ID</span>
+                    <strong id="hod-id">--</strong>
                 </div>
 
             </div>
 
         </section>
-
 
 
         <!-- =================================================
@@ -146,306 +91,280 @@
         <section class="overview-section">
 
             <div class="section-heading">
-
                 <div>
-
-                    <span class="section-label">
-                        DEPARTMENT OVERVIEW
-                    </span>
-
-                    <h3>
-                        Performance at a glance
-                    </h3>
-
-                    <p>
-                        A quick summary of your department's
-                        current feedback data.
-                    </p>
-
+                    <span class="section-label">DEPARTMENT OVERVIEW</span>
+                    <h3>Performance at a glance</h3>
+                    <p>A quick summary of your department's current feedback data.</p>
                 </div>
-
             </div>
-
 
             <div class="stats-grid">
 
-
                 <!-- TOTAL FACULTIES -->
-
                 <div class="stat-card">
-
                     <div class="stat-card-top">
-
-                        <span class="stat-icon">
-                            👨‍🏫
-                        </span>
-
-                        <span class="stat-status">
-                            Department
-                        </span>
-
+                        <span class="stat-icon">👨‍🏫</span>
+                        <span class="stat-status">Department</span>
                     </div>
-
-                    <span class="stat-label">
-                        Total Faculties
-                    </span>
-
-                    <strong id="total-faculties">
-                        0
-                    </strong>
-
+                    <span class="stat-label">Total Faculties</span>
+                    <strong id="total-faculties">0</strong>
                 </div>
-
-
 
                 <!-- TOTAL FEEDBACK -->
-
                 <div class="stat-card">
-
                     <div class="stat-card-top">
-
-                        <span class="stat-icon">
-                            💬
-                        </span>
-
-                        <span class="stat-status">
-                            Responses
-                        </span>
-
+                        <span class="stat-icon">💬</span>
+                        <span class="stat-status">Responses</span>
                     </div>
-
-                    <span class="stat-label">
-                        Total Feedback
-                    </span>
-
-                    <strong id="total-feedback">
-                        0
-                    </strong>
-
+                    <span class="stat-label">Total Feedback</span>
+                    <strong id="total-feedback">0</strong>
                 </div>
 
-
-
-                <!-- AVERAGE -->
-
+                <!-- AVERAGE RATING -->
                 <div class="stat-card highlight-stat">
-
                     <div class="stat-card-top">
-
-                        <span class="stat-icon">
-                            ⭐
-                        </span>
-
-                        <span class="stat-status">
-                            Overall
-                        </span>
-
+                        <span class="stat-icon">⭐</span>
+                        <span class="stat-status">Overall</span>
                     </div>
-
-                    <span class="stat-label">
-                        Department Average
-                    </span>
-
+                    <span class="stat-label">Department Average</span>
                     <div class="stat-number-row">
-
-                        <strong id="department-average">
-                            0.0
-                        </strong>
-
-                        <span>
-                            / 5
-                        </span>
-
+                        <strong id="department-average">0.0</strong>
+                        <span>/ 5</span>
                     </div>
-
                 </div>
 
-
-
-                <!-- FACULTY DATA -->
-
-                <div class="stat-card">
-
+                <!-- MISSING STUDENTS QUICK STAT -->
+                <div class="stat-card warning-stat" id="missing-stat-card">
                     <div class="stat-card-top">
+                        <span class="stat-icon">⚠️</span>
+                        <span class="stat-status">Pending</span>
+                    </div>
+                    <span class="stat-label">Students Not Submitted</span>
+                    <strong id="missing-count">--</strong>
+                </div>
 
-                        <span class="stat-icon">
-                            📊
-                        </span>
+            </div>
 
-                        <span class="stat-status">
-                            Active Data
-                        </span>
+        </section>
+
+
+        <!-- =================================================
+             TABS
+        ================================================== -->
+
+        <section class="tab-section">
+
+            <div class="tab-bar">
+
+                <button class="tab-btn active" data-tab="faculty-tab" type="button">
+                    👨‍🏫 Faculty Performance
+                </button>
+
+                <button class="tab-btn" data-tab="missing-tab" type="button">
+                    ⚠️ Missing Students
+                </button>
+
+                <button class="tab-btn" data-tab="cycles-tab" type="button">
+                    🔄 Feedback Cycles
+                </button>
+
+                <button class="tab-btn" data-tab="replies-tab" type="button">
+                    📨 Sent Messages
+                </button>
+
+            </div>
+
+
+            <!-- =============================================
+                 FACULTY PERFORMANCE TAB
+            ============================================== -->
+
+            <div id="faculty-tab" class="tab-panel active">
+
+                <!-- Filter -->
+                <div class="filter-row">
+
+                    <div class="filter-group">
+                        <label for="year-filter">Academic Year</label>
+                        <select id="year-filter">
+                            <option value="all">All Years</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="division-filter">Division</label>
+                        <select id="division-filter">
+                            <option value="all">All Divisions</option>
+                            <option value="A">Division A</option>
+                            <option value="B">Division B</option>
+                            <option value="C">Division C</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="rating-filter">Rating</label>
+                        <select id="rating-filter">
+                            <option value="all">All Ratings</option>
+                            <option value="high">High (≥ 4.0) 🟢</option>
+                            <option value="mid">Medium (2.5 – 3.9) 🟡</option>
+                            <option value="low">Low (< 2.5) 🔴</option>
+                        </select>
+                    </div>
+
+                    <span id="faculty-count" class="count-badge">0 Faculties</span>
+
+                </div>
+
+
+                <!-- Faculty list -->
+                <div id="faculty-list" class="faculty-list">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading faculty...</span>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 MISSING STUDENTS TAB
+            ============================================== -->
+
+            <div id="missing-tab" class="tab-panel">
+
+                <div class="missing-header">
+
+                    <div>
+                        <h3>Students Who Haven't Submitted Feedback</h3>
+                        <p>
+                            These students are enrolled in your department but have not
+                            submitted any feedback for the current active cycle.
+                        </p>
+                    </div>
+
+                    <button
+                        id="refresh-missing-btn"
+                        class="refresh-btn"
+                        type="button"
+                    >
+                        🔄 Refresh
+                    </button>
+
+                </div>
+
+                <!-- Progress bar -->
+                <div class="submission-progress" id="submission-progress" style="display:none">
+
+                    <div class="progress-labels">
+                        <span>Submitted: <strong id="submitted-count">0</strong></span>
+                        <span>Total: <strong id="total-students-count">0</strong></span>
+                    </div>
+
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progress-bar-fill" style="width:0%"></div>
+                    </div>
+
+                    <p class="progress-pct" id="progress-pct">0% submitted</p>
+
+                </div>
+
+                <!-- Missing students table -->
+                <div id="missing-list">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading students...</span>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 FEEDBACK CYCLES TAB
+            ============================================== -->
+
+            <div id="cycles-tab" class="tab-panel">
+
+                <div class="missing-header">
+                    <div>
+                        <h3>Feedback Cycle Management</h3>
+                        <p>Create, activate or end feedback cycles for your department.</p>
+                    </div>
+                    <button id="refresh-cycles-btn" class="refresh-btn" type="button">🔄 Refresh</button>
+                </div>
+
+                <!-- Create cycle form -->
+                <div class="hod-cycle-create-box">
+
+                    <h4>➕ Create New Cycle</h4>
+
+                    <div class="hod-cycle-form">
+
+                        <div class="filter-group">
+                            <label for="hod-cycle-name">Cycle Name</label>
+                            <input type="text" id="hod-cycle-name" placeholder="e.g. Semester 1 — 2026" maxlength="100">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="hod-cycle-start">Start Date</label>
+                            <input type="date" id="hod-cycle-start">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="hod-cycle-end">End Date</label>
+                            <input type="date" id="hod-cycle-end">
+                        </div>
+
+                        <button id="hod-create-cycle-btn" class="analysis-btn" type="button">
+                            Create Cycle
+                        </button>
 
                     </div>
 
-                    <span class="stat-label">
-                        Faculty Showing Data
-                    </span>
+                    <div id="hod-cycle-msg" style="display:none"></div>
 
-                    <strong id="faculty-with-feedback">
-                        0
-                    </strong>
+                </div>
 
+                <!-- Cycle list -->
+                <div id="cycles-list">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading cycles...</span>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 SENT MESSAGES TAB
+            ============================================== -->
+
+            <div id="replies-tab" class="tab-panel">
+
+                <div class="missing-header">
+                    <div>
+                        <h3>Auto-Reply Message History</h3>
+                        <p>All congratulation and improvement messages sent to faculty.</p>
+                    </div>
+                    <button id="refresh-replies-btn" class="refresh-btn" type="button">🔄 Refresh</button>
+                </div>
+
+                <div id="replies-list">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading messages...</span>
+                    </div>
                 </div>
 
             </div>
 
         </section>
-
-
-
-        <!-- =================================================
-             FILTER
-        ================================================== -->
-
-        <section class="dashboard-card filter-card">
-
-            <div class="section-heading">
-
-                <div>
-
-                    <span class="section-label">
-                        FILTER
-                    </span>
-
-                    <h3>
-                        Faculty Performance
-                    </h3>
-
-                    <p>
-                        Filter faculty members by academic year
-                        and division.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="filters">
-
-                <div class="filter-group">
-
-                    <label for="year-filter">
-                        Academic Year
-                    </label>
-
-                    <select id="year-filter">
-
-                        <option value="all">
-                            All Years
-                        </option>
-
-                        <option value="1">
-                            1st Year
-                        </option>
-
-                        <option value="2">
-                            2nd Year
-                        </option>
-
-                        <option value="3">
-                            3rd Year
-                        </option>
-
-                        <option value="4">
-                            4th Year
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="filter-group">
-
-                    <label for="division-filter">
-                        Division
-                    </label>
-
-                    <select id="division-filter">
-
-                        <option value="all">
-                            All Divisions
-                        </option>
-
-                        <option value="A">
-                            Division A
-                        </option>
-
-                        <option value="B">
-                            Division B
-                        </option>
-
-                        <option value="C">
-                            Division C
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             FACULTY DIRECTORY
-        ================================================== -->
-
-        <section class="dashboard-card faculty-section">
-
-            <div class="section-heading faculty-heading">
-
-                <div>
-
-                    <span class="section-label">
-                        FACULTY DIRECTORY
-                    </span>
-
-                    <h3>
-                        Faculty Performance
-                    </h3>
-
-                    <p>
-                        Review faculty members belonging to
-                        your department.
-                    </p>
-
-                </div>
-
-
-                <span
-                    id="faculty-count"
-                    class="count-badge"
-                >
-                    0 Faculties
-                </span>
-
-            </div>
-
-
-            <div
-                id="faculty-list"
-                class="faculty-list"
-            >
-
-                <div class="loading">
-
-                    <div class="loading-spinner"></div>
-
-                    <span>
-                        Loading faculty...
-                    </span>
-
-                </div>
-
-            </div>
-
-        </section>
-
 
 
         <!-- =================================================
@@ -454,63 +373,27 @@
 
         <section class="recognition-grid">
 
-
             <!-- TOP FACULTY -->
-
             <div class="performance-card best">
-
-                <div class="performance-icon">
-                    🏆
-                </div>
-
+                <div class="performance-icon">🏆</div>
                 <div class="performance-content">
-
-                    <span class="performance-label">
-                        TOP PERFORMING FACULTY
-                    </span>
-
-                    <h3 id="best-faculty-name">
-                        --
-                    </h3>
-
-                    <p id="best-faculty-rating">
-                        Rating: --
-                    </p>
-
+                    <span class="performance-label">TOP PERFORMING FACULTY</span>
+                    <h3 id="best-faculty-name">--</h3>
+                    <p id="best-faculty-rating">Rating: --</p>
                 </div>
-
             </div>
 
-
-
             <!-- LOWEST FACULTY -->
-
             <div class="performance-card lowest">
-
-                <div class="performance-icon">
-                    📌
-                </div>
-
+                <div class="performance-icon">📌</div>
                 <div class="performance-content">
-
-                    <span class="performance-label">
-                        REQUIRES ATTENTION
-                    </span>
-
-                    <h3 id="lowest-faculty-name">
-                        --
-                    </h3>
-
-                    <p id="lowest-faculty-rating">
-                        Rating: --
-                    </p>
-
+                    <span class="performance-label">REQUIRES ATTENTION</span>
+                    <h3 id="lowest-faculty-name">--</h3>
+                    <p id="lowest-faculty-rating">Rating: --</p>
                 </div>
-
             </div>
 
         </section>
-
 
 
         <!-- =================================================
@@ -521,41 +404,24 @@
 
             <div class="report-content">
 
-                <div class="report-icon">
-                    📄
-                </div>
+                <div class="report-icon">📄</div>
 
                 <div>
-
-                    <span class="section-label">
-                        REPORT CENTER
-                    </span>
-
-                    <h3>
-                        Reports & Recognition
-                    </h3>
-
+                    <span class="section-label">REPORT CENTER</span>
+                    <h3>Reports &amp; Recognition</h3>
                     <p>
-                        Generate department reports, faculty
-                        performance reports, appreciation
-                        letters and improvement letters.
+                        Generate department reports, faculty performance reports,
+                        appreciation letters and improvement letters.
                     </p>
-
                 </div>
 
             </div>
 
-
-            <a
-                href="/dashboard/hod-reports.html"
-                class="primary-btn"
-            >
-                Open Reports
-                <span>→</span>
+            <a href="/dashboard/hod-reports.html" class="primary-btn">
+                Open Reports <span>→</span>
             </a>
 
         </section>
-
 
 
         <!-- =================================================
@@ -563,29 +429,46 @@
         ================================================== -->
 
         <section class="privacy-card">
-
-            <div class="privacy-icon">
-                🔒
-            </div>
-
+            <div class="privacy-icon">🔒</div>
             <div>
-
-                <strong>
-                    Anonymous Feedback Protected
-                </strong>
-
+                <strong>Anonymous Feedback Protected</strong>
                 <p>
-                    This dashboard displays aggregated feedback
-                    only. Individual student identities are
-                    never displayed.
+                    This dashboard displays aggregated feedback only.
+                    Individual student identities are never displayed
+                    outside the Missing Students section.
                 </p>
-
             </div>
-
         </section>
 
-    </main>
 
+        <!-- =================================================
+             AUTO-REPLY MODAL
+        ================================================== -->
+
+        <div id="reply-modal" class="modal-overlay" style="display:none">
+
+            <div class="modal-box">
+
+                <button id="modal-close-btn" class="modal-close" type="button">✕</button>
+
+                <div id="modal-icon" class="modal-icon">📨</div>
+
+                <h3 id="modal-title">Message Preview</h3>
+
+                <div id="modal-to" class="modal-to"></div>
+
+                <textarea id="modal-message" class="modal-message" readonly></textarea>
+
+                <div class="modal-actions">
+                    <button id="modal-send-btn" class="send-btn" type="button">✅ Send Message</button>
+                    <button id="modal-cancel-btn" class="cancel-btn" type="button">Cancel</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
 
 
     <!-- =====================================================
@@ -593,22 +476,16 @@
     ====================================================== -->
 
     <footer>
-
-        <p>
-            © 2026 Anonymous Student Feedback System
-        </p>
-
+        <p>© 2026 Anonymous Student Feedback System</p>
     </footer>
-
 
 
     <!-- =====================================================
          SCRIPTS
     ====================================================== -->
 
-    <script src="/js/darkmode.js"></script>
-
-    <script src="/js/hod-dashboard.js"></script>
+    <script src="/js/darkmode.js?v=2"></script>
+    <script src="/js/hod-dashboard.js?v=5"></script>
 
 </body>
 
