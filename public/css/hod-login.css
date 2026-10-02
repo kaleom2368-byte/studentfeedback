@@ -97,17 +97,8 @@ body{
    LIGHT BACKGROUND
 ========================= */
 
-body{
-
-    background:
-    linear-gradient(
-        135deg,
-        #dbeafe,
-        #eff6ff,
-        #ffffff
-    );
-
-}
+body { background: linear-gradient(135deg, #f8fafc, #eff6ff); }
+body.dark { background: linear-gradient(135deg, #1e3a8a, #0f172a); }
 
 
 /* =========================
@@ -536,11 +527,7 @@ main{
     padding:15px;
 
     background:
-    linear-gradient(
-        135deg,
-        #2563eb,
-        #1d4ed8
-    );
+    linear-gradient(135deg, #1e3a8a, #0f172a);
 
     color:white;
 
@@ -808,12 +795,7 @@ footer{
 body.dark{
 
     background:
-    linear-gradient(
-        135deg,
-        #0f172a,
-        #111827,
-        #1e293b
-    );
+    linear-gradient(135deg, #1e3a8a, #0f172a);
 
     color:#f8fafc;
 

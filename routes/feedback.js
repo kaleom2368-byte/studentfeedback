@@ -89,6 +89,18 @@ router.get("/status", async (req, res) => {
     const studentId = req.session.student.student_id;
 
     try {
+        // Get the active cycle first
+        const activeCycle = await getActiveCycle();
+
+        if (!activeCycle) {
+            return res.json({
+                success: true,
+                count: 0,
+                history: [],
+            });
+        }
+
+        // Only return submissions for the CURRENT active cycle
         const result = await db.query(
             `
             SELECT
@@ -102,9 +114,10 @@ router.get("/status", async (req, res) => {
             LEFT JOIN faculty f
                 ON fs.faculty_id = f.faculty_id
             WHERE fs.student_id = $1
+              AND fs.cycle_id = $2
             ORDER BY fs.submitted_at DESC
             `,
-            [studentId]
+            [studentId, activeCycle.id]
         );
 
         return res.json({
@@ -371,49 +384,14 @@ router.post("/submit-all", async (req, res) => {
             // GET SUBJECT REQUIREMENT
             // =============================================
 
-            const requirementSql = `
-                SELECT
-                    requirement
-                FROM subject_requirements
-                WHERE LOWER(TRIM(subject)) =
-                      LOWER(TRIM($1))
-                LIMIT 1
-            `;
-
-            const requirementResult =
-                await client.query(
-                    requirementSql,
-                    [facultySubject]
-                );
-
-            if (requirementResult.rows.length === 0) {
-                throw new Error(
-                    `No feedback requirement configured for ${facultySubject}`
-                );
-            }
-
-            const requirement =
-                requirementResult.rows[0].requirement;
-
             // =============================================
             // DETERMINE FORM TYPE
             // =============================================
 
-            let formType;
-
-            if (requirement === "theory") {
-                formType = "theory";
-            } else if (requirement === "combined") {
-                formType = "combined";
-            } else if (requirement === "other") {
-                throw new Error(
-                    `Subject "${facultySubject}" uses requirement "other", but the feedback table does not support this form type yet.`
-                );
-            } else {
-                throw new Error(
-                    `Invalid feedback requirement for ${facultySubject}`
-                );
-            }
+            // Defaulting all feedback forms to 'theory' for simplicity.
+            // In the future, if specific subjects need 'combined' or 'practical', 
+            // a subject_requirements table or column can be added.
+            let formType = "theory";
 
             // =============================================
             // VALIDATE ANSWERS
