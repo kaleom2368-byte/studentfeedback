@@ -995,34 +995,67 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function showAlreadySubmitted(message) {
-        if (!alreadySubmittedMessage) return;
+    if (!alreadySubmittedMessage) return;
 
-        alreadySubmittedMessage.style.display =
-            "flex";
+    // Show the confirmation message
+    alreadySubmittedMessage.style.display = "flex";
 
-        alreadySubmittedMessage.innerHTML = `
-            <div class="notice-icon">✅</div>
+    alreadySubmittedMessage.innerHTML = `
+        <div class="notice-icon">✅</div>
+        <div class="notice-content">
+            <h2>Feedback Already Submitted</h2>
+            <p>${message}</p>
+            <p>Thank you for your feedback! 🙏</p>
+        </div>
+    `;
 
-            <div class="notice-content">
-                <h2>Feedback Already Submitted</h2>
+    // Hide subject selection section
+    const subjectSection = document.querySelector(
+        ".subject-section, #subject-selection, #select-subjects"
+    );
 
-                <p>${message}</p>
-
-                <p>
-                    Thank you for your feedback! 🙏
-                </p>
-            </div>
-        `;
-
-        if (submitButton) {
-            submitButton.disabled = true;
-        }
-
-        subjectButtons.forEach((button) => {
-            button.disabled = true;
-        });
+    if (subjectSection) {
+        subjectSection.style.display = "none";
     }
 
+    // Hide subject selection controls
+    if (selectedContainer) {
+        selectedContainer.style.display = "none";
+    }
+
+    if (selectAllButton) {
+        selectAllButton.style.display = "none";
+    }
+
+    if (clearAllButton) {
+        clearAllButton.style.display = "none";
+    }
+
+    // Hide the feedback form
+    if (feedbackForm) {
+        feedbackForm.style.display = "none";
+    }
+
+    // Disable subject buttons and submission
+    subjectButtons.forEach((button) => {
+        button.disabled = true;
+    });
+
+    if (submitButton) {
+        submitButton.disabled = true;
+    }
+    // Hide the entire Select Subjects section
+const subjectHeading = [...document.querySelectorAll("h1, h2, h3, h4")]
+    .find(el => el.textContent.includes("Select Subjects"));
+
+if (subjectHeading) {
+    const subjectCard = subjectHeading.closest("section")
+        || subjectHeading.closest(".card")
+        || subjectHeading.parentElement.parentElement;
+
+    subjectCard.style.setProperty("display", "none", "important");
+}
+}
     // =========================================================
     // MESSAGE
     // =========================================================

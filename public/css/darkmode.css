@@ -378,3 +378,38 @@ body.dark header {
 body.dark section {
     background: transparent;
 }
+
+/* ==========================================
+   HOD DASHBOARD - FIX PENDING STUDENTS CARD
+   ========================================== */
+
+body.dark #missing-stat-card {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #475569 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Students Not Submitted label */
+body.dark #missing-stat-card .stat-label {
+    color: #cbd5e1 !important;
+}
+
+/* Pending student count */
+body.dark #missing-stat-card #missing-count {
+    color: #fbbf24 !important;
+}
+
+/* Pending badge */
+body.dark #missing-stat-card .stat-status {
+    background: #78350f !important;
+    color: #fde68a !important;
+    border-color: #92400e !important;
+}
+
+/* Warning icon background */
+body.dark #missing-stat-card .stat-icon {
+    background: #422006 !important;
+    color: #fbbf24 !important;
+}

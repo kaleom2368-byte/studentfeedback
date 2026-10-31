@@ -36,6 +36,261 @@
 .stat-mini .num{font-size:1.8rem;font-weight:800;color:#2563eb;}
 .stat-mini .lbl{font-size:0.78rem;color:#6b7280;font-weight:600;margin-top:0.2rem;}
 .reset-card{background:#fff3cd;border:1px solid #ffc107;border-radius:12px;padding:1.5rem;}
+/* ==========================================
+   ADMIN DASHBOARD — DARK MODE COLOR FIX
+   Add at the END of your existing CSS file
+   ========================================== */
+
+body.dark {
+    background: #0b1120 !important;
+    color: #e2e8f0 !important;
+    color-scheme: dark;
+}
+
+/* Main dashboard background */
+body.dark main,
+body.dark .main-content,
+body.dark .dashboard-container,
+body.dark .content-wrapper {
+    background-color: #0b1120 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Welcome card and section cards */
+body.dark .welcome-box,
+body.dark .section-card,
+body.dark .current-cycle-card,
+body.dark .create-cycle-card,
+body.dark .cycle-history-card,
+body.dark .create-box {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* FIX: Four white statistic cards */
+body.dark .stat-card,
+body.dark .stat-mini,
+body.dark .stat-box,
+body.dark .stats-card,
+body.dark .stat-item,
+body.dark .dashboard-stat,
+body.dark .stats-grid > div {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+
+/* Statistic numbers */
+body.dark .stat-card h2,
+body.dark .stat-card h3,
+body.dark .stat-mini .num,
+body.dark .stat-box h2,
+body.dark .stats-card h2,
+body.dark .stat-item h2,
+body.dark .dashboard-stat h2 {
+    color: #60a5fa !important;
+}
+
+/* Statistic labels */
+body.dark .stat-card p,
+body.dark .stat-mini .lbl,
+body.dark .stat-box p,
+body.dark .stats-card p,
+body.dark .stat-item p,
+body.dark .dashboard-stat p {
+    color: #cbd5e1 !important;
+}
+
+/* FIX: White tab bar */
+body.dark .tab-bar,
+body.dark .tabs,
+body.dark .tab-container,
+body.dark .nav-tabs,
+body.dark .admin-tabs {
+    background: #111827 !important;
+    border-color: #334155 !important;
+}
+
+/* Individual tabs */
+body.dark .tab-btn,
+body.dark .tab,
+body.dark .nav-tabs button,
+body.dark .admin-tabs button {
+    background: #111827 !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+/* Active tab */
+body.dark .tab-btn.active,
+body.dark .tab.active,
+body.dark .nav-tabs button.active,
+body.dark .admin-tabs button.active {
+    background: #1e293b !important;
+    color: #60a5fa !important;
+    border-bottom: 3px solid #3b82f6 !important;
+}
+
+/* Tab hover */
+body.dark .tab-btn:hover,
+body.dark .tab:hover,
+body.dark .nav-tabs button:hover,
+body.dark .admin-tabs button:hover {
+    background: #273449 !important;
+    color: #93c5fd !important;
+}
+
+/* Dashboard headings */
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4,
+body.dark .section-header h2 {
+    color: #f8fafc;
+}
+
+/* Secondary text */
+body.dark p,
+body.dark label,
+body.dark .section-header p {
+    color: #cbd5e1;
+}
+
+/* Header and navigation */
+body.dark header,
+body.dark nav,
+body.dark .navbar {
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Tables */
+body.dark table,
+body.dark .admin-table,
+body.dark .cycle-table {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+body.dark thead,
+body.dark thead tr,
+body.dark th {
+    background: #111827 !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+body.dark td,
+body.dark tbody tr {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+body.dark tbody tr:hover td {
+    background: #273449 !important;
+}
+
+/* Input fields and dropdowns */
+body.dark input,
+body.dark select,
+body.dark textarea {
+    background: #0f172a !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #475569 !important;
+}
+
+body.dark input::placeholder,
+body.dark textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Buttons */
+body.dark button {
+    color: #e2e8f0;
+}
+
+body.dark .submit-btn,
+body.dark .primary-btn {
+    background: #2563eb !important;
+    color: #ffffff !important;
+}
+
+/* Borders and separators */
+body.dark hr,
+body.dark .divider {
+    border-color: #334155}
+
+/* FIX: Password Reset section in dark mode */
+body.dark .reset-card,
+body.dark .password-reset-card,
+body.dark #reset-password-section {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #475569 !important;
+    box-shadow: none !important;
+}
+
+/* Password Reset heading */
+body.dark .reset-card h3,
+body.dark .password-reset-card h3,
+body.dark #reset-password-section h3 {
+    color: #f8fafc !important;
+}
+
+/* Description text */
+body.dark .reset-card p,
+body.dark .password-reset-card p,
+body.dark #reset-password-section p {
+    color: #94a3b8 !important;
+}
+
+/* Form labels */
+body.dark .reset-card label,
+body.dark .password-reset-card label,
+body.dark #reset-password-section label {
+    color: #cbd5e1 !important;
+}
+
+/* Dropdowns and input fields */
+body.dark .reset-card input,
+body.dark .reset-card select,
+body.dark .password-reset-card input,
+body.dark .password-reset-card select,
+body.dark #reset-password-section input,
+body.dark #reset-password-section select {
+    background: #0f172a !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #475569 !important;
+}
+
+/* Placeholder text */
+body.dark .reset-card input::placeholder,
+body.dark .password-reset-card input::placeholder,
+body.dark #reset-password-section input::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1;
+}
+
+/* Reset button */
+body.dark .reset-card button,
+body.dark .password-reset-card button,
+body.dark #reset-password-section button {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body.dark .reset-card button:hover,
+body.dark .password-reset-card button:hover,
+body.dark #reset-password-section button:hover {
+    background: #1d4ed8 !important;
+}
 </style>
 </head>
 <body>
@@ -176,6 +431,7 @@
         <div id="reset-pw-msg" style="display:none"></div>
       </div>
     </div>
+    
 
   </section>
 </main>
