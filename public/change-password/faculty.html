@@ -28,12 +28,13 @@ button[type=submit]:hover { opacity: 0.9; }
   <div id="error-box" class="error-box" style="display:none"></div>
   <form action="/faculty/change-password" method="POST">
     <label for="newPassword">New Password</label>
-    <input type="password" id="newPassword" name="newPassword" placeholder="At least 6 characters" minlength="6" required>
+    <input type="password" id="newPassword" name="newPassword" placeholder="6+ characters, including a symbol" minlength="6" pattern="(?=.*[^A-Za-z0-9\s]).{6,}" title="Use at least 6 characters and at least one special symbol, such as @, #, or !." autocomplete="new-password" required>
+    <p class="note" style="text-align:left;margin: -0.6rem 0 1rem;">Use at least 6 characters and include one special symbol (such as @, #, or !).</p>
     <label for="confirmPassword">Confirm Password</label>
-    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat password" minlength="6" required>
+    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat password" minlength="6" pattern="(?=.*[^A-Za-z0-9\s]).{6,}" title="Use at least 6 characters and at least one special symbol." autocomplete="new-password" required>
     <button type="submit">Set Password →</button>
   </form>
-  <p class="note">🔒 Your password is stored securely and never shown to anyone.</p>
+  <p class="note">🔒 Never share your password with anyone.</p>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {

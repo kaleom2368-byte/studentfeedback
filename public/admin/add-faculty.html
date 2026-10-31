@@ -1,203 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Add Faculty</title>
-
-<link rel="stylesheet" href="../css/add-faculty.css">
-
-<link rel="stylesheet" href="/css/darkmode.css">`n</head>
-
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Faculty</title>
+  <link rel="stylesheet" href="../css/add-faculty.css">
+  <link rel="stylesheet" href="/css/darkmode.css">
+</head>
 <body>
-
-
-<header>
-
-<button id="dark-mode-btn">
-?? Dark Mode
-</button>
-
-
-<h1>
-Anonymous Student Feedback System
-</h1>
-
-<p>
-Add Faculty Member
-</p>
-
-</header>
-
-
-
-<nav>
-
-<a href="admin-dashboard.html">
-Dashboard
-</a>
-
-<a href="#">
-Faculty List
-</a>
-
-<a href="../index.html">
-Logout
-</a>
-
-</nav>
-
-
-
-
-
-<main>
-
-
-<section class="form-box">
-
-
-<h2>
-Add New Faculty
-</h2>
-
-
-
-<form action="/admin/add-faculty" method="POST">
-
-
-
-<label>
-Faculty ID
-</label>
-
-<input 
-type="text"
-name="faculty_id"
-placeholder="Example: FAC001"
-required>
-
-
-
-<label>
-Faculty Name
-</label>
-
-<input 
-type="text"
-name="name"
-placeholder="Enter Faculty Name"
-required>
-
-
-
-<label>
-Email
-</label>
-
-<input 
-type="email"
-name="email"
-placeholder="faculty@gmail.com"
-required>
-
-
-
-<label>
-Password
-</label>
-
-<input 
-type="password"
-name="password"
-placeholder="Enter Password"
-required>
-
-
-
-
-<label>
-Department
-</label>
-
-
-<select name="department" required>
-
-
-<option value="">
-Select Department
-</option>
-
-
-<option>
-Computer Engineering
-</option>
-
-
-<option>
-Information Technology
-</option>
-
-
-<option>
-Mechanical Engineering
-</option>
-
-
-<option>
-Electrical Engineering
-</option>
-
-
-<option>
-Civil Engineering
-</option>
-
-
-</select>
-
-
-
-
-
-<button type="submit">
-
-Add Faculty
-
-</button>
-
-
-
-</form>
-
-
-
-</section>
-
-
-</main>
-
-
-
-
-<footer>
-
-<p>
-© 2026 Anonymous Student Feedback System
-</p>
-
-</footer>
-
-
-
-<script src="/js/darkmode.js"></script>`n</body>
-
+  <header>
+    <button id="dark-mode-btn" type="button">🌙 Dark Mode</button>
+    <h1>Anonymous Student Feedback System</h1>
+    <p>Add Faculty Member</p>
+  </header>
+
+  <nav>
+    <a href="/dashboard/admin-dashboard.html">Dashboard</a>
+    <a href="/dashboard/admin-dashboard.html">Faculty List</a>
+    <a href="/admin/logout">Logout</a>
+  </nav>
+
+  <main>
+    <section class="form-box">
+      <h2>Add New Faculty</h2>
+      <div id="faculty-create-msg" role="status" aria-live="polite" style="display:none"></div>
+      <form id="add-faculty-form">
+        <label for="faculty_id">Faculty ID</label>
+        <input type="text" id="faculty_id" name="faculty_id" placeholder="Example: FAC001" required>
+
+        <label for="name">Faculty Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter Faculty Name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="faculty@college.edu" required>
+
+        <label for="department">Department</label>
+        <select id="department" name="department" required>
+          <option value="">Select Department</option>
+          <option>Computer Engineering</option>
+          <option>Information Technology</option>
+          <option>Mechanical Engineering</option>
+          <option>Electrical Engineering</option>
+          <option>Civil Engineering</option>
+        </select>
+
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" name="subject" placeholder="Subject name and code" required>
+
+        <p class="note">The account is created with the default password <strong>pass@123</strong>. Faculty members must set a new password when they first log in.</p>
+        <button type="submit" id="add-faculty-btn">Add Faculty</button>
+      </form>
+    </section>
+  </main>
+
+  <footer><p>© 2026 Anonymous Student Feedback System</p></footer>
+  <script src="/js/darkmode.js"></script>
+  <script>
+    document.getElementById('add-faculty-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const button = document.getElementById('add-faculty-btn');
+      const message = document.getElementById('faculty-create-msg');
+      const payload = Object.fromEntries(new FormData(form).entries());
+
+      button.disabled = true;
+      button.textContent = 'Creating...';
+      message.style.display = 'none';
+
+      try {
+        const response = await fetch('/admin/create-faculty', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        message.textContent = result.message || (response.ok ? 'Faculty created.' : 'Unable to create faculty.');
+        message.style.display = 'block';
+        message.style.padding = '10px';
+        message.style.marginBottom = '16px';
+        message.style.borderRadius = '8px';
+        message.style.background = response.ok && result.success ? '#ecfdf5' : '#fef2f2';
+        message.style.color = response.ok && result.success ? '#065f46' : '#991b1b';
+        if (response.ok && result.success) form.reset();
+      } catch (error) {
+        message.textContent = 'Network error. Please try again.';
+        message.style.display = 'block';
+        message.style.padding = '10px';
+        message.style.marginBottom = '16px';
+        message.style.borderRadius = '8px';
+        message.style.background = '#fef2f2';
+        message.style.color = '#991b1b';
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Add Faculty';
+      }
+    });
+  </script>
+</body>
 </html>
-
-
-

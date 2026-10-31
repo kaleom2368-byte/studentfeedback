@@ -424,7 +424,8 @@ body.dark #reset-password-section button:hover {
           </div>
           <div class="form-field">
             <label>New Password</label>
-            <input type="password" id="reset-new-pw" placeholder="Min 6 characters">
+            <input type="password" id="reset-new-pw" placeholder="6+ characters, including a symbol" minlength="6" pattern="(?=.*[^A-Za-z0-9\s]).{6,}" title="Use at least 6 characters and at least one special symbol, such as @, #, or !.">
+            <small>At least 6 characters and one special symbol (such as @, #, or !).</small>
           </div>
         </div>
         <button class="submit-btn" id="reset-pw-btn" type="button">🔒 Reset Password</button>
@@ -437,6 +438,6 @@ body.dark #reset-password-section button:hover {
 </main>
 <footer><p>© 2026 Anonymous Student Feedback System</p></footer>
 <script src="/js/darkmode.js?v=2"></script>
-<script src="/js/admin-dashboard.js?v=5"></script>
+<script src="/js/admin-dashboard.js?v=6"></script>
 </body>
 </html>

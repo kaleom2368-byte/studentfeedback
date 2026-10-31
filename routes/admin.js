@@ -3,6 +3,7 @@ const crypto  = require("crypto");
 const router  = express.Router();
 const db      = require("../db");
 const requireAdmin = require("../middleware/require-admin");
+const { isValidPassword, PASSWORD_POLICY_MESSAGE } = require("../utils/password-policy");
 
 
 // =====================================================
@@ -317,8 +318,8 @@ router.post('/change-password', async (req, res) => {
     const { newPassword, confirmPassword } = req.body;
     if (!newPassword || newPassword !== confirmPassword)
         return res.redirect('/change-password/admin.html?error=Passwords+do+not+match');
-    if (newPassword.length < 6)
-        return res.redirect('/change-password/admin.html?error=Password+must+be+at+least+6+characters');
+    if (!isValidPassword(newPassword))
+        return res.redirect('/change-password/admin.html?error=' + encodeURIComponent(PASSWORD_POLICY_MESSAGE));
     try {
         await db.query(
             'UPDATE admin SET password=$1, must_change_password=FALSE WHERE id=$2',
@@ -346,23 +347,42 @@ router.get('/users', requireAdmin, async (req, res) => {
 
 // POST /admin/reset-password
 router.post('/reset-password', requireAdmin, async (req, res) => {
-    const { role, id, newPassword } = req.body;
-    if (!role || !id || !newPassword) return res.status(400).json({ success: false, message: 'role, id, and newPassword required' });
-    if (newPassword.length < 6) return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+    const { role, id, newPassword } = req.body || {};
+    if (!role || !id || !newPassword) {
+        return res.status(400).json({ success: false, message: 'role, id, and newPassword are required.' });
+    }
+    if (!isValidPassword(newPassword)) {
+        return res.status(400).json({ success: false, message: PASSWORD_POLICY_MESSAGE });
+    }
+
     try {
+        let result;
         if (role === 'student') {
-            await db.query('UPDATE students SET password=$1, must_change_password=FALSE WHERE student_id=$2', [newPassword, id]);
+            result = await db.query(
+                'UPDATE students SET password=$1, must_change_password=TRUE WHERE student_id=$2',
+                [newPassword, id]
+            );
         } else if (role === 'faculty') {
-            await db.query('UPDATE faculty SET password=$1, must_change_password=FALSE WHERE faculty_id=$2', [newPassword, id]);
+            result = await db.query(
+                'UPDATE faculty SET password=$1, must_change_password=TRUE WHERE faculty_id=$2',
+                [newPassword, id]
+            );
         } else if (role === 'hod') {
-            await db.query('UPDATE hod SET password=$1, must_change_password=FALSE WHERE hod_id=$2', [newPassword, id]);
+            result = await db.query(
+                'UPDATE hod SET password=$1, must_change_password=TRUE WHERE hod_id=$2',
+                [newPassword, id]
+            );
         } else {
-            return res.status(400).json({ success: false, message: 'Invalid role' });
+            return res.status(400).json({ success: false, message: 'Invalid role.' });
         }
-        return res.json({ success: true, message: `Password reset for ${role}: ${id}` });
+
+        if (!result.rowCount) {
+            return res.status(404).json({ success: false, message: `${role} account not found.` });
+        }
+        return res.json({ success: true, message: `Password reset for ${role}: ${id}. They must change it on next login.` });
     } catch (err) {
         console.error('Admin reset password error:', err);
-        return res.status(500).json({ success: false, message: 'Failed to reset password' });
+        return res.status(500).json({ success: false, message: 'Failed to reset password.' });
     }
 });
 
@@ -405,36 +425,88 @@ router.post('/create-faculty', requireAdmin, async (req, res) => {
 // ADMIN DELETION ROUTES
 // =====================================================
 
+async function runInTransaction(work) {
+    const client = await db.connect();
+    try {
+        await client.query('BEGIN');
+        const result = await work(client);
+        await client.query('COMMIT');
+        return result;
+    } catch (error) {
+        try { await client.query('ROLLBACK'); } catch (rollbackError) {
+            console.error('Admin delete rollback error:', rollbackError);
+        }
+        throw error;
+    } finally {
+        client.release();
+    }
+}
+
 // DELETE /admin/cycles/:id
 router.delete("/cycles/:id", requireAdmin, async (req, res) => {
     try {
-        await db.query('DELETE FROM feedback_cycles WHERE id = $1', [req.params.id]);
-        return res.json({ success: true, message: 'Cycle deleted successfully' });
+        const result = await db.query(
+            'DELETE FROM feedback_cycles WHERE id = $1 RETURNING id',
+            [req.params.id]
+        );
+        if (!result.rowCount) {
+            return res.status(404).json({ success: false, message: 'Feedback cycle not found.' });
+        }
+        return res.json({ success: true, message: 'Cycle deleted successfully.' });
     } catch (err) {
         console.error('Delete cycle error:', err);
-        return res.status(500).json({ success: false, message: 'Failed to delete cycle' });
+        const message = err.code === '23503'
+            ? 'This cycle is still used by feedback records. Remove those records first.'
+            : 'Failed to delete cycle.';
+        return res.status(500).json({ success: false, message });
     }
 });
 
 // DELETE /admin/students/:id
 router.delete("/students/:id", requireAdmin, async (req, res) => {
+    const studentId = req.params.id;
     try {
-        await db.query('DELETE FROM students WHERE student_id = $1', [req.params.id]);
-        return res.json({ success: true, message: 'Student deleted successfully' });
+        const deleted = await runInTransaction(async client => {
+            // Participation records identify who submitted, but do not contain feedback answers.
+            await client.query('DELETE FROM feedback_submissions WHERE student_id = $1', [studentId]);
+            return client.query(
+                'DELETE FROM students WHERE student_id = $1 RETURNING student_id',
+                [studentId]
+            );
+        });
+
+        if (!deleted.rowCount) {
+            return res.status(404).json({ success: false, message: 'Student not found.' });
+        }
+        return res.json({ success: true, message: 'Student and related participation records deleted successfully.' });
     } catch (err) {
         console.error('Delete student error:', err);
-        return res.status(500).json({ success: false, message: 'Failed to delete student' });
+        return res.status(500).json({ success: false, message: 'Failed to delete student. Related database records may prevent deletion.' });
     }
 });
 
 // DELETE /admin/faculty/:id
 router.delete("/faculty/:id", requireAdmin, async (req, res) => {
+    const facultyId = req.params.id;
     try {
-        await db.query('DELETE FROM faculty WHERE faculty_id = $1', [req.params.id]);
-        return res.json({ success: true, message: 'Faculty deleted successfully' });
+        const deleted = await runInTransaction(async client => {
+            // Remove records attached to this faculty member before deleting the account.
+            await client.query('DELETE FROM feedback_submissions WHERE faculty_id = $1', [facultyId]);
+            await client.query('DELETE FROM feedback WHERE faculty_id = $1', [facultyId]);
+            await client.query('DELETE FROM hod_messages WHERE faculty_id = $1', [facultyId]);
+            return client.query(
+                'DELETE FROM faculty WHERE faculty_id = $1 RETURNING faculty_id',
+                [facultyId]
+            );
+        });
+
+        if (!deleted.rowCount) {
+            return res.status(404).json({ success: false, message: 'Faculty member not found.' });
+        }
+        return res.json({ success: true, message: 'Faculty member and related feedback records deleted successfully.' });
     } catch (err) {
         console.error('Delete faculty error:', err);
-        return res.status(500).json({ success: false, message: 'Failed to delete faculty' });
+        return res.status(500).json({ success: false, message: 'Failed to delete faculty. Related database records may prevent deletion.' });
     }
 });
 
