@@ -618,7 +618,6 @@ textarea {
 /* =========================================================
    PROGRESS
    ========================================================= */
-
 .progress-card {
     padding: 20px 23px;
     margin-bottom: 25px;
@@ -628,67 +627,53 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 20px;
-
     margin-bottom: 13px;
 }
 
 .progress-header h3 {
     margin-bottom: 3px;
-
     color: #312e81;
-
     font-size: 15px;
     font-weight: 700;
 }
 
 .progress-header p {
     color: #64748b;
-
     font-size: 11px;
 }
 
 #progress-percent {
-    color: #6d28d9;
-
+    color: #278EF5;
     font-size: 17px;
     font-weight: 700;
-
     white-space: nowrap;
 }
 
 .progress-bar {
     width: 100%;
     height: 9px;
-
     overflow: hidden;
-
     border-radius: 999px;
-
-    background: #ede9fe;
+    background: #EAF3FF;
 }
 
 .progress-fill {
     width: 0%;
     height: 100%;
-
     border-radius: inherit;
 
-    background:
-        linear-gradient(278EF5);
+    /* Light blue progress fill */
+    background: linear-gradient(90deg, #278EF5, #63B3FF);
 
-    box-shadow:
-        0 0 10px rgba(29, 78, 216, 0.15);
+    box-shadow: 0 0 10px rgba(39, 142, 245, 0.25);
 
     transition: width 0.25s ease;
 }
 
 #subject-progress-text {
     margin-top: 10px;
-
     color: #64748b;
-
     font-size: 11px;
 }
 
