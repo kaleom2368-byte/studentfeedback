@@ -514,3 +514,93 @@ RESPONSIVE
 }
 
 }
+
+/* Homepage hero text contrast fix */
+body:not(.dark) .hero .logo h1,
+body:not(.dark) .hero .logo p {
+    color: #ffffff !important;
+}
+
+body:not(.dark) .hero .hero-content h2 {
+    color: #173b70 !important;
+    text-shadow: none !important;
+}
+
+body:not(.dark) .hero .hero-content p {
+    color: #334155 !important;
+}
+
+/* Keep the hero background light */
+body:not(.dark) .hero {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe) !important;
+}
+
+/* Make the underline below Select Your Portal visible */
+body:not(.dark) .portal-section h2::after {
+    background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+}
+
+/* ========================================
+   HOMEPAGE HERO - FINAL COLOR FIX
+   ======================================== */
+
+/* Stronger light-blue hero background */
+body:not(.dark) .hero {
+    background: linear-gradient(
+        135deg,
+        #bfdbfe 0%,
+        #93c5fd 50%,
+        #dbeafe 100%
+    ) !important;
+}
+
+/* Force the main site title to dark blue */
+body:not(.dark) .hero h1,
+body:not(.dark) .hero .logo h1,
+body:not(.dark) .hero .hero-title,
+body:not(.dark) header h1,
+body:not(.dark) .hero-content h1 {
+    color: #12346b !important;
+    -webkit-text-fill-color: #12346b !important;
+    text-shadow: none !important;
+}
+
+/* Header subtitle */
+body:not(.dark) .hero .logo p,
+body:not(.dark) header p {
+    color: #1e3a5f !important;
+    -webkit-text-fill-color: #1e3a5f !important;
+}
+
+/* Main hero heading */
+body:not(.dark) .hero h2,
+body:not(.dark) .hero-content h2 {
+    color: #12346b !important;
+    -webkit-text-fill-color: #12346b !important;
+    text-shadow: none !important;
+}
+
+/* Main description */
+body:not(.dark) .hero-content p,
+body:not(.dark) .hero .subtitle {
+    color: #243b53 !important;
+    -webkit-text-fill-color: #243b53 !important;
+    text-shadow: none !important;
+}
+
+/* Portal area */
+body:not(.dark) .portal-section,
+body:not(.dark) #portals,
+body:not(.dark) .portals-section {
+    background: #eff6ff !important;
+}
+
+/* Keep portal heading readable */
+body:not(.dark) .portal-section h2,
+body:not(.dark) #portals h2,
+body:not(.dark) .portals-section h2 {
+    color: #12346b !important;
+    -webkit-text-fill-color: #12346b !important;
+}
+
+/* Dark mode remains unchanged */
