@@ -33,6 +33,7 @@ function getFeedbackAverage(responses) {
 const router = express.Router();
 
 const db = require("../db");
+const { isValidPassword, PASSWORD_POLICY_MESSAGE } = require("../utils/password-policy");
 
 
 // =====================================================
@@ -840,8 +841,8 @@ router.post('/change-password', async (req, res) => {
     const { newPassword, confirmPassword } = req.body;
     if (!newPassword || newPassword !== confirmPassword)
         return res.redirect('/change-password/hod.html?error=Passwords+do+not+match');
-    if (newPassword.length < 6)
-        return res.redirect('/change-password/hod.html?error=Password+must+be+at+least+6+characters');
+    if (!isValidPassword(newPassword))
+        return res.redirect('/change-password/hod.html?error=' + encodeURIComponent(PASSWORD_POLICY_MESSAGE));
     try {
         await db.query(
             'UPDATE hod SET password=$1, must_change_password=FALSE WHERE hod_id=$2',
@@ -874,7 +875,7 @@ router.post('/reset-password', async (req, res) => {
     const department = req.session.hod.department;
     const { role, id, newPassword } = req.body;
     if (!role || !id || !newPassword) return res.status(400).json({ success: false, message: 'role, id, newPassword required' });
-    if (newPassword.length < 6) return res.status(400).json({ success: false, message: 'Password min 6 characters' });
+    if (!isValidPassword(newPassword)) return res.status(400).json({ success: false, message: PASSWORD_POLICY_MESSAGE });
     try {
         if (role === 'student') {
             const check = await db.query('SELECT student_id FROM students WHERE student_id=$1 AND LOWER(TRIM(department))=LOWER(TRIM($2))', [id, department]);

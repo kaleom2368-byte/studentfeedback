@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const db = require("../db");
+const { isValidPassword, PASSWORD_POLICY_MESSAGE } = require("../utils/password-policy");
 
 // =====================================================
 // STUDENT LOGIN
@@ -149,8 +150,8 @@ router.post("/change-password", async (req, res) => {
     const { newPassword, confirmPassword } = req.body;
     if (!newPassword || newPassword !== confirmPassword)
         return res.redirect('/change-password/student.html?error=Passwords+do+not+match');
-    if (newPassword.length < 6)
-        return res.redirect('/change-password/student.html?error=Password+must+be+at+least+6+characters');
+    if (!isValidPassword(newPassword))
+        return res.redirect('/change-password/student.html?error=' + encodeURIComponent(PASSWORD_POLICY_MESSAGE));
     try {
         await db.query(
             'UPDATE students SET password=$1, must_change_password=FALSE WHERE student_id=$2',

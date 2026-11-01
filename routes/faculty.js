@@ -3,6 +3,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { isValidPassword, PASSWORD_POLICY_MESSAGE } = require("../utils/password-policy");
 
 const PARAMETERS = [
     "course_satisfaction",
@@ -222,7 +223,8 @@ router.post("/login", async (req, res) => {
                 email,
                 password,
                 department,
-                subject
+                subject,
+                must_change_password
             FROM faculty
             WHERE faculty_id = $1
               AND LOWER(TRIM(department)) =
@@ -251,6 +253,7 @@ router.post("/login", async (req, res) => {
             department: faculty.department,
             subject: faculty.subject || ""
         };
+        req.session.mustChangePassword = !!faculty.must_change_password;
 
         req.session.save(error => {
             if (error) {
@@ -258,14 +261,73 @@ router.post("/login", async (req, res) => {
                 return res.status(500).send("Session Error");
             }
 
-            res.redirect(
-                "/dashboard/faculty-dashboard.html"
-            );
+            if (faculty.must_change_password) {
+                return res.redirect("/change-password/faculty.html");
+            }
+
+            return res.redirect("/dashboard/faculty-dashboard.html");
         });
 
     } catch (error) {
         console.error("Faculty login error:", error);
         res.status(500).send("Database Error");
+    }
+});
+
+/* =========================================================
+   CHANGE PASSWORD (first login / reset password)
+========================================================= */
+
+router.post("/change-password", async (req, res) => {
+    if (!req.session?.faculty?.faculty_id) {
+        return res.redirect("/auth/faculty.html");
+    }
+
+    const { newPassword, confirmPassword } = req.body || {};
+
+    if (!newPassword || newPassword !== confirmPassword) {
+        return res.redirect(
+            "/change-password/faculty.html?error=" +
+            encodeURIComponent("Passwords do not match.")
+        );
+    }
+
+    if (!isValidPassword(newPassword)) {
+        return res.redirect(
+            "/change-password/faculty.html?error=" +
+            encodeURIComponent(PASSWORD_POLICY_MESSAGE)
+        );
+    }
+
+    try {
+        const result = await db.query(
+            `UPDATE faculty
+             SET password = $1, must_change_password = FALSE
+             WHERE faculty_id = $2`,
+            [newPassword, req.session.faculty.faculty_id]
+        );
+
+        if (!result.rowCount) {
+            return res.redirect(
+                "/auth/faculty.html?error=" +
+                encodeURIComponent("Faculty account was not found.")
+            );
+        }
+
+        req.session.mustChangePassword = false;
+        return req.session.save(error => {
+            if (error) {
+                console.error("Faculty password session save error:", error);
+                return res.status(500).send("Unable to save session.");
+            }
+            return res.redirect("/dashboard/faculty-dashboard.html");
+        });
+    } catch (error) {
+        console.error("Faculty change-password error:", error);
+        return res.redirect(
+            "/change-password/faculty.html?error=" +
+            encodeURIComponent("Failed to change password. Please try again.")
+        );
     }
 });
 

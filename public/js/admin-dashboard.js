@@ -157,8 +157,11 @@ function renderStudentsTable(students) {
   if (!wrapper) return;
   if (students.length === 0) { wrapper.innerHTML = '<p>No students found.</p>'; return; }
   wrapper.innerHTML = `<table class="admin-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Dept</th><th>Year</th><th>Div</th><th>Action</th></tr></thead><tbody id="student-tbody">${
-    students.map(s => `<tr><td>${escHTML(s.student_id)}</td><td>${escHTML(s.name)}</td><td>${escHTML(s.email)}</td><td>${escHTML(s.department)}</td><td>${escHTML(String(s.year))}</td><td>${escHTML(s.division)}</td><td><button style="padding:4px 8px;background:#ef4444;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem" onclick="deleteStudent('${s.student_id}', '${escHTML(s.name)}')">Delete</button></td></tr>`).join('')
+    students.map(s => `<tr><td>${escHTML(s.student_id)}</td><td>${escHTML(s.name)}</td><td>${escHTML(s.email)}</td><td>${escHTML(s.department)}</td><td>${escHTML(String(s.year))}</td><td>${escHTML(s.division)}</td><td><button type="button" data-delete-student="${escHTML(s.student_id)}" data-name="${escHTML(s.name)}" style="padding:4px 8px;background:#ef4444;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">Delete</button></td></tr>`).join('')
   }</tbody></table><p style="font-size:0.8rem;color:#9ca3af;margin-top:0.5rem">${students.length} students</p>`;
+  wrapper.querySelectorAll('[data-delete-student]').forEach(button => {
+    button.addEventListener('click', () => window.deleteStudent(button.dataset.deleteStudent, button.dataset.name));
+  });
 }
 
 function renderFacultyTable(faculty) {
@@ -166,8 +169,11 @@ function renderFacultyTable(faculty) {
   if (!wrapper) return;
   if (faculty.length === 0) { wrapper.innerHTML = '<p>No faculty found.</p>'; return; }
   wrapper.innerHTML = `<table class="admin-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Dept</th><th>Subject</th><th>Action</th></tr></thead><tbody id="faculty-tbody">${
-    faculty.map(f => `<tr><td>${escHTML(f.faculty_id)}</td><td>${escHTML(f.name)}</td><td>${escHTML(f.email)}</td><td>${escHTML(f.department)}</td><td>${escHTML(f.subject || '--')}</td><td><button style="padding:4px 8px;background:#ef4444;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem" onclick="deleteFaculty('${f.faculty_id}', '${escHTML(f.name)}')">Delete</button></td></tr>`).join('')
+    faculty.map(f => `<tr><td>${escHTML(f.faculty_id)}</td><td>${escHTML(f.name)}</td><td>${escHTML(f.email)}</td><td>${escHTML(f.department)}</td><td>${escHTML(f.subject || '--')}</td><td><button type="button" data-delete-faculty="${escHTML(f.faculty_id)}" data-name="${escHTML(f.name)}" style="padding:4px 8px;background:#ef4444;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">Delete</button></td></tr>`).join('')
   }</tbody></table><p style="font-size:0.8rem;color:#9ca3af;margin-top:0.5rem">${faculty.length} faculty members</p>`;
+  wrapper.querySelectorAll('[data-delete-faculty]').forEach(button => {
+    button.addEventListener('click', () => window.deleteFaculty(button.dataset.deleteFaculty, button.dataset.name));
+  });
 }
 
 // --- CREATE STUDENT ---
@@ -251,7 +257,7 @@ function setupResetPassword() {
     const id = document.getElementById('reset-user-id')?.value.trim();
     const newPassword = document.getElementById('reset-new-pw')?.value;
     if (!role || !id || !newPassword) { showMsg('reset-pw-msg', 'Please fill all fields.', 'error'); return; }
-    if (newPassword.length < 6) { showMsg('reset-pw-msg', 'Password must be at least 6 characters.', 'error'); return; }
+    if (newPassword.length < 6 || !/[^A-Za-z0-9\s]/.test(newPassword)) { showMsg('reset-pw-msg', 'Password must be at least 6 characters and include at least one special symbol (@, #, !, etc.).', 'error'); return; }
     if (!confirm(`Reset password for ${role}: ${id}?`)) return;
     btn.disabled = true; btn.textContent = 'Resetting…';
     try {
@@ -317,9 +323,9 @@ window.deleteCycle = async function(id, name) {
 window.deleteStudent = async function(id, name) {
     if (!confirm(`Delete student "${name}" (${id}) permanently?`)) return;
     try {
-        const res = await fetch(`/admin/students/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+        const res = await fetch(`/admin/students/${encodeURIComponent(id)}`, { method: 'DELETE', credentials: 'same-origin' });
         const data = await res.json();
-        if (data.success) { alert('Deleted student successfully'); loadUsers(); }
+        if (res.ok && data.success) { alert(data.message || 'Deleted student successfully.'); loadUsers(); }
         else alert(data.message || 'Failed to delete.');
     } catch { alert('Network error.'); }
 };
@@ -327,9 +333,9 @@ window.deleteStudent = async function(id, name) {
 window.deleteFaculty = async function(id, name) {
     if (!confirm(`Delete faculty "${name}" (${id}) permanently?`)) return;
     try {
-        const res = await fetch(`/admin/faculty/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+        const res = await fetch(`/admin/faculty/${encodeURIComponent(id)}`, { method: 'DELETE', credentials: 'same-origin' });
         const data = await res.json();
-        if (data.success) { alert('Deleted faculty successfully'); loadUsers(); }
+        if (res.ok && data.success) { alert(data.message || 'Deleted faculty successfully.'); loadUsers(); }
         else alert(data.message || 'Failed to delete.');
     } catch { alert('Network error.'); }
 };
